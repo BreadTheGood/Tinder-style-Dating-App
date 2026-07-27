@@ -1,0 +1,10 @@
+{
+  "description": "Connect with potential matches through swiping, messaging, and profile customization in a user-friendly dating app designed for meaningful relationships.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
