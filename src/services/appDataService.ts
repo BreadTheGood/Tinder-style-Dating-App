@@ -44,7 +44,7 @@ export const mockAppDataService: AppDataService = {
     await wait(300)
     return currentUser
   },
-  async recordSwipe(targetId, action) {
+  async recordSwipe(_targetId, action) {
     await wait(300)
     return action === 'like' && Math.random() > 0.4
   },
