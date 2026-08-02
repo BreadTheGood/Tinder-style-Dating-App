@@ -7,7 +7,7 @@ export function ProfileScreen({ user, onSettings }: { user: UserProfile; onSetti
   return (
     <div className="flex flex-col h-full overflow-y-auto" style={{ background: '#0d0d0f' }}>
       <div className="relative h-80 flex-shrink-0">
-        <img src={me.images[0]} alt={me.name} className="w-full h-full object-cover" />
+        <img src={me.images?.[0] || 'https://via.placeholder.com/600x700?text=Sin+Foto'} alt={me.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0d0d0f 0%, transparent 60%)' }} />
         <button onClick={onSettings} className="absolute top-12 right-4 w-10 h-10 glass rounded-full flex items-center justify-center">
           <SettingsIcon size={18} className="text-white/70" />
@@ -19,7 +19,7 @@ export function ProfileScreen({ user, onSettings }: { user: UserProfile; onSetti
       </div>
 
       <div className="mx-5 mt-4 grid grid-cols-3 gap-3">
-        {me.stats.map((s) => (
+        {(me.stats || []).map((s) => (
           <div key={s.label} className="glass rounded-2xl py-4 text-center">
             <div className="gradient-brand-text font-extrabold text-2xl">{s.value}</div>
             <div className="text-white/40 text-xs font-semibold mt-0.5">{s.label}</div>
@@ -35,7 +35,7 @@ export function ProfileScreen({ user, onSettings }: { user: UserProfile; onSetti
       <div className="mx-5 mt-4 glass rounded-2xl p-4 mb-4">
         <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Intereses</p>
         <div className="flex flex-wrap gap-2">
-          {me.tags.map((t) => (
+          {(me.tags || []).map((t) => (
             <span key={t} className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(255,62,108,0.15)', color: '#ff6b8a', border: '1px solid rgba(255,62,108,0.2)' }}>
               {t}
             </span>
