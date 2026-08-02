@@ -151,5 +151,41 @@ export const supabaseAppDataService: AppDataService = {
       return false
     }
     return true
+  },
+
+  async uploadPhoto(file: File) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+
+    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).single()
+    if (!myProfile) return false
+
+    const ext = file.name.split('.').pop()
+    const filename = `${myProfile.id}/${Math.random().toString(36).substring(2)}.${ext}`
+
+    const { error: uploadError } = await supabase.storage.from('photos').upload(filename, file)
+    if (uploadError) {
+      console.error('Error uploading:', uploadError)
+      return false
+    }
+
+    const { data: { publicUrl } } = supabase.storage.from('photos').getPublicUrl(filename)
+
+    const { count } = await supabase.from('Photos').select('*', { count: 'exact', head: true }).eq('profile_id', myProfile.id)
+    const sortOrder = count ? count + 1 : 1
+
+    const { error: insertError } = await supabase.from('Photos').insert({
+      profile_id: myProfile.id,
+      photo_url: publicUrl,
+      sort_order: sortOrder,
+      is_main: sortOrder === 1
+    })
+
+    if (insertError) {
+      console.error('Error saving photo record:', insertError)
+      return false
+    }
+
+    return publicUrl
   }
 }

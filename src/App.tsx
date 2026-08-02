@@ -47,8 +47,13 @@ export default function App() {
         }
         
         if (mounted) {
-          setScreen('swipe')
-          setNavTab('swipe')
+          if (snapshot.currentUser && snapshot.currentUser.images.length === 0) {
+            setScreen('edit_profile')
+            setNavTab('profile')
+          } else {
+            setScreen('swipe')
+            setNavTab('swipe')
+          }
         }
       } else {
         snapshot = await loadAppData(mockAppDataService)
@@ -67,10 +72,23 @@ export default function App() {
     hydrate()
     
     // Listen for auth changes (like login or logout)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        setScreen('swipe')
-        setNavTab('swipe')
+        // Fetch to see if they need onboarding
+        const snap = await loadAppData(supabaseAppDataService).catch(() => null)
+        if (snap) {
+          setProfiles(snap.profiles)
+          setConversations(snap.conversations)
+          setCurrentUser(snap.currentUser)
+
+          if (snap.currentUser && snap.currentUser.images.length === 0) {
+            setScreen('edit_profile')
+            setNavTab('profile')
+          } else {
+            setScreen('swipe')
+            setNavTab('swipe')
+          }
+        }
       } else {
         setScreen('login')
       }
