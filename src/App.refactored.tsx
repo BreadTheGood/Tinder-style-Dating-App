@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { BottomNav } from './components/BottomNav'
+import { INITIAL_CONVERSATIONS } from './data/mockData'
 import { ChatScreen } from './screens/ChatScreen'
 import { LoginScreen } from './screens/LoginScreen'
 import { MatchModal } from './screens/MatchModal'
@@ -7,38 +8,14 @@ import { MessagesScreen } from './screens/MessagesScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { SwipeScreen } from './screens/SwipeScreen'
-import { loadAppData, mockAppDataService } from './services/appDataService'
-import type { Conversation, Profile, Screen, UserProfile } from './types'
+import type { Conversation, Profile, Screen } from './types'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('login')
   const [navTab, setNavTab] = useState<'swipe' | 'messages' | 'profile'>('swipe')
   const [matchedProfile, setMatchedProfile] = useState<Profile | null>(null)
-  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [conversations, setConversations] = useState<Conversation[]>(INITIAL_CONVERSATIONS)
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null)
-  const [profiles, setProfiles] = useState<Profile[]>([])
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    let mounted = true
-
-    const hydrate = async () => {
-      setIsLoading(true)
-      const snapshot = await loadAppData(mockAppDataService)
-      if (!mounted) return
-      setProfiles(snapshot.profiles)
-      setConversations(snapshot.conversations)
-      setCurrentUser(snapshot.currentUser)
-      setIsLoading(false)
-    }
-
-    hydrate()
-
-    return () => {
-      mounted = false
-    }
-  }, [])
 
   const totalUnread = conversations.reduce((s, c) => s + c.unread, 0)
 
@@ -74,7 +51,15 @@ export default function App() {
       case 'login':
         return <LoginScreen onLogin={() => { setNavTab('swipe'); go('swipe') }} />
       case 'swipe':
-        return <SwipeScreen onMatch={handleMatch} conversations={conversations} setConversations={setConversations} profiles={profiles} isLoading={isLoading} />
+        return (
+          <SwipeScreen
+            onMatch={handleMatch}
+            conversations={conversations}
+            setConversations={setConversations}
+            profiles={conversations.map((c) => c.profile)}
+            isLoading={false}
+          />
+        )
       case 'messages':
         return <MessagesScreen conversations={conversations} onOpenChat={handleOpenChat} />
       case 'chat':
@@ -89,7 +74,7 @@ export default function App() {
           />
         ) : null
       case 'profile':
-        return currentUser ? <ProfileScreen user={currentUser} onSettings={() => go('settings')} /> : null
+        return <ProfileScreen user={conversations[0]?.profile ?? ({} as any)} onSettings={() => go('settings')} />
       case 'settings':
         return <SettingsScreen onBack={() => { go('profile'); setNavTab('profile') }} />
       default:
@@ -100,14 +85,6 @@ export default function App() {
   return (
     <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#050507' }}>
       <div className="relative w-full max-w-[390px] h-full max-h-[844px] overflow-hidden" style={{ background: '#0d0d0f' }}>
-        {isLoading && screen === 'swipe' ? (
-          <div className="absolute inset-0 z-40 flex items-center justify-center" style={{ background: 'rgba(5,5,7,0.8)' }}>
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-center backdrop-blur-xl">
-              <div className="mx-auto mb-3 h-10 w-10 rounded-full border-2 border-[#f304eb] border-t-transparent animate-spin" />
-              <p className="text-sm font-semibold text-white/70">Cargando experiencia…</p>
-            </div>
-          </div>
-        ) : null}
         {renderScreen()}
 
         {showNav && <BottomNav active={navTab} onChange={handleNavChange} unread={totalUnread} />}
