@@ -14,7 +14,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const handleAuth = async () => {
     if (mode === 'login' || mode === 'register') {
       setLoading(true)
-      setErrorMsg('')
+      setErrorMsg('Las contraseñas no coinciden')
       
       if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
