@@ -60,7 +60,12 @@ export default function App() {
           }
         }
       } else {
-        snapshot = await loadAppData(mockAppDataService)
+        const mockSnap = await loadAppData(mockAppDataService)
+        snapshot = {
+          profiles: mockSnap.profiles,
+          conversations: mockSnap.conversations,
+          currentUser: null as any,
+        }
         if (mounted) {
           setScreen('login')
         }
@@ -79,7 +84,10 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
         // Fetch to see if they need onboarding
-        const snap = await loadAppData(supabaseAppDataService).catch(() => null)
+        const snap = await loadAppData(supabaseAppDataService).catch((err) => {
+          console.error("Auth state change fetch error:", err)
+          return null
+        })
         if (snap) {
           setProfiles(snap.profiles)
           setConversations(snap.conversations)
@@ -136,7 +144,7 @@ export default function App() {
   const renderScreen = () => {
     switch (screen) {
       case 'login':
-        return <LoginScreen onLogin={() => { setNavTab('swipe'); go('swipe') }} />
+        return <LoginScreen onLogin={() => setIsLoading(true)} />
       case 'swipe':
         return <SwipeScreen onMatch={handleMatch} conversations={conversations} setConversations={setConversations} profiles={profiles} isLoading={isLoading} />
       case 'messages':
