@@ -37,5 +37,5 @@ export interface UserProfile {
   bio: string
   images: string[]
   tags: string[]
-  stats: Array<{ label: string; value: string }>
+  stats?: Array<{ label: string; value: string }>
 }
