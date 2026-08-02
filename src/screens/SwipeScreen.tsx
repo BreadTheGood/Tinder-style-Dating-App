@@ -2,6 +2,7 @@ import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { FireIcon, HeartIcon, StarIcon, XIcon } from '../components/icons'
 import { SwipeCard } from '../components/SwipeCard'
 import type { Conversation, Profile } from '../types'
+import { supabaseAppDataService } from '../services/supabaseAppDataService'
 
 export function SwipeScreen({ onMatch, setConversations, profiles, isLoading }: { onMatch: (p: Profile) => void; conversations: Conversation[]; setConversations: Dispatch<SetStateAction<Conversation[]>>; profiles: Profile[]; isLoading: boolean }) {
   const [queue, setQueue] = useState<Profile[]>([])
@@ -15,10 +16,11 @@ export function SwipeScreen({ onMatch, setConversations, profiles, isLoading }: 
     if (animating) return
     setAnimating(true)
     const liked = queue[0]
-    setTimeout(() => {
-      setQueue((q) => q.slice(1))
-      setAnimating(false)
-      if (Math.random() > 0.4) {
+
+    // Registra en Supabase de forma asíncrona
+    supabaseAppDataService.recordSwipe?.(liked.id, 'like').then(isMatch => {
+      // Si la base de datos dice que es match o tenemos suerte (para pruebas)
+      if (isMatch || Math.random() > 0.5) {
         onMatch(liked)
         setConversations((c) => [{
           profile: liked,
@@ -26,12 +28,21 @@ export function SwipeScreen({ onMatch, setConversations, profiles, isLoading }: 
           messages: [{ id: 1, text: `Hola! Soy ${liked.name} 👋 ¡Hacemos buen match!`, from: 'them', time: 'Ahora' }],
         }, ...c])
       }
+    })
+
+    setTimeout(() => {
+      setQueue((q) => q.slice(1))
+      setAnimating(false)
     }, 400)
   }
 
   const handleDislike = () => {
     if (animating) return
     setAnimating(true)
+    const disliked = queue[0]
+
+    supabaseAppDataService.recordSwipe?.(disliked.id, 'pass')
+
     setTimeout(() => {
       setQueue((q) => q.slice(1))
       setAnimating(false)

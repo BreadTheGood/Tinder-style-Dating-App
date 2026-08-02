@@ -1,7 +1,7 @@
 import { SettingsIcon } from '../components/icons'
 import type { UserProfile } from '../types'
 
-export function ProfileScreen({ user, onSettings }: { user: UserProfile; onSettings: () => void }) {
+export function ProfileScreen({ user, onSettings, onEdit }: { user: UserProfile; onSettings: () => void; onEdit: () => void }) {
   const me = user
 
   return (
@@ -47,7 +47,7 @@ export function ProfileScreen({ user, onSettings }: { user: UserProfile; onSetti
       </div>
 
       <div className="mx-5 mb-28">
-        <button className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all active:scale-95 glass">Editar perfil</button>
+        <button onClick={onEdit} className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all active:scale-95 glass">Editar perfil</button>
       </div>
     </div>
   )

@@ -5,6 +5,7 @@ import { LoginScreen } from './screens/LoginScreen'
 import { MatchModal } from './screens/MatchModal'
 import { MessagesScreen } from './screens/MessagesScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
+import { EditProfileScreen } from './screens/EditProfileScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { SwipeScreen } from './screens/SwipeScreen'
 import { loadAppData, mockAppDataService } from './services/appDataService'
@@ -130,7 +131,23 @@ export default function App() {
           />
         ) : null
       case 'profile':
-        return currentUser ? <ProfileScreen user={currentUser} onSettings={() => go('settings')} /> : null
+        return currentUser ? <ProfileScreen user={currentUser} onSettings={() => go('settings')} onEdit={() => go('edit_profile')} /> : null
+      case 'edit_profile':
+        return currentUser ? (
+          <EditProfileScreen
+            user={currentUser}
+            onBack={() => go('profile')}
+            onSave={async (data) => {
+              const { data: { session } } = await supabase.auth.getSession()
+              const service = session ? supabaseAppDataService : mockAppDataService
+              const success = await service.updateProfile?.(data)
+              if (success) {
+                setCurrentUser((prev) => (prev ? { ...prev, ...data } : prev))
+                go('profile')
+              }
+            }}
+          />
+        ) : null
       case 'settings':
         return <SettingsScreen onBack={() => { go('profile'); setNavTab('profile') }} />
       default:

@@ -7,6 +7,8 @@ export interface AppDataService {
   getProfiles: () => Promise<Profile[]>
   getConversations: () => Promise<Conversation[]>
   getCurrentUser: () => Promise<UserProfile>
+  recordSwipe?: (targetId: string | number, action: 'like' | 'pass') => Promise<boolean>
+  updateProfile?: (data: Partial<UserProfile>) => Promise<boolean>
 }
 
 export interface AppDataSnapshot {
@@ -41,6 +43,15 @@ export const mockAppDataService: AppDataService = {
   async getCurrentUser() {
     await wait(300)
     return currentUser
+  },
+  async recordSwipe(targetId, action) {
+    await wait(300)
+    return action === 'like' && Math.random() > 0.4
+  },
+  async updateProfile(data) {
+    await wait(500)
+    Object.assign(currentUser, data)
+    return true
   },
 }
 

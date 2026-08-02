@@ -100,4 +100,56 @@ export const supabaseAppDataService: AppDataService = {
       stats: [{ label: 'Likes', value: '0' }, { label: 'Matches', value: '0' }, { label: 'Visitas', value: '0' }],
     }
   },
+
+  async recordSwipe(targetId, action) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+
+    // Use our own profile ID to swipe
+    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).single()
+    if (!myProfile) return false
+
+    const { error } = await supabase.from('Swipes').insert({
+      swiper_id: myProfile.id,
+      swiped_id: targetId,
+      action: action,
+      created_at: new Date().toISOString()
+    })
+
+    if (error) {
+      console.error('Error saving swipe:', error)
+      return false
+    }
+
+    if (action === 'like') {
+      const { data: match } = await supabase.from('Swipes')
+        .select('*')
+        .eq('swiper_id', targetId)
+        .eq('swiped_id', myProfile.id)
+        .eq('action', 'like')
+        .maybeSingle()
+
+      if (match) return true
+    }
+    return false
+  },
+
+  async updateProfile(data) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+
+    const { error } = await supabase
+      .from('Profiles')
+      .update({
+        bio: data.bio,
+        name: data.name
+      })
+      .eq('user_id', user.id)
+
+    if (error) {
+      console.error('Error updating profile:', error)
+      return false
+    }
+    return true
+  }
 }
