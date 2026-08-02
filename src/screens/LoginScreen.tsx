@@ -14,7 +14,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const handleAuth = async () => {
     if (mode === 'login' || mode === 'register') {
       setLoading(true)
-      setErrorMsg('Las contraseñas no coinciden')
+      setErrorMsg('Credenciales incorrectas, por favor verifica tu email y contraseña.')
       
       if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -31,7 +31,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
         }
         const { error } = await supabase.auth.signUp({ email, password })
         if (error) {
-          setErrorMsg(error.message)
+          setErrorMsg('Las contraseñas no coinciden')
           setLoading(false)
           return
         }
