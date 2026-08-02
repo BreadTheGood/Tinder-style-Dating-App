@@ -8,7 +8,9 @@ import { ProfileScreen } from './screens/ProfileScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { SwipeScreen } from './screens/SwipeScreen'
 import { loadAppData, mockAppDataService } from './services/appDataService'
+import { supabaseAppDataService } from './services/supabaseAppDataService'
 import type { Conversation, Profile, Screen, UserProfile } from './types'
+import { supabase } from './lib/supabase'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('login')
@@ -25,7 +27,35 @@ export default function App() {
 
     const hydrate = async () => {
       setIsLoading(true)
-      const snapshot = await loadAppData(mockAppDataService)
+      
+      // Check current session first
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      let snapshot;
+      if (session) {
+        try {
+          snapshot = await loadAppData(supabaseAppDataService)
+          // Fallback to mock profiles if the database is currently empty so the UI doesn't look blank
+          if (snapshot.profiles.length === 0) {
+            const mockSnap = await loadAppData(mockAppDataService)
+            snapshot.profiles = mockSnap.profiles
+          }
+        } catch (error) {
+          console.error("Error loading Supabase data, falling back to mock", error)
+          snapshot = await loadAppData(mockAppDataService)
+        }
+        
+        if (mounted) {
+          setScreen('swipe')
+          setNavTab('swipe')
+        }
+      } else {
+        snapshot = await loadAppData(mockAppDataService)
+        if (mounted) {
+          setScreen('login')
+        }
+      }
+      
       if (!mounted) return
       setProfiles(snapshot.profiles)
       setConversations(snapshot.conversations)
@@ -34,9 +64,20 @@ export default function App() {
     }
 
     hydrate()
+    
+    // Listen for auth changes (like login or logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setScreen('swipe')
+        setNavTab('swipe')
+      } else {
+        setScreen('login')
+      }
+    })
 
     return () => {
       mounted = false
+      subscription.unsubscribe()
     }
   }, [])
 

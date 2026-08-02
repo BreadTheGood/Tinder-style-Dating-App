@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { BackIcon, FireIcon } from '../components/icons'
+import { supabase } from '../lib/supabase'
 
 export function SettingsScreen({ onBack }: { onBack: () => void }) {
   const [ageRange, setAgeRange] = useState([22, 35])
@@ -110,7 +111,7 @@ export function SettingsScreen({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
-        <button className="w-full py-4 rounded-xl font-bold text-[#f304eb] text-sm glass">Cerrar sesión</button>
+        <button onClick={() => supabase.auth.signOut()} className="w-full py-4 rounded-xl font-bold text-[#f304eb] text-sm glass">Cerrar sesión</button>
       </div>
     </div>
   )

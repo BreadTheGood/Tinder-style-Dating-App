@@ -1,7 +1,7 @@
 export type Screen = 'login' | 'swipe' | 'match' | 'messages' | 'chat' | 'profile' | 'settings'
 
 export interface Profile {
-  id: number
+  id: string | number
   name: string
   age: number
   bio: string
@@ -15,7 +15,7 @@ export interface Profile {
 }
 
 export interface Message {
-  id: number
+  id: string | number
   text: string
   from: 'me' | 'them'
   time: string
@@ -30,7 +30,7 @@ export interface Conversation {
 }
 
 export interface UserProfile {
-  id: number
+  id: string | number
   name: string
   age: number
   job: string
