@@ -17,7 +17,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
       setErrorMsg('')
       
       if (mode === 'login') {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) {
           setErrorMsg(error.message)
           setLoading(false)
@@ -29,7 +29,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
           setLoading(false)
           return
         }
-        const { data, error } = await supabase.auth.signUp({ email, password })
+        const { error } = await supabase.auth.signUp({ email, password })
         if (error) {
           setErrorMsg(error.message)
           setLoading(false)

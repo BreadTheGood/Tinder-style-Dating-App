@@ -3,7 +3,7 @@ import { FireIcon, HeartIcon, StarIcon, XIcon } from '../components/icons'
 import { SwipeCard } from '../components/SwipeCard'
 import type { Conversation, Profile } from '../types'
 
-export function SwipeScreen({ onMatch, conversations, setConversations, profiles, isLoading }: { onMatch: (p: Profile) => void; conversations: Conversation[]; setConversations: Dispatch<SetStateAction<Conversation[]>>; profiles: Profile[]; isLoading: boolean }) {
+export function SwipeScreen({ onMatch, setConversations, profiles, isLoading }: { onMatch: (p: Profile) => void; conversations: Conversation[]; setConversations: Dispatch<SetStateAction<Conversation[]>>; profiles: Profile[]; isLoading: boolean }) {
   const [queue, setQueue] = useState<Profile[]>([])
   const [animating, setAnimating] = useState(false)
 

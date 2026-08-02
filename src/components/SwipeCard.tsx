@@ -1,5 +1,5 @@
 import { useRef, useState, type PointerEvent, type CSSProperties } from 'react'
-import { HeartIcon, LocationIcon, XIcon } from './icons'
+import { LocationIcon } from './icons'
 import type { Profile } from '../types'
 
 export function SwipeCard({
