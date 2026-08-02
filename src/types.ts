@@ -1,4 +1,4 @@
-export type Screen = 'login' | 'swipe' | 'match' | 'messages' | 'chat' | 'profile' | 'settings' | 'edit_profile'
+export type Screen = 'login' | 'swipe' | 'match' | 'messages' | 'chat' | 'profile' | 'settings' | 'edit_profile' | 'onboarding'
 
 export interface Profile {
   id: string | number
@@ -37,5 +37,7 @@ export interface UserProfile {
   bio: string
   images: string[]
   tags: string[]
+  gender?: string
+  birthdate?: string
   stats?: Array<{ label: string; value: string }>
 }

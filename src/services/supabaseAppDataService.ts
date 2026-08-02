@@ -138,12 +138,15 @@ export const supabaseAppDataService: AppDataService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return false
 
+    const updateData: any = {}
+    if (data.bio !== undefined) updateData.bio = data.bio
+    if (data.name !== undefined) updateData.name = data.name
+    if (data.gender !== undefined) updateData.gender = data.gender
+    if (data.birthdate !== undefined) updateData.birthdate = data.birthdate
+
     const { error } = await supabase
       .from('Profiles')
-      .update({
-        bio: data.bio,
-        name: data.name
-      })
+      .update(updateData)
       .eq('user_id', user.id)
 
     if (error) {

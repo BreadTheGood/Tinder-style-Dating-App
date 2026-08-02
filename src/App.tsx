@@ -6,6 +6,7 @@ import { MatchModal } from './screens/MatchModal'
 import { MessagesScreen } from './screens/MessagesScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
 import { EditProfileScreen } from './screens/EditProfileScreen'
+import { OnboardingScreen } from './screens/OnboardingScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { SwipeScreen } from './screens/SwipeScreen'
 import { loadAppData, mockAppDataService } from './services/appDataService'
@@ -42,8 +43,11 @@ export default function App() {
             snapshot.profiles = mockSnap.profiles
           }
         } catch (error) {
-          console.error("Error loading Supabase data, falling back to mock", error)
-          snapshot = await loadAppData(mockAppDataService)
+          console.error("Error loading Supabase data, logging out", error)
+          await supabase.auth.signOut()
+          setScreen('login')
+          setIsLoading(false)
+          return
         }
         
         if (mounted) {
@@ -127,7 +131,7 @@ export default function App() {
     go(s)
   }
 
-  const showNav = screen !== 'login' && screen !== 'chat' && screen !== 'settings'
+  const showNav = screen !== 'login' && screen !== 'chat' && screen !== 'settings' && screen !== 'onboarding'
 
   const renderScreen = () => {
     switch (screen) {
@@ -162,6 +166,22 @@ export default function App() {
               if (success) {
                 setCurrentUser((prev) => (prev ? { ...prev, ...data } : prev))
                 go('profile')
+              }
+            }}
+          />
+        ) : null
+      case 'onboarding':
+        return currentUser ? (
+          <OnboardingScreen
+            user={currentUser}
+            onComplete={async (data) => {
+              const { data: { session } } = await supabase.auth.getSession()
+              const service = session ? supabaseAppDataService : mockAppDataService
+              const success = await service.updateProfile?.(data)
+              if (success) {
+                setCurrentUser((prev) => (prev ? { ...prev, ...data } : prev))
+                setScreen('swipe')
+                setNavTab('swipe')
               }
             }}
           />
