@@ -1,4 +1,3 @@
-import { SettingsIcon } from '../components/icons'
 import type { UserProfile } from '../types'
 import { supabase } from '../lib/supabase'
 
