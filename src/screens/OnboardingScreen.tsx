@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react'
 import type { UserProfile } from '../types'
-import { supabaseAppDataService } from '../services/supabaseAppDataService'
 import { PhotoEditor } from '../components/PhotoEditor'
 
 const AVAILABLE_TAGS = ['Música', 'Deportes', 'Cine', 'Viajes', 'Lectura', 'Arte', 'Cocina', 'Fotografía', 'Videojuegos', 'Naturaleza', 'Mascotas', 'Fiesta']
@@ -39,6 +38,15 @@ export function OnboardingScreen({
     setEditingPhoto(null)
     const url = URL.createObjectURL(croppedFile)
     setLocalImages(prev => [...prev, { url, file: croppedFile }])
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const url = URL.createObjectURL(file)
+      setEditingPhoto(url)
+    }
+    e.target.value = '' // Reset input so same file can be chosen again
   }
 
   const handleNext = async () => {
