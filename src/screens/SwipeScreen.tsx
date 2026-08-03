@@ -19,13 +19,15 @@ export function SwipeScreen({ onMatch, setConversations, profiles, isLoading }: 
 
     // Registra en Supabase de forma asíncrona
     supabaseAppDataService.recordSwipe?.(liked.id, 'like').then(isMatch => {
-      // Si la base de datos dice que es match o tenemos suerte (para pruebas)
-      if (isMatch || Math.random() > 0.5) {
+      // Si la base de datos dice que es match
+      if (isMatch) {
         onMatch(liked)
+        // Agregamos la conversacion localmente. No tenemos el match_id aquí fácilmente,
+        // pero se arreglará cuando recarguen o podemos mejorarlo luego con real-time Matches.
         setConversations((c) => [{
           profile: liked,
-          unread: 1,
-          messages: [{ id: 1, text: `Hola! Soy ${liked.name} 👋 ¡Hacemos buen match!`, from: 'them', time: 'Ahora' }],
+          unread: 0,
+          messages: [],
         }, ...c])
       }
     })

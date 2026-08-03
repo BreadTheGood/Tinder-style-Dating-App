@@ -278,7 +278,7 @@ export default function App() {
 
         {showNav && <BottomNav active={navTab} onChange={handleNavChange} unread={totalUnread} />}
 
-        {matchedProfile && <MatchModal profile={matchedProfile} onClose={() => setMatchedProfile(null)} onMessage={handleMatchMessage} />}
+        {matchedProfile && currentUser && <MatchModal profile={matchedProfile} currentUser={currentUser} onClose={() => setMatchedProfile(null)} onMessage={handleMatchMessage} />}
       </div>
     </div>
   )

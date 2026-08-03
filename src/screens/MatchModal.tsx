@@ -1,8 +1,8 @@
 import { type CSSProperties } from 'react'
 import { HeartIcon } from '../components/icons'
-import type { Profile } from '../types'
+import type { Profile, UserProfile } from '../types'
 
-export function MatchModal({ profile, onClose, onMessage }: { profile: Profile; onClose: () => void; onMessage: () => void }) {
+export function MatchModal({ profile, currentUser, onClose, onMessage }: { profile: Profile; currentUser: UserProfile; onClose: () => void; onMessage: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
       <div className="animate-fade-in w-full max-w-sm text-center">
@@ -22,7 +22,7 @@ export function MatchModal({ profile, onClose, onMessage }: { profile: Profile; 
 
           <div className="flex items-center justify-center gap-4 mb-8">
             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 shadow-xl">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&auto=format" alt="Tú" className="w-full h-full object-cover" />
+              <img src={currentUser?.images?.[0] || 'https://via.placeholder.com/200'} alt="Tú" className="w-full h-full object-cover" />
             </div>
             <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-lg">
               <HeartIcon filled size={14} className="text-white" />
