@@ -69,9 +69,6 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
               {t}
             </span>
           ))}
-          <button className="px-3 py-1.5 rounded-full text-xs font-semibold text-white/40" style={{ background: 'rgba(255,255,255,0.05)', border: '1px dashed rgba(255,255,255,0.15)' }}>
-            + Agregar
-          </button>
         </div>
       </div>
 
