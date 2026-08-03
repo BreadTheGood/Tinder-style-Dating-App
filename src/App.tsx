@@ -227,14 +227,6 @@ export default function App() {
   return (
     <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#050507' }}>
       <div className="relative w-full max-w-[390px] h-full max-h-[844px] overflow-hidden" style={{ background: '#0d0d0f' }}>
-        {isLoading && screen === 'swipe' ? (
-          <div className="absolute inset-0 z-40 flex items-center justify-center" style={{ background: 'rgba(5,5,7,0.8)' }}>
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-center backdrop-blur-xl">
-              <div className="mx-auto mb-3 h-10 w-10 rounded-full border-2 border-[#f304eb] border-t-transparent animate-spin" />
-              <p className="text-sm font-semibold text-white/70">Cargando experiencia…</p>
-            </div>
-          </div>
-        ) : null}
         {renderScreen()}
 
         {showNav && <BottomNav active={navTab} onChange={handleNavChange} unread={totalUnread} />}
