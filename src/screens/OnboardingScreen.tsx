@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import type { UserProfile } from '../types'
 import { PhotoEditor } from '../components/PhotoEditor'
+import { DatePicker } from '../components/DatePicker'
 
 const AVAILABLE_TAGS = ['Música', 'Deportes', 'Cine', 'Viajes', 'Lectura', 'Arte', 'Cocina', 'Fotografía', 'Videojuegos', 'Naturaleza', 'Mascotas', 'Fiesta']
 
@@ -100,8 +101,8 @@ export function OnboardingScreen({
               <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[#f304eb] transition-colors" placeholder="¿Cómo te llamas?" />
             </div>
             <div>
-              <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Fecha de nacimiento</label>
-              <input type="date" value={birthdate} onChange={e => setBirthdate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[#f304eb] [color-scheme:dark]" />
+              <label className="text-white/60 text-sm font-medium">Fecha de Nacimiento</label>
+              <DatePicker value={birthdate} onChange={setBirthdate} />
             </div>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Género</label>
