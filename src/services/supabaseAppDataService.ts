@@ -150,7 +150,7 @@ export const supabaseAppDataService: AppDataService = {
             bio: '¡Bienvenido! Pronto podrás editar tu perfil.',
             images: [],
             tags: [],
-            stats: [{ label: 'Likes', value: '0' }, { label: 'Matches', value: '0' }, { label: 'Visitas', value: '0' }]
+            stats: [{ label: 'Likes', value: '0' }, { label: 'Matches', value: '0' }]
         }
     }
 
@@ -163,6 +163,15 @@ export const supabaseAppDataService: AppDataService = {
         age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25))
     }
 
+    const { count: likesCount } = await supabase.from('Swipes')
+      .select('*', { count: 'exact', head: true })
+      .eq('swiped_on_id', data.id)
+      .eq('swipe_type', 'like');
+
+    const { count: matchesCount } = await supabase.from('Matches')
+      .select('*', { count: 'exact', head: true })
+      .or(`profile1_id.eq.${data.id},profile2_id.eq.${data.id}`);
+
     return {
       id: data.id,
       name: data.name || '',
@@ -173,7 +182,10 @@ export const supabaseAppDataService: AppDataService = {
       bio: data.bio || '',
       images,
       tags: data.tags || [],
-      stats: [{ label: 'Likes', value: '0' }, { label: 'Matches', value: '0' }, { label: 'Visitas', value: '0' }],
+      stats: [
+        { label: 'Likes', value: String(likesCount || 0) }, 
+        { label: 'Matches', value: String(matchesCount || 0) }
+      ],
     }
   },
 
