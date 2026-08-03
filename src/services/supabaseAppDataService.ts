@@ -139,16 +139,33 @@ export const supabaseAppDataService: AppDataService = {
     if (!user) return false
 
     // Ensure profile exists
-    let { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).single()
+    let { data: myProfile, error: fetchErr } = await supabase.from('Profiles').select('*').eq('user_id', user.id).maybeSingle()
+    
+    if (fetchErr) {
+      console.error("Error fetching profile:", fetchErr)
+    }
+
     if (!myProfile) {
       const newProfile = {
         id: crypto.randomUUID(),
         user_id: user.id,
-        name: '',
-        bio: '',
-        gender: 'other'
+        name: data.name || '',
+        bio: data.bio || '',
+        gender: data.gender || 'other',
+        birthdate: data.birthdate || null,
+        tags: data.tags || []
       }
-      await supabase.from('Profiles').insert(newProfile)
+      const { error: insertErr, data: inserted } = await supabase.from('Profiles').insert(newProfile).select()
+      if (insertErr) {
+        console.error('Error insertando perfil:', insertErr)
+        alert('Error en base de datos (Insert): ' + insertErr.message + '\nPor favor dile al desarrollador que agregue permisos (RLS) de INSERT a la tabla Profiles.')
+        return false
+      }
+      if (!inserted || inserted.length === 0) {
+        alert('Insert silenciosamente falló. Problemas de RLS.')
+        return false
+      }
+      return true
     }
 
     const updateData: any = {}
@@ -158,15 +175,24 @@ export const supabaseAppDataService: AppDataService = {
     if (data.birthdate !== undefined) updateData.birthdate = data.birthdate
     if (data.tags !== undefined) updateData.tags = data.tags
 
-    const { error } = await supabase
+    const { error: updateErr, data: updated } = await supabase
       .from('Profiles')
       .update(updateData)
       .eq('user_id', user.id)
+      .select()
 
-    if (error) {
-      console.error('Error updating profile:', error)
+    if (updateErr) {
+      console.error('Error updating profile:', updateErr)
+      alert('Error en base de datos (Update): ' + updateErr.message)
       return false
     }
+    
+    if (!updated || updated.length === 0) {
+      console.error('Update falló silenciosamente, probable bloqueo RLS')
+      alert('Tus datos no se guardaron debido a políticas de seguridad (RLS) en Supabase. Dile al desarrollador que agregue una política de UPDATE a la tabla Profiles.')
+      return false
+    }
+    
     return true
   },
 
@@ -174,7 +200,7 @@ export const supabaseAppDataService: AppDataService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return false
 
-    let { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).single()
+    let { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
     if (!myProfile) {
       const newProfile = {
         id: crypto.randomUUID(),
@@ -183,12 +209,15 @@ export const supabaseAppDataService: AppDataService = {
         bio: '',
         gender: 'other'
       }
-      const { error: createError } = await supabase.from('Profiles').insert(newProfile)
+      const { error: createError, data: inserted } = await supabase.from('Profiles').insert(newProfile).select()
       if (createError) {
         console.error('Error creando tu perfil base: ' + createError.message)
         throw new Error('Error de Perfil: ' + createError.message)
       }
-      myProfile = { id: newProfile.id }
+      if (!inserted || inserted.length === 0) {
+        throw new Error('Error de Perfil: Fallo silencioso al insertar por políticas de seguridad (RLS).')
+      }
+      myProfile = { id: inserted[0].id }
     }
 
     const ext = file.name.split('.').pop()
