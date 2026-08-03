@@ -169,6 +169,7 @@ export const supabaseAppDataService: AppDataService = {
     const { error: uploadError } = await supabase.storage.from('photos').upload(filename, file)
     if (uploadError) {
       console.error('Error uploading:', uploadError)
+      alert('Error de Storage: ' + uploadError.message)
       return false
     }
 
@@ -178,6 +179,7 @@ export const supabaseAppDataService: AppDataService = {
     const sortOrder = count ? count + 1 : 1
 
     const { error: insertError } = await supabase.from('Photos').insert({
+      id: crypto.randomUUID(), // Por si el ID no se autogenera en BD
       profile_id: myProfile.id,
       photo_url: publicUrl,
       sort_order: sortOrder,
@@ -186,6 +188,7 @@ export const supabaseAppDataService: AppDataService = {
 
     if (insertError) {
       console.error('Error saving photo record:', insertError)
+      alert('Error guardando en BD: ' + insertError.message)
       return false
     }
 
