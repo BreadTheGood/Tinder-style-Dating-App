@@ -13,11 +13,67 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   const [newRole, setNewRole] = useState('event_manager')
   const [creating, setCreating] = useState(false)
 
+  const [eventsList, setEventsList] = useState<any[]>([])
+  const [showEventForm, setShowEventForm] = useState(false)
+  const [newEventName, setNewEventName] = useState('')
+  const [newEventDesc, setNewEventDesc] = useState('')
+  const [newEventDate, setNewEventDate] = useState('')
+  const [savingEvent, setSavingEvent] = useState(false)
+
   useEffect(() => {
     if (activeTab === 'managers' && isAdmin) {
       loadManagers()
+    } else if (activeTab === 'events') {
+      loadEvents()
     }
   }, [activeTab])
+
+  const loadEvents = async () => {
+    setLoading(true)
+    // Admins see all events, managers see only theirs
+    let query = supabase.from('Events').select('*').order('start_datetime', { ascending: false })
+    if (!isAdmin) {
+       query = query.eq('manager_id', manager.id)
+    }
+    const { data } = await query
+    if (data) setEventsList(data)
+    setLoading(false)
+  }
+
+  const handleCreateEvent = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newEventName || !newEventDate) return
+    setSavingEvent(true)
+
+    // Calculate start and end datetime
+    // Start datetime assumes 12:00 PM of that day (or we can use 00:00)
+    // The user said "todos los eventos duran 12hs", let's assume they start at 12:00 PM and end at 00:00 AM
+    const startDate = new Date(newEventDate + 'T12:00:00')
+    const endDate = new Date(startDate.getTime() + 12 * 60 * 60 * 1000)
+
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase() // Generamos un código genérico temporal
+
+    const { error: dbErr } = await supabase.from('Events').insert({
+       manager_id: manager.id,
+       name: newEventName,
+       description: newEventDesc,
+       start_datetime: startDate.toISOString(),
+       end_datetime: endDate.toISOString(),
+       code: code
+    })
+
+    if (dbErr) {
+       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error creando evento: ' + dbErr.message } }))
+    } else {
+       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Evento creado exitosamente.' } }))
+       setNewEventName('')
+       setNewEventDesc('')
+       setNewEventDate('')
+       setShowEventForm(false)
+       loadEvents()
+    }
+    setSavingEvent(false)
+  }
 
   const loadManagers = async () => {
     setLoading(true)
@@ -127,18 +183,78 @@ export function ManagerDashboard({ manager }: { manager: any }) {
          {activeTab === 'events' && (
            <>
              <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Tus Eventos</h1>
-                <button className="bg-gradient-to-r from-[#f304eb] to-[#ff7043] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity">
-                   + Crear Evento
+                <h1 className="text-3xl font-bold text-gray-800">{isAdmin ? 'Todos los Eventos' : 'Tus Eventos'}</h1>
+                <button 
+                  onClick={() => setShowEventForm(!showEventForm)}
+                  className="bg-gradient-to-r from-[#f304eb] to-[#ff7043] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity"
+                >
+                   {showEventForm ? 'Cancelar' : '+ Crear Evento'}
                 </button>
              </div>
-             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center text-gray-500 flex flex-col items-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                   <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                </div>
-                <h3 className="text-lg font-bold text-gray-700 mb-1">Aún no hay eventos</h3>
-                <p className="text-sm">Empieza creando tu primer evento para generar tickets y cargar la lista de invitados en CSV.</p>
-             </div>
+
+             {showEventForm && (
+               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8 animate-fade-in">
+                  <h2 className="text-lg font-bold text-gray-800 mb-4">Detalles del Nuevo Evento</h2>
+                  <form onSubmit={handleCreateEvent} className="space-y-4">
+                     <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-1">Nombre del Evento</label>
+                        <input type="text" required value={newEventName} onChange={e => setNewEventName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" placeholder="Ej: Fiesta de Verano 2026" />
+                     </div>
+                     <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-1">Descripción</label>
+                        <textarea rows={2} value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb] resize-none" placeholder="Breve descripción del evento..." />
+                     </div>
+                     <div className="flex gap-4">
+                        <div className="flex-1">
+                           <label className="block text-sm font-semibold text-gray-600 mb-1">Fecha (Día, Mes, Año)</label>
+                           <input type="date" required value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" />
+                           <p className="text-xs text-gray-400 mt-1">Por defecto, el evento durará 12 horas desde el mediodía.</p>
+                        </div>
+                        <div className="flex-1">
+                           <label className="block text-sm font-semibold text-gray-600 mb-1">Lista de Códigos (Opcional)</label>
+                           <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Próximamente', body: 'La carga de CSV se integrará en la siguiente fase.' } }))} className="w-full bg-gray-100 border border-gray-200 border-dashed rounded-lg px-4 py-2.5 text-gray-500 font-medium hover:bg-gray-200 transition-colors">
+                              Subir archivo .csv
+                           </button>
+                        </div>
+                     </div>
+                     <div className="pt-2 flex justify-end">
+                        <button type="submit" disabled={savingEvent} className="bg-gray-900 text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50">
+                           {savingEvent ? 'Guardando...' : 'Guardar Evento'}
+                        </button>
+                     </div>
+                  </form>
+               </div>
+             )}
+
+             {eventsList.length === 0 && !loading ? (
+               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center text-gray-500 flex flex-col items-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                     <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-700 mb-1">Aún no hay eventos</h3>
+                  <p className="text-sm">Empieza creando tu primer evento para generar tickets y cargar la lista de invitados en CSV.</p>
+               </div>
+             ) : (
+               <div className="grid grid-cols-2 gap-6">
+                 {eventsList.map(e => {
+                   const startDate = new Date(e.start_datetime)
+                   return (
+                     <div key={e.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col relative overflow-hidden group">
+                       <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#f304eb] to-[#ff7043]" />
+                       <div className="flex justify-between items-start mb-2">
+                         <h3 className="text-xl font-bold text-gray-900">{e.name}</h3>
+                         <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-widest">{e.code}</span>
+                       </div>
+                       <p className="text-gray-500 text-sm mb-6 flex-1">{e.description || 'Sin descripción'}</p>
+                       <div className="flex items-center text-sm font-semibold text-gray-700 bg-gray-50 p-3 rounded-xl">
+                          <svg className="w-5 h-5 mr-2 text-[#f304eb]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                          {startDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                       </div>
+                     </div>
+                   )
+                 })}
+               </div>
+             )}
            </>
          )}
 
