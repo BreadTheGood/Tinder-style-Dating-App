@@ -172,15 +172,16 @@ export const supabaseAppDataService: AppDataService = {
     const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
     if (!myProfile) return false
 
-    const { error } = await supabase.from('Swipes').insert({
+    const { error, data } = await supabase.from('Swipes').insert({
       id: crypto.randomUUID(),
       swiper_id: myProfile.id,
       swiped_on_id: targetId,
       swipe_type: action
-    })
+    }).select()
 
-    if (error) {
+    if (error || !data || data.length === 0) {
       console.error('Error saving swipe:', error)
+      alert(`Error Swipe: ${error?.message || 'Fallo silencioso por políticas de seguridad (RLS)'}. Dile al dev que agregue permisos de INSERT y SELECT.`)
       return false
     }
 
@@ -194,13 +195,14 @@ export const supabaseAppDataService: AppDataService = {
 
       if (match) {
         // Create match
-        const { error: matchError } = await supabase.from('Matches').insert({
+        const { error: matchError, data: matchData } = await supabase.from('Matches').insert({
           id: crypto.randomUUID(),
           profile1_id: myProfile.id,
           profile2_id: targetId,
-        })
-        if (matchError) {
+        }).select()
+        if (matchError || !matchData || matchData.length === 0) {
           console.error("Error creating match", matchError)
+          alert(`Error Match: ${matchError?.message || 'Fallo silencioso RLS'}. (Check RLS on Matches)`)
         }
         return true
       }
@@ -215,15 +217,16 @@ export const supabaseAppDataService: AppDataService = {
     const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
     if (!myProfile) return false
     
-    const { error } = await supabase.from('Messages').insert({
+    const { error, data } = await supabase.from('Messages').insert({
        id: crypto.randomUUID(),
        match_id: matchId,
        sender_id: myProfile.id,
        content: text
-    })
+    }).select()
     
-    if (error) {
+    if (error || !data || data.length === 0) {
        console.error("Error sending message:", error)
+       alert(`Error Message: ${error?.message || 'Fallo silencioso RLS'}. (Check RLS on Messages)`)
        return false
     }
     return true
