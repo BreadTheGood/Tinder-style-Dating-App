@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import type { UserProfile } from '../types'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
+import { PhotoEditor } from '../components/PhotoEditor'
 
 const AVAILABLE_TAGS = ['Música', 'Deportes', 'Cine', 'Viajes', 'Lectura', 'Arte', 'Cocina', 'Fotografía', 'Videojuegos', 'Naturaleza', 'Mascotas', 'Fiesta']
 
@@ -24,7 +25,11 @@ export function OnboardingScreen({
   const [errorMsg, setErrorMsg] = useState('')
   
   const [isSaving, setIsSaving] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [showPhotoOptions, setShowPhotoOptions] = useState(false)
+  const [editingPhoto, setEditingPhoto] = useState<string | null>(null)
+  
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const galleryInputRef = useRef<HTMLInputElement>(null)
 
   const toggleTag = (t: string) => {
     setTags(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])
@@ -46,15 +51,23 @@ export function OnboardingScreen({
     }
   }
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
+    if (file) {
+      const url = URL.createObjectURL(file)
+      setEditingPhoto(url)
+    }
+    setShowPhotoOptions(false)
+    e.target.value = '' // Reset input so same file can be chosen again
+  }
 
+  const handleSaveCropped = async (croppedFile: File) => {
+    setEditingPhoto(null)
     setErrorMsg('')
     setIsSaving(true)
     try {
       if (!supabaseAppDataService.uploadPhoto) throw new Error('Servicio de subida no disponible')
-      const publicUrl = await supabaseAppDataService.uploadPhoto(file)
+      const publicUrl = await supabaseAppDataService.uploadPhoto(croppedFile)
       if (publicUrl) {
         setImages((prev) => [...prev, publicUrl])
       } else {
@@ -131,9 +144,23 @@ export function OnboardingScreen({
                   <img src={img} alt="Profile" className="w-full h-full object-cover" />
                 </div>
               ))}
-              <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={handlePhotoUpload} />
-              <div onClick={() => fileInputRef.current?.click()} className="aspect-[3/4] bg-white/5 border-2 border-dashed border-white/20 rounded-xl flex items-center justify-center text-white/40 cursor-pointer text-3xl pb-1 hover:bg-white/10 hover:border-[#f304eb] transition-all">
-                +
+              <input 
+                type="file" 
+                accept="image/*"
+                capture="environment" 
+                ref={cameraInputRef} 
+                className="hidden" 
+                onChange={handleFileChange} 
+              />
+              <input 
+                type="file" 
+                accept="image/*" 
+                ref={galleryInputRef} 
+                className="hidden" 
+                onChange={handleFileChange} 
+              />
+              <div onClick={() => setShowPhotoOptions(true)} className="aspect-[3/4] bg-white/5 border-2 border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center text-white/40 cursor-pointer hover:bg-white/10 hover:border-[#f304eb] transition-all">
+                <span className="text-3xl pb-1">+</span>
               </div>
             </div>
             <p className="text-xs text-white/40 text-center mt-4">Sube al menos una foto para que los demás puedan verte.</p>
@@ -147,6 +174,37 @@ export function OnboardingScreen({
           {isSaving ? 'Guardando...' : step === 3 ? 'Comenzar a Swipear' : 'Siguiente'}
         </button>
       </div>
+
+      {/* Photo Options Modal */}
+      {showPhotoOptions && (
+        <div className="fixed inset-0 z-50 flex items-end bg-black/60 backdrop-blur-sm" onClick={() => setShowPhotoOptions(false)}>
+          <div className="w-full bg-[#1a1a1f] rounded-t-3xl p-6 shadow-2xl pb-10" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-white mb-4">Agregar foto</h3>
+            <div className="space-y-3">
+              <button onClick={() => cameraInputRef.current?.click()} className="w-full py-4 rounded-xl font-semibold text-white glass border border-white/10 active:scale-95 transition-all text-left px-5 flex items-center justify-between">
+                <span>Tomar foto con cámara</span>
+                <span className="text-xl">📷</span>
+              </button>
+              <button onClick={() => galleryInputRef.current?.click()} className="w-full py-4 rounded-xl font-semibold text-white glass border border-white/10 active:scale-95 transition-all text-left px-5 flex items-center justify-between">
+                <span>Elegir de galería</span>
+                <span className="text-xl">🖼️</span>
+              </button>
+              <button onClick={() => setShowPhotoOptions(false)} className="w-full py-4 rounded-xl font-semibold text-white/50 active:scale-95 transition-all">
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Photo Editor */}
+      {editingPhoto && (
+        <PhotoEditor 
+          imageSrc={editingPhoto} 
+          onCancel={() => setEditingPhoto(null)} 
+          onSave={handleSaveCropped} 
+        />
+      )}
     </div>
   )
 }
