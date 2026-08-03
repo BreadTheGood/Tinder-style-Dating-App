@@ -247,7 +247,7 @@ export const supabaseAppDataService: AppDataService = {
 
     if (error || !data || data.length === 0) {
       console.error('Error saving swipe:', error)
-      alert(`Error Swipe: ${error?.message || 'Fallo silencioso por políticas de seguridad (RLS)'}. Dile al dev que agregue permisos de INSERT y SELECT.`)
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: error?.message || 'Fallo silencioso por RLS. Añade permisos a Swipes.' } }))
       return false
     }
 
@@ -268,7 +268,7 @@ export const supabaseAppDataService: AppDataService = {
         }).select()
         if (matchError || !matchData || matchData.length === 0) {
           console.error("Error creating match", matchError)
-          alert(`Error Match: ${matchError?.message || 'Fallo silencioso RLS'}. (Check RLS on Matches)`)
+          window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: matchError?.message || 'Fallo silencioso RLS en Matches' } }))
         }
         return true
       }
@@ -292,7 +292,7 @@ export const supabaseAppDataService: AppDataService = {
     
     if (error || !data || data.length === 0) {
        console.error("Error sending message:", error)
-       alert(`Error Message: ${error?.message || 'Fallo silencioso RLS'}. (Check RLS on Messages)`)
+       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: error?.message || 'Fallo silencioso RLS en Messages' } }))
        return false
     }
     return true
@@ -322,11 +322,11 @@ export const supabaseAppDataService: AppDataService = {
       const { error: insertErr, data: inserted } = await supabase.from('Profiles').insert(newProfile).select()
       if (insertErr) {
         console.error('Error insertando perfil:', insertErr)
-        alert('Error en base de datos (Insert): ' + insertErr.message + '\nPor favor dile al desarrollador que agregue permisos (RLS) de INSERT a la tabla Profiles.')
+        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error de Perfil', body: insertErr.message } }))
         return false
       }
       if (!inserted || inserted.length === 0) {
-        alert('Insert silenciosamente falló. Problemas de RLS.')
+        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Fallo al crear perfil por permisos RLS' } }))
         return false
       }
       return true
@@ -347,13 +347,13 @@ export const supabaseAppDataService: AppDataService = {
 
     if (updateErr) {
       console.error('Error updating profile:', updateErr)
-      alert('Error en base de datos (Update): ' + updateErr.message)
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: updateErr.message } }))
       return false
     }
     
     if (!updated || updated.length === 0) {
       console.error('Update falló silenciosamente, probable bloqueo RLS')
-      alert('Tus datos no se guardaron debido a políticas de seguridad (RLS) en Supabase. Dile al desarrollador que agregue una política de UPDATE a la tabla Profiles.')
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error RLS', body: 'Tus datos no se guardaron debido a políticas de seguridad en Supabase.' } }))
       return false
     }
     

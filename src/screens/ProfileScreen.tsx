@@ -28,9 +28,9 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
         if (res.success) {
            setTicketCode('')
            fetchEvents()
-           alert('¡Te has unido al evento con éxito!')
+           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: '¡Te has unido al evento con éxito!' } }))
         } else {
-           alert(res.error || 'Error al unirse al evento')
+           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: res.error || 'Error al unirse al evento' } }))
         }
      }
      setJoining(false)

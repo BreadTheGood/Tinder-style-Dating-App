@@ -23,7 +23,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [requiresPassword, setRequiresPassword] = useState(false)
-  const [toastMessage, setToastMessage] = useState<{title: string; body: string; image: string} | null>(null)
+  const [toastMessage, setToastMessage] = useState<{title: string; body: string; image?: string} | null>(null)
 
   useEffect(() => {
     let mounted = true
@@ -109,6 +109,15 @@ export default function App() {
       mounted = false
       subscription.unsubscribe()
     }
+  }, [])
+
+  useEffect(() => {
+    const handleToast = (e: any) => {
+       setToastMessage(e.detail)
+       setTimeout(() => setToastMessage(null), 4000)
+    }
+    window.addEventListener('app-toast', handleToast)
+    return () => window.removeEventListener('app-toast', handleToast)
   }, [])
 
   // Listen for real-time messages
@@ -299,7 +308,13 @@ export default function App() {
                  if (conv) handleOpenChat(conv)
               }}
             >
-              <img src={toastMessage.image} alt={toastMessage.title} className="w-12 h-12 rounded-full object-cover" style={{ border: '2px solid rgba(255,62,108,0.5)' }} />
+              {toastMessage.image ? (
+                <img src={toastMessage.image} alt={toastMessage.title} className="w-12 h-12 rounded-full object-cover" style={{ border: '2px solid rgba(255,62,108,0.5)' }} />
+              ) : (
+                <div className="w-10 h-10 rounded-full gradient-brand flex items-center justify-center shadow-lg">
+                  <span className="text-white font-extrabold text-lg">!</span>
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <p className="text-white font-bold text-sm mb-0.5">{toastMessage.title}</p>
                 <p className="text-white/70 text-xs font-medium truncate">{toastMessage.body}</p>
