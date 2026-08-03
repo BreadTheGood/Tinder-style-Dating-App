@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { EyeIcon, FireIcon } from '../components/icons'
 import { supabase } from '../lib/supabase'
 
-export function LoginScreen({ onLogin }: { onLogin: () => void }) {
+export function LoginScreen({ onLogin, onTicketLogin }: { onLogin: () => void, onTicketLogin: (email: string) => void }) {
   const [mode, setMode] = useState<'login' | 'ticket-code' | 'register'>('login')
+  const [ticketCode, setTicketCode] = useState('')
   const [showPass, setShowPass] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -42,8 +43,15 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
       setLoading(false)
       onLogin() // Proceed to the app
     } else {
-      // Logic for ticket code
-      onLogin() 
+      if (ticketCode !== 'EVENTO2026') {
+        setErrorMsg('Código de evento inválido')
+        return
+      }
+      if (!email || !email.includes('@')) {
+        setErrorMsg('Por favor, ingresa un email válido')
+        return
+      }
+      onTicketLogin(email)
     }
   }
 
@@ -83,16 +91,33 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
 
           <div className="space-y-4">
             {mode === 'ticket-code' && (
-              <div>
-                <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Codigo</label>
-                <input
-                  type="text"
-                  placeholder="Ingresa el codigo de tu entrada"
-                  className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
-                  onFocus={(e) => (e.target.style.borderColor = 'rgba(249, 8, 165, 0.5)')}
-                  onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
-                />
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Código del evento</label>
+                  <input
+                    type="text"
+                    placeholder="Ej. EVENTO2026"
+                    value={ticketCode}
+                    onChange={e => setTicketCode(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
+                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+                    onFocus={(e) => (e.target.style.borderColor = 'rgba(249, 8, 165, 0.5)')}
+                    onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Email</label>
+                  <input
+                    type="email"
+                    placeholder="tu@email.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
+                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+                    onFocus={(e) => (e.target.style.borderColor = 'rgba(249, 8, 165, 0.5)')}
+                    onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+                  />
+                </div>
               </div>
             )}
           </div>
