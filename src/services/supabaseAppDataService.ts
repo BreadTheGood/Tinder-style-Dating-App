@@ -20,8 +20,21 @@ export const supabaseAppDataService: AppDataService = {
     if (!data || data.length === 0) {
       return []
     }
+    
+    let filteredData = data;
+    
+    if (session) {
+       const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', session.user.id).maybeSingle()
+       if (myProfile) {
+          const { data: swipedData } = await supabase.from('Swipes').select('swiped_on_id').eq('swiper_id', myProfile.id)
+          if (swipedData && swipedData.length > 0) {
+             const swipedIds = new Set(swipedData.map(s => s.swiped_on_id))
+             filteredData = filteredData.filter(p => !swipedIds.has(p.id))
+          }
+       }
+    }
 
-    return data.map((p: any) => {
+    return filteredData.map((p: any) => {
       // Calculate age from birthdate
       let age = 25
       if (p.birthdate) {
