@@ -10,7 +10,7 @@ import { OnboardingScreen } from './screens/OnboardingScreen'
 import { SwipeScreen } from './screens/SwipeScreen'
 import { loadAppData, mockAppDataService } from './services/appDataService'
 import { supabaseAppDataService } from './services/supabaseAppDataService'
-import type { Conversation, Profile, Screen, UserProfile } from './types'
+import type { Conversation, Profile, Screen, UserProfile, Message } from './types'
 import { supabase } from './lib/supabase'
 
 export default function App() {
