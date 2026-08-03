@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { BottomNav } from './components/BottomNav'
 import { ChatScreen } from './screens/ChatScreen'
 import { LoginScreen } from './screens/LoginScreen'
@@ -26,9 +26,9 @@ export default function App() {
   const [toastMessage, setToastMessage] = useState<{title: string; body: string; image?: string} | null>(null)
   
   // Ref para saber exactamente en qué chat está el usuario sin reiniciar el WebSocket
-  const activeChatIdRef = React.useRef<string | number | null>(null)
+  const activeChatIdRef = useRef<string | number | null>(null)
   useEffect(() => {
-     activeChatIdRef.current = screen === 'chat' && activeConversation ? activeConversation.id : null
+     activeChatIdRef.current = (screen === 'chat' && activeConversation) ? (activeConversation.id || null) : null
   }, [screen, activeConversation])
 
   useEffect(() => {
