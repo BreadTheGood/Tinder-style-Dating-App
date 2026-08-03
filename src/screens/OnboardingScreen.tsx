@@ -18,18 +18,20 @@ export function OnboardingScreen({
   const [bio, setBio] = useState(user.bio || '')
   
   const [images, setImages] = useState<string[]>(user.images || [])
+  const [errorMsg, setErrorMsg] = useState('')
   
   const [isSaving, setIsSaving] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleNext = () => {
+    setErrorMsg('')
     if (step === 1) {
-      if (!name || !birthdate) return alert('Por favor, completa todos los campos para continuar.')
+      if (!name || !birthdate) return setErrorMsg('Por favor, completa todos los campos para continuar.')
       setStep(2)
     } else if (step === 2) {
       setStep(3)
     } else if (step === 3) {
-      if (images.length === 0) return alert('Debes subir al menos una foto para continuar.')
+      if (images.length === 0) return setErrorMsg('Debes subir al menos una foto para continuar.')
       setIsSaving(true)
       onComplete({ name, birthdate, gender, bio, images }).finally(() => setIsSaving(false))
     }
@@ -39,12 +41,13 @@ export function OnboardingScreen({
     const file = e.target.files?.[0]
     if (!file) return
 
+    setErrorMsg('')
     setIsSaving(true)
     const publicUrl = await supabaseAppDataService.uploadPhoto?.(file)
     if (publicUrl) {
       setImages((prev) => [...prev, publicUrl])
     } else {
-      alert('Error al subir la foto.')
+      setErrorMsg('Error al subir la foto. Por favor, intenta nuevamente.')
     }
     setIsSaving(false)
   }
@@ -110,6 +113,7 @@ export function OnboardingScreen({
       </div>
       
       <div className="p-5 border-t border-white/10 bg-[#0d0d0f]">
+        {errorMsg && <p className="text-red-500 text-xs text-center mb-3 font-medium animate-fade-in">{errorMsg}</p>}
         <button onClick={handleNext} disabled={isSaving} className="w-full py-4 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all disabled:opacity-50" style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}>
           {isSaving ? 'Guardando...' : step === 3 ? 'Comenzar a Swipear' : 'Siguiente'}
         </button>
