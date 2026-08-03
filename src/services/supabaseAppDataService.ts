@@ -177,6 +177,59 @@ export const supabaseAppDataService: AppDataService = {
     }
   },
 
+  async getMyEvents() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
+    if (!myProfile) return []
+
+    // Asumimos una tabla "ProfileEvents" o similar. 
+    // Usaremos "ProfileEvents" (profile_id, event_id) y "Events" (id, name, code)
+    const { data: events, error } = await supabase
+      .from('ProfileEvents')
+      .select('event_id, Events(*)')
+      .eq('profile_id', myProfile.id)
+
+    if (error || !events) {
+       console.error("Error fetching events:", error)
+       return []
+    }
+    
+    return events.map((e: any) => e.Events).filter(Boolean)
+  },
+
+  async joinEvent(code: string) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Not logged in' }
+
+    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
+    if (!myProfile) return { success: false, error: 'No profile' }
+
+    // Buscar el evento
+    const { data: event, error: eventErr } = await supabase.from('Events').select('*').eq('code', code).maybeSingle()
+    
+    if (eventErr || !event) {
+       return { success: false, error: 'Código de evento no válido o evento inexistente' }
+    }
+
+    // Insertar en la tabla de relación
+    const { error: insertErr } = await supabase.from('ProfileEvents').insert({
+       profile_id: myProfile.id,
+       event_id: event.id
+    })
+
+    if (insertErr) {
+       // Si ya está unido, suele dar error de unicidad. Lo ignoramos o avisamos.
+       if (insertErr.code === '23505') {
+          return { success: false, error: 'Ya estás en este evento' }
+       }
+       return { success: false, error: 'Error al unirte al evento: ' + insertErr.message }
+    }
+
+    return { success: true }
+  },
+
   async recordSwipe(targetId, action) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return false
