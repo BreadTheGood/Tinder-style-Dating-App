@@ -49,9 +49,8 @@ export const supabaseAppDataService: AppDataService = {
   },
 
   async getConversations() {
-    // We are still returning mocked conversations for now
-    // until we implement the Match/Messages queries
-    return INITIAL_CONVERSATIONS
+    // Devolvemos un arreglo vacío hasta que implementemos la lógica real de matches/mensajes en BD
+    return []
   },
 
   async getCurrentUser() {

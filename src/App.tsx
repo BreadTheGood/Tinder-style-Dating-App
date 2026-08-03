@@ -37,11 +37,7 @@ export default function App() {
       if (session) {
         try {
           snapshot = await loadAppData(supabaseAppDataService)
-          // Fallback to mock profiles if the database is currently empty so the UI doesn't look blank
-          if (snapshot.profiles.length === 0) {
-            const mockSnap = await loadAppData(mockAppDataService)
-            snapshot.profiles = mockSnap.profiles
-          }
+          // Eliminamos el fallback a perfiles falsos para que la app dependa 100% de la BD real
         } catch (error) {
           console.error("Error loading Supabase data, logging out", error)
           await supabase.auth.signOut()
