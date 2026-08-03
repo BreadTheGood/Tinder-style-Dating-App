@@ -11,6 +11,7 @@ export interface AppDataService {
   updateProfile?: (data: Partial<UserProfile>) => Promise<boolean>
   uploadPhoto?: (file: File) => Promise<string | false>
   deletePhoto?: (photoUrl: string) => Promise<boolean>
+  sendMessage?: (matchId: string, text: string) => Promise<boolean>
 }
 
 export interface AppDataSnapshot {
@@ -55,6 +56,10 @@ export const mockAppDataService: AppDataService = {
     Object.assign(currentUser, data)
     return true
   },
+  async sendMessage(_matchId, _text) {
+    await wait(300)
+    return true
+  }
 }
 
 export async function loadAppData(service: AppDataService = mockAppDataService): Promise<AppDataSnapshot> {

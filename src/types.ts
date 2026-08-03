@@ -23,6 +23,7 @@ export interface Message {
 }
 
 export interface Conversation {
+  id?: string // Match ID
   profile: Profile
   messages: Message[]
   unread: number

@@ -48,8 +48,71 @@ export const supabaseAppDataService: AppDataService = {
   },
 
   async getConversations() {
-    // Devolvemos un arreglo vacío hasta que implementemos la lógica real de matches/mensajes en BD
-    return []
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
+    if (!myProfile) return []
+
+    // Fetch Matches for this user
+    const { data: matches, error: matchesError } = await supabase
+      .from('Matches')
+      .select('*, user1:Profiles!Matches_user1_id_fkey(*, Photos(*)), user2:Profiles!Matches_user2_id_fkey(*, Photos(*)), Messages(*)')
+      .or(`user1_id.eq.${myProfile.id},user2_id.eq.${myProfile.id}`)
+      .order('created_at', { ascending: false })
+
+    if (matchesError || !matches) {
+      console.error('Error fetching matches:', matchesError)
+      return []
+    }
+
+    const conversations = []
+    for (const match of matches) {
+      const isUser1 = match.user1_id === myProfile.id
+      const otherProfileData = isUser1 ? match.user2 : match.user1
+
+      if (!otherProfileData) continue
+
+      let age = 25
+      if (otherProfileData.birthdate) {
+        const diff = Date.now() - new Date(otherProfileData.birthdate).getTime()
+        age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25))
+      }
+
+      const photos = otherProfileData.Photos ? otherProfileData.Photos.sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0)) : []
+      const images = photos.map((img: any) => img.photo_url)
+
+      const profile: any = {
+        id: otherProfileData.id,
+        name: otherProfileData.name || 'Usuario',
+        age,
+        bio: otherProfileData.bio || '',
+        distance: 'Cerca',
+        job: '',
+        image: images.length > 0 ? images[0] : 'https://via.placeholder.com/600x700?text=Sin+Foto',
+        images,
+        tags: otherProfileData.tags || [],
+      }
+      
+      const rawMessages = match.Messages || []
+      rawMessages.sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+
+      const messages: any[] = rawMessages.map((msg: any) => ({
+        id: msg.id,
+        text: msg.text,
+        from: msg.sender_id === myProfile.id ? 'me' : 'them',
+        time: new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        createdAt: msg.created_at
+      }))
+
+      conversations.push({
+        id: match.id,
+        profile,
+        messages,
+        unread: 0 
+      })
+    }
+    return conversations
   },
 
   async getCurrentUser() {
@@ -106,14 +169,13 @@ export const supabaseAppDataService: AppDataService = {
     if (!user) return false
 
     // Use our own profile ID to swipe
-    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).single()
+    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
     if (!myProfile) return false
 
     const { error } = await supabase.from('Swipes').insert({
       swiper_id: myProfile.id,
       swiped_id: targetId,
-      action: action,
-      created_at: new Date().toISOString()
+      action: action
     })
 
     if (error) {
@@ -129,9 +191,39 @@ export const supabaseAppDataService: AppDataService = {
         .eq('action', 'like')
         .maybeSingle()
 
-      if (match) return true
+      if (match) {
+        // Create match
+        const { error: matchError } = await supabase.from('Matches').insert({
+          user1_id: myProfile.id,
+          user2_id: targetId,
+        })
+        if (matchError) {
+          console.error("Error creating match", matchError)
+        }
+        return true
+      }
     }
     return false
+  },
+  
+  async sendMessage(matchId: string, text: string) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+
+    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
+    if (!myProfile) return false
+    
+    const { error } = await supabase.from('Messages').insert({
+       match_id: matchId,
+       sender_id: myProfile.id,
+       text: text
+    })
+    
+    if (error) {
+       console.error("Error sending message:", error)
+       return false
+    }
+    return true
   },
 
   async updateProfile(data) {

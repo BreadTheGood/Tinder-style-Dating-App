@@ -110,6 +110,53 @@ export default function App() {
     }
   }, [])
 
+  // Listen for real-time messages
+  useEffect(() => {
+    if (!currentUser || conversations.length === 0) return
+
+    const channel = supabase
+      .channel('public:Messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Messages' }, payload => {
+        const newMessage = payload.new
+        
+        if (newMessage.sender_id === currentUser.id) return
+
+        setConversations(prev => prev.map(conv => {
+          if (conv.id === newMessage.match_id) {
+            const msg: Message = {
+              id: newMessage.id,
+              text: newMessage.text,
+              from: 'them',
+              time: new Date(newMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }
+            if (!conv.messages.find(m => m.id === msg.id)) {
+               return {
+                 ...conv,
+                 messages: [...conv.messages, msg],
+                 unread: activeConversation?.id !== conv.id ? conv.unread + 1 : conv.unread
+               }
+            }
+          }
+          return conv
+        }))
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [currentUser, conversations.length, activeConversation?.id])
+
+  // Keep active conversation in sync
+  useEffect(() => {
+    if (activeConversation) {
+      const updated = conversations.find(c => c.id === activeConversation.id)
+      if (updated && updated.messages.length !== activeConversation.messages.length) {
+        setActiveConversation(updated)
+      }
+    }
+  }, [conversations, activeConversation?.id])
+
   const totalUnread = conversations.reduce((s, c) => s + c.unread, 0)
 
   const go = (s: Screen) => setScreen(s)

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { BackIcon, SendIcon } from '../components/icons'
+import { supabaseAppDataService } from '../services/supabaseAppDataService'
 import type { Conversation, Message } from '../types'
 
 export function ChatScreen({ conversation, onBack, onUpdate }: { conversation: Conversation; onBack: () => void; onUpdate: (msgs: Message[]) => void }) {
@@ -10,16 +11,19 @@ export function ChatScreen({ conversation, onBack, onUpdate }: { conversation: C
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [conversation.messages])
 
-  const send = () => {
+  const send = async () => {
     if (!text.trim()) return
-    const msg: Message = { id: Date.now(), text: text.trim(), from: 'me', time: 'Ahora' }
-    onUpdate([...conversation.messages, msg])
+    const msgText = text.trim()
     setText('')
-    setTimeout(() => {
-      const replies = ['Qué interesante! 😊', '¡Me encanta!', 'Cuéntame más ✨', 'Totalmente de acuerdo 😄', '🥰', 'Ja! Sí, es muy así']
-      const reply: Message = { id: Date.now() + 1, text: replies[Math.floor(Math.random() * replies.length)], from: 'them', time: 'Ahora' }
-      onUpdate([...conversation.messages, msg, reply])
-    }, 1200)
+    
+    // Optimistic UI update
+    const msg: Message = { id: Date.now(), text: msgText, from: 'me', time: 'Ahora' }
+    onUpdate([...conversation.messages, msg])
+    
+    // Send to DB
+    if (conversation.id) {
+       await supabaseAppDataService.sendMessage!(conversation.id, msgText)
+    }
   }
 
   return (
