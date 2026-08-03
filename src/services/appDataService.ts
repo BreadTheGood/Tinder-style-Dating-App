@@ -12,6 +12,8 @@ export interface AppDataService {
   uploadPhoto?: (file: File) => Promise<string | false>
   deletePhoto?: (photoUrl: string) => Promise<boolean>
   sendMessage?: (matchId: string, text: string) => Promise<boolean>
+  getMyEvents?: () => Promise<any[]>
+  joinEvent?: (code: string) => Promise<{success: boolean; error?: string}>
 }
 
 export interface AppDataSnapshot {
