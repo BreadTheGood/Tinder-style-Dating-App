@@ -91,6 +91,8 @@ export const supabaseAppDataService: AppDataService = {
       id: data.id,
       name: data.name || '',
       age,
+      birthdate: data.birthdate || undefined,
+      gender: data.gender || undefined,
       job: '',
       bio: data.bio || '',
       images,
