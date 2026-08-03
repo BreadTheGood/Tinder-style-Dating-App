@@ -138,6 +138,19 @@ export const supabaseAppDataService: AppDataService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return false
 
+    // Ensure profile exists
+    let { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).single()
+    if (!myProfile) {
+      const newProfile = {
+        id: crypto.randomUUID(),
+        user_id: user.id,
+        name: user.email?.split('@')[0] || 'Usuario',
+        bio: '',
+        gender: 'other'
+      }
+      await supabase.from('Profiles').insert(newProfile)
+    }
+
     const updateData: any = {}
     if (data.bio !== undefined) updateData.bio = data.bio
     if (data.name !== undefined) updateData.name = data.name
@@ -160,8 +173,22 @@ export const supabaseAppDataService: AppDataService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return false
 
-    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).single()
-    if (!myProfile) return false
+    let { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).single()
+    if (!myProfile) {
+      const newProfile = {
+        id: crypto.randomUUID(),
+        user_id: user.id,
+        name: user.email?.split('@')[0] || 'Usuario',
+        bio: '',
+        gender: 'other'
+      }
+      const { error: createError } = await supabase.from('Profiles').insert(newProfile)
+      if (createError) {
+        alert('Error creando tu perfil base: ' + createError.message)
+        return false
+      }
+      myProfile = { id: newProfile.id }
+    }
 
     const ext = file.name.split('.').pop()
     const filename = `${myProfile.id}/${Math.random().toString(36).substring(2)}.${ext}`
