@@ -101,8 +101,10 @@ export default function App() {
             setNavTab('swipe')
           }
         }
+        setIsLoading(false)
       } else {
         setScreen('login')
+        setIsLoading(false)
       }
     })
 

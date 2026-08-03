@@ -14,7 +14,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const handleAuth = async () => {
     if (mode === 'login' || mode === 'register') {
       setLoading(true)
-      setErrorMsg('Credenciales incorrectas, por favor verifica tu email y contraseña.')
+      setErrorMsg('')
       
       if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
