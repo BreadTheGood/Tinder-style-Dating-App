@@ -24,6 +24,12 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [requiresPassword, setRequiresPassword] = useState(false)
   const [toastMessage, setToastMessage] = useState<{title: string; body: string; image?: string} | null>(null)
+  
+  // Ref para saber exactamente en qué chat está el usuario sin reiniciar el WebSocket
+  const activeChatIdRef = React.useRef<string | number | null>(null)
+  useEffect(() => {
+     activeChatIdRef.current = screen === 'chat' && activeConversation ? activeConversation.id : null
+  }, [screen, activeConversation])
 
   useEffect(() => {
     let mounted = true
@@ -140,19 +146,16 @@ export default function App() {
               time: new Date(newMessage.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }
             if (!conv.messages.find(m => m.id === msg.id)) {
-               if (activeConversation?.id !== conv.id) {
-                  setToastMessage({
-                    title: conv.profile.name,
-                    body: msg.text,
-                    image: conv.profile.image
-                  })
-                  setTimeout(() => setToastMessage(null), 4000)
+               const isUserInThisChat = activeChatIdRef.current === conv.id
+               
+               if (!isUserInThisChat) {
+                  window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: conv.profile.name, body: msg.text, image: conv.profile.image } }))
                }
                
                return {
                  ...conv,
                  messages: [...conv.messages, msg],
-                 unread: activeConversation?.id !== conv.id ? conv.unread + 1 : conv.unread
+                 unread: !isUserInThisChat ? conv.unread + 1 : conv.unread
                }
             }
           }
@@ -164,7 +167,7 @@ export default function App() {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [currentUser, conversations.length, activeConversation?.id])
+  }, [currentUser, conversations.length])
 
   // Keep active conversation in sync
   useEffect(() => {
@@ -201,6 +204,7 @@ export default function App() {
   const handleNavChange = (s: 'swipe' | 'messages' | 'profile') => {
     setNavTab(s)
     go(s)
+    setActiveConversation(null) // Si tocamos la barra inferior, salimos de cualquier chat
   }
 
   const showNav = screen !== 'login' && screen !== 'chat' && screen !== 'onboarding'
@@ -224,7 +228,7 @@ export default function App() {
         return activeConversation ? (
           <ChatScreen
             conversation={activeConversation}
-            onBack={() => { go('messages'); setNavTab('messages') }}
+            onBack={() => { setActiveConversation(null); go('messages'); setNavTab('messages') }}
             onUpdate={(msgs) => {
               setConversations((prev) => prev.map((c) => (c.profile.id === activeConversation.profile.id ? { ...c, messages: msgs } : c)))
               setActiveConversation((a) => (a ? { ...a, messages: msgs } : a))
