@@ -25,11 +25,8 @@ export function OnboardingScreen({
   const [errorMsg, setErrorMsg] = useState('')
   
   const [isSaving, setIsSaving] = useState(false)
-  const [showPhotoOptions, setShowPhotoOptions] = useState(false)
   const [editingPhoto, setEditingPhoto] = useState<string | null>(null)
-  
-  const cameraInputRef = useRef<HTMLInputElement>(null)
-  const galleryInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const toggleTag = (t: string) => {
     setTags(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])
@@ -57,7 +54,6 @@ export function OnboardingScreen({
       const url = URL.createObjectURL(file)
       setEditingPhoto(url)
     }
-    setShowPhotoOptions(false)
     e.target.value = '' // Reset input so same file can be chosen again
   }
 
@@ -146,20 +142,12 @@ export function OnboardingScreen({
               ))}
               <input 
                 type="file" 
-                accept="image/*"
-                capture="environment" 
-                ref={cameraInputRef} 
-                className="hidden" 
-                onChange={handleFileChange} 
-              />
-              <input 
-                type="file" 
                 accept="image/*" 
-                ref={galleryInputRef} 
+                ref={fileInputRef} 
                 className="hidden" 
                 onChange={handleFileChange} 
               />
-              <div onClick={() => setShowPhotoOptions(true)} className="aspect-[3/4] bg-white/5 border-2 border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center text-white/40 cursor-pointer hover:bg-white/10 hover:border-[#f304eb] transition-all">
+              <div onClick={() => fileInputRef.current?.click()} className="aspect-[3/4] bg-white/5 border-2 border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center text-white/40 cursor-pointer hover:bg-white/10 hover:border-[#f304eb] transition-all">
                 <span className="text-3xl pb-1">+</span>
               </div>
             </div>
@@ -174,28 +162,6 @@ export function OnboardingScreen({
           {isSaving ? 'Guardando...' : step === 3 ? 'Comenzar a Swipear' : 'Siguiente'}
         </button>
       </div>
-
-      {/* Photo Options Modal */}
-      {showPhotoOptions && (
-        <div className="fixed inset-0 z-50 flex items-end bg-black/60 backdrop-blur-sm" onClick={() => setShowPhotoOptions(false)}>
-          <div className="w-full bg-[#1a1a1f] rounded-t-3xl p-6 shadow-2xl pb-10" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-white mb-4">Agregar foto</h3>
-            <div className="space-y-3">
-              <button onClick={() => cameraInputRef.current?.click()} className="w-full py-4 rounded-xl font-semibold text-white glass border border-white/10 active:scale-95 transition-all text-left px-5 flex items-center justify-between">
-                <span>Tomar foto con cámara</span>
-                <span className="text-xl">📷</span>
-              </button>
-              <button onClick={() => galleryInputRef.current?.click()} className="w-full py-4 rounded-xl font-semibold text-white glass border border-white/10 active:scale-95 transition-all text-left px-5 flex items-center justify-between">
-                <span>Elegir de galería</span>
-                <span className="text-xl">🖼️</span>
-              </button>
-              <button onClick={() => setShowPhotoOptions(false)} className="w-full py-4 rounded-xl font-semibold text-white/50 active:scale-95 transition-all">
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Photo Editor */}
       {editingPhoto && (
