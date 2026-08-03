@@ -219,5 +219,26 @@ export const supabaseAppDataService: AppDataService = {
     }
 
     return publicUrl
+  },
+
+  async deletePhoto(photoUrl: string) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+
+    // Delete record from DB
+    const { error: dbError } = await supabase.from('Photos').delete().eq('photo_url', photoUrl)
+    if (dbError) {
+      console.error('Error deleting photo from DB:', dbError)
+      return false
+    }
+
+    // Try deleting from storage
+    const urlParts = photoUrl.split('/public/photos/')
+    if (urlParts.length === 2) {
+      const path = urlParts[1]
+      await supabase.storage.from('photos').remove([path])
+    }
+    
+    return true
   }
 }

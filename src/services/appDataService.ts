@@ -10,6 +10,7 @@ export interface AppDataService {
   recordSwipe?: (targetId: string | number, action: 'like' | 'pass') => Promise<boolean>
   updateProfile?: (data: Partial<UserProfile>) => Promise<boolean>
   uploadPhoto?: (file: File) => Promise<string | false>
+  deletePhoto?: (photoUrl: string) => Promise<boolean>
 }
 
 export interface AppDataSnapshot {

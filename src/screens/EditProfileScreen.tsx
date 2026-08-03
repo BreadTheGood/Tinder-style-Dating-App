@@ -71,6 +71,13 @@ export function EditProfileScreen({
     }
   }
 
+  const handleDeletePhoto = async (photoUrl: string, idx: number) => {
+    setImages(prev => prev.filter((_, i) => i !== idx))
+    if (supabaseAppDataService.deletePhoto) {
+      await supabaseAppDataService.deletePhoto(photoUrl)
+    }
+  }
+
   return (
     <div className="flex flex-col h-full bg-[#0d0d0f] text-white">
       {/* Encabezado */}
@@ -154,10 +161,10 @@ export function EditProfileScreen({
                 <div key={idx} className="aspect-[3/4] bg-white/10 rounded-xl overflow-hidden relative border border-white/10">
                   <img src={img} alt="Profile" className="w-full h-full object-cover" />
                   <button 
-                    onClick={() => setImages(prev => prev.filter((_, i) => i !== idx))}
-                    className="absolute top-1 right-1 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white/70 hover:text-white"
+                    onClick={() => handleDeletePhoto(img, idx)}
+                    className="absolute top-1.5 right-1.5 w-7 h-7 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-colors"
                   >
-                    ×
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4"><path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
                 </div>
               ))}
