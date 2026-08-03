@@ -185,7 +185,7 @@ export const supabaseAppDataService: AppDataService = {
       const { error: createError } = await supabase.from('Profiles').insert(newProfile)
       if (createError) {
         console.error('Error creando tu perfil base: ' + createError.message)
-        return false
+        throw new Error('Error de Perfil: ' + createError.message)
       }
       myProfile = { id: newProfile.id }
     }
@@ -196,7 +196,7 @@ export const supabaseAppDataService: AppDataService = {
     const { error: uploadError } = await supabase.storage.from('photos').upload(filename, file)
     if (uploadError) {
       console.error('Error uploading:', uploadError)
-      return false
+      throw new Error('Error de Storage: ' + uploadError.message)
     }
 
     const { data: { publicUrl } } = supabase.storage.from('photos').getPublicUrl(filename)
@@ -214,7 +214,7 @@ export const supabaseAppDataService: AppDataService = {
 
     if (insertError) {
       console.error('Error saving photo record:', insertError)
-      return false
+      throw new Error('Error en tabla Photos: ' + insertError.message)
     }
 
     return publicUrl

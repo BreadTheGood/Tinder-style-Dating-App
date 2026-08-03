@@ -43,13 +43,19 @@ export function OnboardingScreen({
 
     setErrorMsg('')
     setIsSaving(true)
-    const publicUrl = await supabaseAppDataService.uploadPhoto?.(file)
-    if (publicUrl) {
-      setImages((prev) => [...prev, publicUrl])
-    } else {
-      setErrorMsg('Error al subir la foto. Por favor, intenta nuevamente.')
+    try {
+      if (!supabaseAppDataService.uploadPhoto) throw new Error('Servicio de subida no disponible')
+      const publicUrl = await supabaseAppDataService.uploadPhoto(file)
+      if (publicUrl) {
+        setImages((prev) => [...prev, publicUrl])
+      } else {
+        setErrorMsg('Error al subir la foto. Por favor, intenta nuevamente.')
+      }
+    } catch (error: any) {
+      setErrorMsg(error.message)
+    } finally {
+      setIsSaving(false)
     }
-    setIsSaving(false)
   }
 
   return (
