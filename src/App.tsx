@@ -23,6 +23,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [requiresPassword, setRequiresPassword] = useState(false)
+  const [toastMessage, setToastMessage] = useState<{title: string; body: string; image: string} | null>(null)
 
   useEffect(() => {
     let mounted = true
@@ -130,6 +131,15 @@ export default function App() {
               time: new Date(newMessage.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }
             if (!conv.messages.find(m => m.id === msg.id)) {
+               if (activeConversation?.id !== conv.id) {
+                  setToastMessage({
+                    title: conv.profile.name,
+                    body: msg.text,
+                    image: conv.profile.image
+                  })
+                  setTimeout(() => setToastMessage(null), 4000)
+               }
+               
                return {
                  ...conv,
                  messages: [...conv.messages, msg],
@@ -274,6 +284,31 @@ export default function App() {
   return (
     <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#050507' }}>
       <div className="relative w-full max-w-[390px] h-full max-h-[844px] overflow-hidden" style={{ background: '#0d0d0f' }}>
+        
+        {/* Notificación Toast (Estilo celular) */}
+        <div 
+          className={`absolute top-6 left-4 right-4 z-[9999] transition-all duration-500 ease-in-out ${toastMessage ? 'translate-y-0 opacity-100' : '-translate-y-24 opacity-0 pointer-events-none'}`}
+        >
+          {toastMessage && (
+            <div 
+              className="p-3.5 rounded-2xl flex items-center gap-3.5 shadow-2xl cursor-pointer"
+              style={{ background: 'rgba(30,30,35,0.95)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 12px 32px rgba(0,0,0,0.4)' }}
+              onClick={() => {
+                 setToastMessage(null)
+                 const conv = conversations.find(c => c.profile.name === toastMessage.title)
+                 if (conv) handleOpenChat(conv)
+              }}
+            >
+              <img src={toastMessage.image} alt={toastMessage.title} className="w-12 h-12 rounded-full object-cover" style={{ border: '2px solid rgba(255,62,108,0.5)' }} />
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-bold text-sm mb-0.5">{toastMessage.title}</p>
+                <p className="text-white/70 text-xs font-medium truncate">{toastMessage.body}</p>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-[#f304eb] flex-shrink-0" />
+            </div>
+          )}
+        </div>
+
         {renderScreen()}
 
         {showNav && <BottomNav active={navTab} onChange={handleNavChange} unread={totalUnread} />}
