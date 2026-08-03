@@ -2,6 +2,8 @@ import { useState, useRef } from 'react'
 import type { UserProfile } from '../types'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
 
+const AVAILABLE_TAGS = ['Música', 'Deportes', 'Cine', 'Viajes', 'Lectura', 'Arte', 'Cocina', 'Fotografía', 'Videojuegos', 'Naturaleza', 'Mascotas', 'Fiesta']
+
 export function OnboardingScreen({
   user,
   onComplete,
@@ -16,6 +18,7 @@ export function OnboardingScreen({
   const [gender, setGender] = useState(user.gender || 'female')
   
   const [bio, setBio] = useState(user.bio || '')
+  const [tags, setTags] = useState<string[]>(user.tags || [])
   
   const [images, setImages] = useState<string[]>(user.images || [])
   const [errorMsg, setErrorMsg] = useState('')
@@ -23,17 +26,23 @@ export function OnboardingScreen({
   const [isSaving, setIsSaving] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const toggleTag = (t: string) => {
+    setTags(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])
+  }
+
   const handleNext = () => {
     setErrorMsg('')
     if (step === 1) {
       if (!name || !birthdate) return setErrorMsg('Por favor, completa todos los campos para continuar.')
+      const age = Math.floor((Date.now() - new Date(birthdate).getTime()) / (1000 * 60 * 60 * 24 * 365.25))
+      if (age < 18) return setErrorMsg('Debes ser mayor de 18 años para usar la aplicación.')
       setStep(2)
     } else if (step === 2) {
       setStep(3)
     } else if (step === 3) {
       if (images.length === 0) return setErrorMsg('Debes subir al menos una foto para continuar.')
       setIsSaving(true)
-      onComplete({ name, birthdate, gender, bio, images }).finally(() => setIsSaving(false))
+      onComplete({ name, birthdate, gender, bio, images, tags }).finally(() => setIsSaving(false))
     }
   }
 
@@ -71,7 +80,7 @@ export function OnboardingScreen({
             <h2 className="text-2xl font-extrabold mb-6">Tus Datos</h2>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Nombre</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[#f304eb] transition-colors" placeholder="Tu nombre" />
+              <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[#f304eb] transition-colors" placeholder="¿Cómo te llamas?" />
             </div>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Fecha de nacimiento</label>
@@ -93,8 +102,22 @@ export function OnboardingScreen({
             <h2 className="text-2xl font-extrabold mb-6">Sobre Ti</h2>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Biografía</label>
-              <textarea value={bio} onChange={e => setBio(e.target.value)} className="w-full h-40 bg-white/5 border border-white/10 rounded-xl p-4 text-white resize-none focus:outline-none focus:border-[#f304eb] transition-colors" placeholder="Cuéntanos un poco sobre tus gustos, hobbies..." maxLength={500} />
+              <textarea value={bio} onChange={e => setBio(e.target.value)} className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white resize-none focus:outline-none focus:border-[#f304eb] transition-colors" placeholder="Cuéntanos un poco sobre tus gustos, hobbies..." maxLength={500} />
               <div className="text-right text-white/40 text-xs mt-1">{bio.length}/500</div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Intereses (Etiquetas)</label>
+              <div className="flex flex-wrap gap-2">
+                {AVAILABLE_TAGS.map(tag => (
+                  <button
+                    key={tag}
+                    onClick={() => toggleTag(tag)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${tags.includes(tag) ? 'bg-[#f304eb] border-[#f304eb] text-white' : 'bg-white/5 border-white/20 text-white/60 hover:text-white'}`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}

@@ -43,7 +43,7 @@ export const supabaseAppDataService: AppDataService = {
         job: '', // Placeholder, not in DB
         image: images.length > 0 ? images[0] : 'https://via.placeholder.com/600x700?text=Sin+Foto',
         images: images,
-        tags: [],
+        tags: p.tags || [],
       }
     })
   },
@@ -70,7 +70,7 @@ export const supabaseAppDataService: AppDataService = {
     if (error || !data) {
         return {
             id: user.id,
-            name: user.email?.split('@')[0] || 'Usuario',
+            name: '',
             age: 25,
             job: '',
             bio: '¡Bienvenido! Pronto podrás editar tu perfil.',
@@ -96,7 +96,7 @@ export const supabaseAppDataService: AppDataService = {
       job: '',
       bio: data.bio || '',
       images,
-      tags: [],
+      tags: data.tags || [],
       stats: [{ label: 'Likes', value: '0' }, { label: 'Matches', value: '0' }, { label: 'Visitas', value: '0' }],
     }
   },
@@ -144,7 +144,7 @@ export const supabaseAppDataService: AppDataService = {
       const newProfile = {
         id: crypto.randomUUID(),
         user_id: user.id,
-        name: user.email?.split('@')[0] || 'Usuario',
+        name: '',
         bio: '',
         gender: 'other'
       }
@@ -156,6 +156,7 @@ export const supabaseAppDataService: AppDataService = {
     if (data.name !== undefined) updateData.name = data.name
     if (data.gender !== undefined) updateData.gender = data.gender
     if (data.birthdate !== undefined) updateData.birthdate = data.birthdate
+    if (data.tags !== undefined) updateData.tags = data.tags
 
     const { error } = await supabase
       .from('Profiles')
@@ -178,7 +179,7 @@ export const supabaseAppDataService: AppDataService = {
       const newProfile = {
         id: crypto.randomUUID(),
         user_id: user.id,
-        name: user.email?.split('@')[0] || 'Usuario',
+        name: '',
         bio: '',
         gender: 'other'
       }
