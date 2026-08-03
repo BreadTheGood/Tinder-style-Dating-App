@@ -1,6 +1,5 @@
 import { supabase } from '../lib/supabase'
 import type { AppDataService } from './appDataService'
-import { INITIAL_CONVERSATIONS } from '../data/mockData'
 
 export const supabaseAppDataService: AppDataService = {
   async getProfiles() {
