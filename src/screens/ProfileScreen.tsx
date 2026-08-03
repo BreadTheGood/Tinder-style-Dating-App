@@ -1,7 +1,8 @@
 import { SettingsIcon } from '../components/icons'
 import type { UserProfile } from '../types'
+import { supabase } from '../lib/supabase'
 
-export function ProfileScreen({ user, onSettings, onEdit }: { user: UserProfile; onSettings: () => void; onEdit: () => void }) {
+export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () => void }) {
   const me = user
 
   return (
@@ -9,9 +10,6 @@ export function ProfileScreen({ user, onSettings, onEdit }: { user: UserProfile;
       <div className="relative h-80 flex-shrink-0">
         <img src={me.images?.[0] || 'https://via.placeholder.com/600x700?text=Sin+Foto'} alt={me.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0d0d0f 0%, transparent 60%)' }} />
-        <button onClick={onSettings} className="absolute top-12 right-4 w-10 h-10 glass rounded-full flex items-center justify-center">
-          <SettingsIcon size={18} className="text-white/70" />
-        </button>
         <div className="absolute bottom-4 left-5">
           <h2 className="text-white font-extrabold text-3xl tracking-tight">{me.name}, {me.age}</h2>
           <p className="text-white/60 text-sm font-medium">{me.job}</p>
@@ -47,7 +45,8 @@ export function ProfileScreen({ user, onSettings, onEdit }: { user: UserProfile;
       </div>
 
       <div className="mx-5 mb-28">
-        <button onClick={onEdit} className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all active:scale-95 glass">Editar perfil</button>
+        <button onClick={onEdit} className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all active:scale-95 glass border border-white/10">Editar perfil</button>
+        <button onClick={() => supabase.auth.signOut()} className="w-full mt-3 py-4 rounded-xl font-bold text-red-500 text-sm transition-all active:scale-95 bg-white/5 border border-red-500/20 hover:bg-red-500/10">Cerrar sesión</button>
       </div>
     </div>
   )

@@ -7,7 +7,6 @@ import { MessagesScreen } from './screens/MessagesScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
 import { EditProfileScreen } from './screens/EditProfileScreen'
 import { OnboardingScreen } from './screens/OnboardingScreen'
-import { SettingsScreen } from './screens/SettingsScreen'
 import { SwipeScreen } from './screens/SwipeScreen'
 import { loadAppData, mockAppDataService } from './services/appDataService'
 import { supabaseAppDataService } from './services/supabaseAppDataService'
@@ -137,7 +136,7 @@ export default function App() {
     go(s)
   }
 
-  const showNav = screen !== 'login' && screen !== 'chat' && screen !== 'settings' && screen !== 'onboarding'
+  const showNav = screen !== 'login' && screen !== 'chat' && screen !== 'onboarding'
 
   const renderScreen = () => {
     switch (screen) {
@@ -159,7 +158,7 @@ export default function App() {
           />
         ) : null
       case 'profile':
-        return currentUser ? <ProfileScreen user={currentUser} onSettings={() => go('settings')} onEdit={() => go('edit_profile')} /> : null
+        return currentUser ? <ProfileScreen user={currentUser} onEdit={() => go('edit_profile')} /> : null
       case 'edit_profile':
         return currentUser ? (
           <EditProfileScreen
@@ -192,8 +191,6 @@ export default function App() {
             }}
           />
         ) : null
-      case 'settings':
-        return <SettingsScreen onBack={() => { go('profile'); setNavTab('profile') }} />
       default:
         return null
     }

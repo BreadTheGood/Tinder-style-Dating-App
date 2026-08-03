@@ -1,4 +1,4 @@
-export type Screen = 'login' | 'swipe' | 'match' | 'messages' | 'chat' | 'profile' | 'settings' | 'edit_profile' | 'onboarding'
+export type Screen = 'login' | 'swipe' | 'match' | 'messages' | 'chat' | 'profile' | 'edit_profile' | 'onboarding'
 
 export interface Profile {
   id: string | number
