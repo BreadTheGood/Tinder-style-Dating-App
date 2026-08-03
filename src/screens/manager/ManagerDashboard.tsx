@@ -9,7 +9,8 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   const [managersList, setManagersList] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [newEmail, setNewEmail] = useState('')
-  const [newPassword, setNewPassword] = useState('')
+  const [newAuthId, setNewAuthId] = useState('')
+  const [newRole, setNewRole] = useState('event_manager')
   const [creating, setCreating] = useState(false)
 
   useEffect(() => {
@@ -47,41 +48,24 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
   const handleCreateManager = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newEmail || !newPassword) return
+    if (!newEmail || !newAuthId) return
     setCreating(true)
 
-    // Usamos el signUp para registrar en auth.users, pero esto podría generar un error si requiere verificación de correo
-    // También cerraremos la sesión del admin y lo volveremos a logear? NO, usamos el auth.signUp normal.
-    // Ojo: Supabase no deja crear usuarios admin sin usar el Service Role Key.
-    // Como truco, crearemos el registro manualmente en Managers y le pediremos al usuario que se registre después.
-    // Pero como diste la instrucción de crearlos:
-    const { data: authData, error: authErr } = await supabase.auth.signUp({
+    const { error: dbErr } = await supabase.from('Managers').insert({
+      id: newAuthId,
       email: newEmail,
-      password: newPassword
+      role: newRole,
+      is_active: true
     })
-
-    if (authErr) {
-       alert("Error creando el usuario de Auth: " + authErr.message)
-       setCreating(false)
-       return
-    }
-
-    if (authData.user) {
-       const { error: dbErr } = await supabase.from('Managers').insert({
-         id: authData.user.id,
-         email: newEmail,
-         role: 'event_manager',
-         is_active: true
-       })
        
-       if (dbErr) {
-          alert("Error guardando el perfil del Manager: " + dbErr.message)
-       } else {
-          alert("Manager creado exitosamente.")
-          setNewEmail('')
-          setNewPassword('')
-          loadManagers()
-       }
+    if (dbErr) {
+       alert("Error vinculando el perfil del Manager: " + dbErr.message)
+    } else {
+       alert("Manager vinculado exitosamente.")
+       setNewEmail('')
+       setNewAuthId('')
+       setNewRole('event_manager')
+       loadManagers()
     }
     setCreating(false)
   }
@@ -162,18 +146,26 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
              {/* Formulario de Creación */}
              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-                <h2 className="text-lg font-bold text-gray-800 mb-4">Crear nuevo Manager</h2>
+                <h2 className="text-lg font-bold text-gray-800 mb-1">Vincular Manager Existente</h2>
+                <p className="text-sm text-gray-500 mb-4">Primero crea el usuario en Supabase (Authentication &gt; Users) y pega aquí su UID.</p>
                 <form onSubmit={handleCreateManager} className="flex gap-4 items-end">
+                   <div className="flex-1">
+                      <label className="block text-sm font-semibold text-gray-600 mb-1">UID del Usuario (Supabase)</label>
+                      <input type="text" required value={newAuthId} onChange={e => setNewAuthId(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" placeholder="123e4567-e89b-12d3..." />
+                   </div>
                    <div className="flex-1">
                       <label className="block text-sm font-semibold text-gray-600 mb-1">Correo Electrónico</label>
                       <input type="email" required value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" placeholder="nuevo@manager.com" />
                    </div>
-                   <div className="flex-1">
-                      <label className="block text-sm font-semibold text-gray-600 mb-1">Contraseña (Mín. 6 caracteres)</label>
-                      <input type="text" required minLength={6} value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" placeholder="Contraseña segura" />
+                   <div className="w-40">
+                      <label className="block text-sm font-semibold text-gray-600 mb-1">Rol</label>
+                      <select value={newRole} onChange={e => setNewRole(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]">
+                         <option value="event_manager">Manager</option>
+                         <option value="system_admin">Admin</option>
+                      </select>
                    </div>
-                   <button type="submit" disabled={creating} className="bg-gray-900 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50">
-                      {creating ? 'Creando...' : '+ Registrar'}
+                   <button type="submit" disabled={creating} className="bg-gray-900 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50 h-[46px]">
+                      {creating ? 'Vinculando...' : 'Vincular'}
                    </button>
                 </form>
              </div>
