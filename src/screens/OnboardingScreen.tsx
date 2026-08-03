@@ -6,11 +6,11 @@ const AVAILABLE_TAGS = ['Música', 'Deportes', 'Cine', 'Viajes', 'Lectura', 'Art
 
 export function OnboardingScreen({
   user,
-  guestEmail,
+  requiresPassword,
   onComplete,
 }: {
   user?: UserProfile | null
-  guestEmail?: string
+  requiresPassword?: boolean
   onComplete: (data: Partial<UserProfile>, password?: string, files?: File[]) => Promise<string | void>
 }) {
   const [step, setStep] = useState(1)
@@ -60,7 +60,7 @@ export function OnboardingScreen({
       setStep(3)
     } else if (step === 3) {
       if (localImages.length === 0) return setErrorMsg('Debes subir al menos una foto para continuar.')
-      if (guestEmail) {
+      if (requiresPassword) {
         setStep(4)
       } else {
         await finishOnboarding()
@@ -87,7 +87,7 @@ export function OnboardingScreen({
   return (
     <div className="flex flex-col h-full bg-[#0d0d0f] text-white">
       <div className="p-5 flex items-center justify-between border-b border-white/10">
-         <div className="text-white/40 text-sm font-semibold">Paso {step} de {guestEmail ? '4' : '3'}</div>
+         <div className="text-white/40 text-sm font-semibold">Paso {step} de {requiresPassword ? '4' : '3'}</div>
          <span className="font-bold text-[#f304eb]">Completar Perfil</span>
       </div>
       
@@ -169,11 +169,11 @@ export function OnboardingScreen({
           </div>
         )}
 
-        {step === 4 && guestEmail && (
+        {step === 4 && requiresPassword && (
           <div className="space-y-6 animate-fade-in">
             <h2 className="text-2xl font-extrabold mb-6">Protege tu cuenta</h2>
             <p className="text-sm text-white/60 leading-relaxed mb-4">
-              Estás ingresando con la entrada del evento. Por favor, crea una contraseña para asociarla a tu correo <strong className="text-white">{guestEmail}</strong> y proteger tu perfil.
+              Estás ingresando con la entrada del evento. Por favor, crea una contraseña definitiva para tu cuenta y así proteger tu perfil.
             </p>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Contraseña</label>
@@ -192,7 +192,7 @@ export function OnboardingScreen({
       <div className="p-5 border-t border-white/10 bg-[#0d0d0f]">
         {errorMsg && <p className="text-red-500 text-xs text-center mb-3 font-medium animate-fade-in">{errorMsg}</p>}
         <button onClick={handleNext} disabled={isSaving} className="w-full py-4 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all disabled:opacity-50" style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}>
-          {isSaving ? 'Guardando...' : (step === 3 && !guestEmail) || step === 4 ? 'Finalizar y Entrar' : 'Siguiente'}
+          {isSaving ? 'Guardando...' : (step === 3 && !requiresPassword) || step === 4 ? 'Finalizar y Entrar' : 'Siguiente'}
         </button>
       </div>
 

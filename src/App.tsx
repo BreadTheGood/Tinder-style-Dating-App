@@ -22,7 +22,7 @@ export default function App() {
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [pendingTicketEmail, setPendingTicketEmail] = useState('')
+  const [requiresPassword, setRequiresPassword] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -144,10 +144,9 @@ export default function App() {
       case 'login':
         return (
           <LoginScreen 
-            onLogin={() => setIsLoading(true)} 
-            onTicketLogin={(email) => {
-              setPendingTicketEmail(email)
-              setScreen('onboarding')
+            onLogin={(requires) => {
+              setRequiresPassword(!!requires)
+              setIsLoading(true)
             }} 
           />
         )
@@ -185,70 +184,41 @@ export default function App() {
           />
         ) : null
       case 'onboarding':
-        if (currentUser) {
-          return (
-            <OnboardingScreen
-              user={currentUser}
-              onComplete={async (data, _password, files) => {
-                try {
-                  const uploadedUrls = []
-                  for (const f of files || []) {
-                    const url = await supabaseAppDataService.uploadPhoto!(f)
-                    if (url) uploadedUrls.push(url)
-                  }
-                  data.images = uploadedUrls
-
-                  const success = await supabaseAppDataService.updateProfile?.(data)
-                  if (success) {
-                    setCurrentUser((prev) => (prev ? { ...prev, ...data } : prev))
-                    setScreen('swipe')
-                    setNavTab('swipe')
-                  } else {
-                    return 'Error al actualizar el perfil'
-                  }
-                } catch (err: any) {
-                  return err.message
+        return currentUser ? (
+          <OnboardingScreen
+            user={currentUser}
+            requiresPassword={requiresPassword}
+            onComplete={async (data, password, files) => {
+              try {
+                if (requiresPassword && password) {
+                  const { error } = await supabase.auth.updateUser({ password })
+                  if (error) return 'Error al actualizar contraseña: ' + error.message
                 }
-              }}
-            />
-          )
-        } else if (pendingTicketEmail) {
-          return (
-            <OnboardingScreen
-              guestEmail={pendingTicketEmail}
-              onComplete={async (data, password, files) => {
-                try {
-                  if (!password) return 'Debes ingresar una contraseña.'
+                
+                const uploadedUrls = []
+                for (const f of files || []) {
+                  const url = await supabaseAppDataService.uploadPhoto!(f)
+                  if (url) uploadedUrls.push(url)
+                }
+                
+                // Append existing images if editing
+                data.images = [...(currentUser.images || []), ...uploadedUrls]
 
-                  const { error } = await supabase.auth.signUp({
-                    email: pendingTicketEmail,
-                    password: password
-                  })
-                  if (error) return 'Error al crear la cuenta: ' + error.message
-
-                  const uploadedUrls = []
-                  for (const f of files || []) {
-                    const url = await supabaseAppDataService.uploadPhoto!(f)
-                    if (url) uploadedUrls.push(url)
-                  }
-                  data.images = uploadedUrls
-
-                  await supabaseAppDataService.updateProfile?.(data)
-                  
-                  setPendingTicketEmail('')
-                  const snap = await loadAppData(supabaseAppDataService)
-                  setProfiles(snap.profiles)
-                  setCurrentUser(snap.currentUser)
+                const success = await supabaseAppDataService.updateProfile?.(data)
+                if (success) {
+                  setRequiresPassword(false)
+                  setCurrentUser((prev) => (prev ? { ...prev, ...data } : prev))
                   setScreen('swipe')
                   setNavTab('swipe')
-                } catch (err: any) {
-                  return err.message
+                } else {
+                  return 'Error al actualizar el perfil'
                 }
-              }}
-            />
-          )
-        }
-        return null
+              } catch (err: any) {
+                return err.message
+              }
+            }}
+          />
+        ) : null
       default:
         return null
     }

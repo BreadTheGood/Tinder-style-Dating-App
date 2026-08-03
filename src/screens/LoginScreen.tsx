@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { EyeIcon, FireIcon } from '../components/icons'
 import { supabase } from '../lib/supabase'
 
-export function LoginScreen({ onLogin, onTicketLogin }: { onLogin: () => void, onTicketLogin: (email: string) => void }) {
+const TEMP_PASSWORD = 'TempEventPassword2026!'
+
+export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean) => void }) {
   const [mode, setMode] = useState<'login' | 'ticket-code' | 'register'>('login')
   const [ticketCode, setTicketCode] = useState('')
   const [showPass, setShowPass] = useState(false)
@@ -51,7 +53,36 @@ export function LoginScreen({ onLogin, onTicketLogin }: { onLogin: () => void, o
         setErrorMsg('Por favor, ingresa un email válido')
         return
       }
-      onTicketLogin(email)
+      
+      setLoading(true)
+      
+      // 1. Check if it's an abandoned user (has temp password)
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password: TEMP_PASSWORD })
+      
+      if (!signInError && signInData.session) {
+         setLoading(false)
+         onLogin(true) // Requires password update
+         return
+      }
+      
+      // 2. Check if it's a completely new user
+      const { error: signUpError } = await supabase.auth.signUp({ email, password: TEMP_PASSWORD })
+      
+      if (signUpError) {
+         if (signUpError.message.toLowerCase().includes('already registered')) {
+            setErrorMsg('Este email ya tiene una cuenta. Por favor, ingresa tu contraseña.')
+            setMode('login')
+         } else {
+            setErrorMsg('Error: ' + signUpError.message)
+         }
+         setLoading(false)
+         return
+      }
+      
+      // 3. New user signed up successfully
+      // Auto logged in.
+      setLoading(false)
+      onLogin(true)
     }
   }
 
