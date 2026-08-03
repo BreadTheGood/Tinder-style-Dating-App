@@ -52,7 +52,7 @@ export default function App() {
         
         if (mounted) {
           if (snapshot.currentUser && snapshot.currentUser.images.length === 0) {
-            setScreen('edit_profile')
+            setScreen('onboarding')
             setNavTab('profile')
           } else {
             setScreen('swipe')
@@ -94,7 +94,7 @@ export default function App() {
           setCurrentUser(snap.currentUser)
 
           if (snap.currentUser && snap.currentUser.images.length === 0) {
-            setScreen('edit_profile')
+            setScreen('onboarding')
             setNavTab('profile')
           } else {
             setScreen('swipe')
