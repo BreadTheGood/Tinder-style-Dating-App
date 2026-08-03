@@ -35,6 +35,7 @@ export function ManagerApp() {
         // Log them out if they are not in the Managers table
         console.error('Not a manager', error)
         await supabase.auth.signOut()
+        alert('Acceso Denegado: Esta cuenta no tiene permisos de Manager.')
      }
      setLoading(false)
   }

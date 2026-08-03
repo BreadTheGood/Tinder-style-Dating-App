@@ -42,6 +42,18 @@ export default function App() {
       
       let snapshot;
       if (session) {
+        // Evitar que un manager ingrese a la app de usuarios
+        const { data: managerData } = await supabase.from('Managers').select('id').eq('id', session.user.id).maybeSingle()
+        if (managerData) {
+           await supabase.auth.signOut()
+           setScreen('login')
+           setIsLoading(false)
+           setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acceso Denegado', body: 'Las cuentas de Manager deben ingresar por el Portal (/manage).' } }))
+           }, 500)
+           return
+        }
+
         try {
           snapshot = await loadAppData(supabaseAppDataService)
           // Eliminamos el fallback a perfiles falsos para que la app dependa 100% de la BD real
@@ -87,6 +99,17 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
         // Fetch to see if they need onboarding
+        const { data: managerData } = await supabase.from('Managers').select('id').eq('id', session.user.id).maybeSingle()
+        if (managerData) {
+           await supabase.auth.signOut()
+           setScreen('login')
+           setIsLoading(false)
+           setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acceso Denegado', body: 'Las cuentas de Manager deben ingresar por el Portal (/manage).' } }))
+           }, 500)
+           return
+        }
+
         const snap = await loadAppData(supabaseAppDataService).catch((err) => {
           console.error("Auth state change fetch error:", err)
           return null
