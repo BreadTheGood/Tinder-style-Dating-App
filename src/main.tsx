@@ -4,7 +4,7 @@ import App from './App'
 import { ManagerApp } from './ManagerApp'
 import './index.css'
 
-const isManager = window.location.pathname.startsWith('/manage')
+const isManager = window.location.search.includes('manage=true') || window.location.hash.includes('manage') || window.location.pathname.includes('/manage')
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
