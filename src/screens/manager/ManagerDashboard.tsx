@@ -35,7 +35,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     loadManagers()
   }
   
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+
 
   const deleteManager = async (id: string) => {
     if (id === manager.id) {
