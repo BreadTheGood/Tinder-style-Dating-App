@@ -57,8 +57,8 @@ export const supabaseAppDataService: AppDataService = {
     // Fetch Matches for this user
     const { data: matches, error: matchesError } = await supabase
       .from('Matches')
-      .select('*, user1:Profiles!Matches_user1_id_fkey(*, Photos(*)), user2:Profiles!Matches_user2_id_fkey(*, Photos(*)), Messages(*)')
-      .or(`user1_id.eq.${myProfile.id},user2_id.eq.${myProfile.id}`)
+      .select('*, user1:Profiles!Matches_profile1_id_fkey(*, Photos(*)), user2:Profiles!Matches_profile2_id_fkey(*, Photos(*)), Messages(*)')
+      .or(`profile1_id.eq.${myProfile.id},profile2_id.eq.${myProfile.id}`)
       .order('created_at', { ascending: false })
 
     if (matchesError || !matches) {
@@ -68,7 +68,7 @@ export const supabaseAppDataService: AppDataService = {
 
     const conversations = []
     for (const match of matches) {
-      const isUser1 = match.user1_id === myProfile.id
+      const isUser1 = match.profile1_id === myProfile.id
       const otherProfileData = isUser1 ? match.user2 : match.user1
 
       if (!otherProfileData) continue
@@ -95,14 +95,14 @@ export const supabaseAppDataService: AppDataService = {
       }
       
       const rawMessages = match.Messages || []
-      rawMessages.sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      rawMessages.sort((a: any, b: any) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime())
 
       const messages: any[] = rawMessages.map((msg: any) => ({
         id: msg.id,
-        text: msg.text,
+        text: msg.content,
         from: msg.sender_id === myProfile.id ? 'me' : 'them',
-        time: new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        createdAt: msg.created_at
+        time: new Date(msg.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        createdAt: msg.sent_at
       }))
 
       conversations.push({
@@ -173,9 +173,10 @@ export const supabaseAppDataService: AppDataService = {
     if (!myProfile) return false
 
     const { error } = await supabase.from('Swipes').insert({
+      id: crypto.randomUUID(),
       swiper_id: myProfile.id,
-      swiped_id: targetId,
-      action: action
+      swiped_on_id: targetId,
+      swipe_type: action
     })
 
     if (error) {
@@ -187,15 +188,16 @@ export const supabaseAppDataService: AppDataService = {
       const { data: match } = await supabase.from('Swipes')
         .select('*')
         .eq('swiper_id', targetId)
-        .eq('swiped_id', myProfile.id)
-        .eq('action', 'like')
+        .eq('swiped_on_id', myProfile.id)
+        .eq('swipe_type', 'like')
         .maybeSingle()
 
       if (match) {
         // Create match
         const { error: matchError } = await supabase.from('Matches').insert({
-          user1_id: myProfile.id,
-          user2_id: targetId,
+          id: crypto.randomUUID(),
+          profile1_id: myProfile.id,
+          profile2_id: targetId,
         })
         if (matchError) {
           console.error("Error creating match", matchError)
@@ -214,9 +216,10 @@ export const supabaseAppDataService: AppDataService = {
     if (!myProfile) return false
     
     const { error } = await supabase.from('Messages').insert({
+       id: crypto.randomUUID(),
        match_id: matchId,
        sender_id: myProfile.id,
-       text: text
+       content: text
     })
     
     if (error) {

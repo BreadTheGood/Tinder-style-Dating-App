@@ -125,9 +125,9 @@ export default function App() {
           if (conv.id === newMessage.match_id) {
             const msg: Message = {
               id: newMessage.id,
-              text: newMessage.text,
+              text: newMessage.content,
               from: 'them',
-              time: new Date(newMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              time: new Date(newMessage.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }
             if (!conv.messages.find(m => m.id === msg.id)) {
                return {
