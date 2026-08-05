@@ -32,104 +32,88 @@ export default function App() {
      activeChatIdRef.current = (screen === 'chat' && activeConversation) ? (activeConversation.id || null) : null
   }, [screen, activeConversation])
 
+  const loadUserData = async (userId: string) => {
+    // 1. Evitar que un manager ingrese a la app de usuarios
+    const { data: managerData } = await supabase.from('Managers').select('id').eq('id', userId).maybeSingle()
+    if (managerData) {
+       await supabase.auth.signOut()
+       setScreen('login')
+       setIsLoading(false)
+       setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acceso Denegado', body: 'Las cuentas de Manager deben ingresar por el Portal (/manage).' } }))
+       }, 500)
+       return
+    }
+
+    try {
+      // Timeout de 7 segundos para evitar carga infinita si la red se cuelga
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('El tiempo de espera ha caducado.')), 7000)
+      )
+
+      const snap = await Promise.race([
+        loadAppData(supabaseAppDataService),
+        timeoutPromise
+      ])
+
+      if (snap && snap.currentUser) {
+        setProfiles(snap.profiles)
+        setConversations(snap.conversations)
+        setCurrentUser(snap.currentUser)
+
+        if (!snap.currentUser.images || snap.currentUser.images.length === 0) {
+          setScreen('onboarding')
+          setNavTab('profile')
+        } else {
+          setScreen('swipe')
+          setNavTab('swipe')
+        }
+      } else {
+        throw new Error('No se pudo cargar el perfil del usuario.')
+      }
+    } catch (err: any) {
+      console.error('Error cargando datos de la app:', err)
+      window.dispatchEvent(new CustomEvent('app-toast', { 
+        detail: { title: 'Error de Carga', body: err.message || 'Error al conectar con la base de datos.' } 
+      }))
+      setScreen('login')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     let mounted = true
 
-    const hydrate = async () => {
-      setIsLoading(true)
-      
-      // Check current session first
-      const { data: { session } } = await supabase.auth.getSession()
-      
-      let snapshot;
-      if (session) {
-        // Evitar que un manager ingrese a la app de usuarios
-        const { data: managerData } = await supabase.from('Managers').select('id').eq('id', session.user.id).maybeSingle()
-        if (managerData) {
-           await supabase.auth.signOut()
-           setScreen('login')
-           setIsLoading(false)
-           setTimeout(() => {
-              window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acceso Denegado', body: 'Las cuentas de Manager deben ingresar por el Portal (/manage).' } }))
-           }, 500)
-           return
-        }
-
-        try {
-          snapshot = await loadAppData(supabaseAppDataService)
-          // Eliminamos el fallback a perfiles falsos para que la app dependa 100% de la BD real
-        } catch (error) {
-          console.error("Error loading Supabase data, logging out", error)
-          await supabase.auth.signOut()
-          setScreen('login')
-          setIsLoading(false)
-          return
-        }
-        
-        if (mounted) {
-          if (snapshot.currentUser && snapshot.currentUser.images.length === 0) {
-            setScreen('onboarding')
-            setNavTab('profile')
-          } else {
-            setScreen('swipe')
-            setNavTab('swipe')
+    // Timeout máximo global de seguridad (8s) para asegurar que NUNCA quede en pantalla de carga
+    const globalLoadingGuard = setTimeout(() => {
+      if (mounted) {
+        setIsLoading(loading => {
+          if (loading) {
+            window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Atención', body: 'Conexión lenta. Por favor, intenta de nuevo.' } }))
           }
-        }
-      } else {
-        const mockSnap = await loadAppData(mockAppDataService)
-        snapshot = {
-          profiles: mockSnap.profiles,
-          conversations: mockSnap.conversations,
-          currentUser: null as any,
-        }
-        if (mounted) {
-          setScreen('login')
-        }
-      }
-      
-      if (!mounted) return
-      setProfiles(snapshot.profiles)
-      setConversations(snapshot.conversations)
-      setCurrentUser(snapshot.currentUser)
-      setIsLoading(false)
-    }
-
-    hydrate()
-    
-    // Listen for auth changes (like login or logout)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session) {
-        // Fetch to see if they need onboarding
-        const { data: managerData } = await supabase.from('Managers').select('id').eq('id', session.user.id).maybeSingle()
-        if (managerData) {
-           await supabase.auth.signOut()
-           setScreen('login')
-           setIsLoading(false)
-           setTimeout(() => {
-              window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acceso Denegado', body: 'Las cuentas de Manager deben ingresar por el Portal (/manage).' } }))
-           }, 500)
-           return
-        }
-
-        const snap = await loadAppData(supabaseAppDataService).catch((err) => {
-          console.error("Auth state change fetch error:", err)
-          return null
+          return false
         })
-        if (snap) {
-          setProfiles(snap.profiles)
-          setConversations(snap.conversations)
-          setCurrentUser(snap.currentUser)
+      }
+    }, 8000)
 
-          if (snap.currentUser && snap.currentUser.images.length === 0) {
-            setScreen('onboarding')
-            setNavTab('profile')
-          } else {
-            setScreen('swipe')
-            setNavTab('swipe')
-          }
-        }
-        setIsLoading(false)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return
+
+      if (event === 'TOKEN_REFRESHED' && currentUser) {
+        return
+      }
+
+      if (session) {
+        setIsLoading(true)
+        await loadUserData(session.user.id)
       } else {
+        const mockSnap = await loadAppData(mockAppDataService).catch(() => null)
+        if (mounted && mockSnap) {
+          setProfiles(mockSnap.profiles)
+          setConversations(mockSnap.conversations)
+        }
+        setCurrentUser(null)
         setScreen('login')
         setIsLoading(false)
       }
@@ -137,6 +121,7 @@ export default function App() {
 
     return () => {
       mounted = false
+      clearTimeout(globalLoadingGuard)
       subscription.unsubscribe()
     }
   }, [])
@@ -320,15 +305,14 @@ export default function App() {
                 if (success) {
                   setRequiresPassword(false)
                   setIsLoading(true)
-                  const snap = await loadAppData(supabaseAppDataService).catch(() => null)
-                  if (snap) {
-                    setProfiles(snap.profiles)
-                    setConversations(snap.conversations)
-                    setCurrentUser(snap.currentUser)
+                  const { data: { session } } = await supabase.auth.getSession()
+                  if (session) {
+                    await loadUserData(session.user.id)
+                  } else {
+                    setIsLoading(false)
+                    setScreen('swipe')
+                    setNavTab('swipe')
                   }
-                  setIsLoading(false)
-                  setScreen('swipe')
-                  setNavTab('swipe')
                 } else {
                   return 'Error al actualizar el perfil'
                 }
