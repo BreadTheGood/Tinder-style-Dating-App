@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { supabase } from './lib/supabase'
+import { managerSupabase as supabase } from './lib/managerSupabase'
 import { ManagerLoginScreen } from './screens/manager/ManagerLoginScreen'
 import { ManagerDashboard } from './screens/manager/ManagerDashboard'
 
@@ -22,6 +22,7 @@ export function ManagerApp() {
       if (session) {
          fetchManagerData(session)
       } else {
+         localStorage.removeItem('manager_login_time')
          setManagerData(null)
          setLoading(false)
       }
@@ -36,6 +37,27 @@ export function ManagerApp() {
         setLoading(false)
         return
      }
+
+     // === CÓDIGO NUEVO: Verificación de expiración de 1 hora ===
+     const loginTime = localStorage.getItem('manager_login_time')
+     if (loginTime) {
+        const timePassed = Date.now() - parseInt(loginTime, 10)
+        if (timePassed > 60 * 60 * 1000) { // 1 hora
+           console.log('Sesión expirada tras 1 hora de uso continuo.')
+           localStorage.removeItem('manager_login_time')
+           await supabase.auth.signOut()
+           setManagerData(null)
+           setSession(null)
+           setLoading(false)
+           window.dispatchEvent(new CustomEvent('app-toast', { 
+             detail: { title: 'Sesión Expirada', body: 'Por seguridad, debes volver a iniciar sesión tras 1 hora.' } 
+           }))
+           return
+        }
+     } else {
+        localStorage.setItem('manager_login_time', Date.now().toString())
+     }
+     // ==========================================================
      
      if (isFetching.current) return
      isFetching.current = true

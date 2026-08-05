@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
+import { managerSupabase as supabase } from '../../lib/managerSupabase'
 
 export function ManagerDashboard({ manager }: { manager: any }) {
   const isAdmin = manager.role === 'system_admin'

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { supabase } from '../../lib/supabase'
+import { managerSupabase as supabase } from '../../lib/managerSupabase'
 
 export function ManagerLoginScreen() {
   const [email, setEmail] = useState('')
