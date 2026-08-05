@@ -283,7 +283,6 @@ export default function App() {
           <LoginScreen 
             onLogin={(requires) => {
               setRequiresPassword(!!requires)
-              setIsLoading(true)
             }} 
           />
         )
