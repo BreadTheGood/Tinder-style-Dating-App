@@ -269,8 +269,8 @@ export default function App() {
           <div className="relative w-20 h-20 rounded-2xl gradient-brand flex items-center justify-center mb-5 shadow-lg animate-pulse" style={{ boxShadow: '0 8px 32px rgba(255,62,108,0.4)' }}>
             <FireIcon size={36} className="text-white" />
           </div>
-          <h1 className="text-3xl font-black uppercase tracking-[0.25em] mb-2 pl-2">
-            <span className="gradient-brand-text notranslate" translate="no">FUEGO</span>
+          <h1 className="text-4xl font-black italic tracking-tighter mb-2 transform -rotate-2">
+            <span className="gradient-brand-text notranslate" translate="no">gira!</span>
           </h1>
           <p className="text-xs text-white/40 font-semibold tracking-widest uppercase animate-pulse">Cargando...</p>
         </div>
