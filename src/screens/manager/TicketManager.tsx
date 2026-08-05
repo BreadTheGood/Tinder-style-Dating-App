@@ -13,7 +13,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
 
   const loadTickets = async () => {
     setLoading(true)
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('TicketCodes')
       .select('*')
       .eq('event_id', event.id)

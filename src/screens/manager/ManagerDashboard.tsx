@@ -299,9 +299,10 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
       {/* Main Content */}
       <div className="flex-1 p-10 overflow-y-auto">
-         {activeTab === 'events' && managingTicketsFor ? (
+         {activeTab === 'events' && managingTicketsFor && (
            <TicketManager event={managingTicketsFor} onBack={() => setManagingTicketsFor(null)} />
-         ) : activeTab === 'events' && !managingTicketsFor ? (
+         )}
+         {activeTab === 'events' && !managingTicketsFor && (
            <>
              <div className="flex justify-between items-center mb-6">
                 <div>
