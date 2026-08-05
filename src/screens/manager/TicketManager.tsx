@@ -6,6 +6,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
   const [loading, setLoading] = useState(false)
   const [generateCount, setGenerateCount] = useState(10)
   const [generating, setGenerating] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     loadTickets()
@@ -49,6 +50,45 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
       loadTickets()
     }
     setGenerating(false)
+  }
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    const reader = new FileReader()
+    reader.onload = async (ev) => {
+      try {
+        const text = ev.target?.result as string
+        const codes = text.split(/[\r\n,]+/).map(c => c.trim()).filter(c => c.length > 0)
+        const validCodes = codes.filter(c => c.toLowerCase() !== 'codigo' && c.toLowerCase() !== 'code' && c.toLowerCase() !== 'código')
+        
+        if (validCodes.length === 0) throw new Error('No se encontraron códigos válidos en el archivo.')
+
+        const newTickets = validCodes.map(code => ({
+          event_id: event.id,
+          code: code,
+          is_redeemed: false
+        }))
+
+        // Chunking array for Supabase (max 1000 per request is safe)
+        const chunkSize = 500
+        for (let i = 0; i < newTickets.length; i += chunkSize) {
+          const chunk = newTickets.slice(i, i + chunkSize)
+          const { error } = await supabase.from('TicketCodes').insert(chunk)
+          if (error) throw error
+        }
+
+        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: `${validCodes.length} tickets importados correctamente.` } }))
+        loadTickets()
+      } catch (err: any) {
+        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error de Importación', body: err.message } }))
+      } finally {
+        setUploading(false)
+        e.target.value = '' // Reset input
+      }
+    }
+    reader.readAsText(file)
   }
 
   const downloadCSV = () => {
@@ -129,15 +169,17 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
             </form>
           </div>
 
-          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 flex flex-col items-center justify-center text-center">
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 flex flex-col items-center justify-center text-center relative">
             <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center mb-3">
               <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
             </div>
             <h3 className="text-sm font-bold text-gray-700 mb-1">Importar desde CSV</h3>
-            <p className="text-xs text-gray-500 mb-4">¿Ya tienes códigos de Passline, Eventbrite u otra tiquetera?</p>
-            <button disabled className="px-4 py-2 bg-gray-200 text-gray-500 rounded-lg text-sm font-bold opacity-50 cursor-not-allowed">
-              Próximamente
-            </button>
+            <p className="text-xs text-gray-500 mb-4">Sube un archivo .csv con los códigos (columna única o separados por coma).</p>
+            
+            <label className={`px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-50 cursor-pointer transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+              {uploading ? 'Importando...' : 'Seleccionar Archivo'}
+              <input type="file" accept=".csv" className="hidden" onChange={handleFileUpload} disabled={uploading} />
+            </label>
           </div>
         </div>
 
