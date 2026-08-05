@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from './lib/supabase'
 import { ManagerLoginScreen } from './screens/manager/ManagerLoginScreen'
 import { ManagerDashboard } from './screens/manager/ManagerDashboard'
@@ -8,38 +8,73 @@ export function ManagerApp() {
   const [managerData, setManagerData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
+  const isFetching = useRef(false)
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
-      if (session) fetchManagerData(session.user.id)
+      if (session) fetchManagerData(session)
       else setLoading(false)
     })
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       if (session) {
-         fetchManagerData(session.user.id)
+         fetchManagerData(session)
       } else {
          setManagerData(null)
          setLoading(false)
       }
     })
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  const fetchManagerData = async (userId: string) => {
-     setLoading(true)
-     const { data, error } = await supabase.from('Managers').select('*').eq('id', userId).maybeSingle()
-     if (data) {
-        setManagerData(data)
-     } else {
-        // Log them out if they are not in the Managers table
-        console.error('Not a manager', error)
-        await supabase.auth.signOut()
-        setTimeout(() => {
-           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acceso Denegado', body: 'Esta cuenta no tiene permisos de Manager.' } }))
-        }, 500)
+  const fetchManagerData = async (currSession: any) => {
+     if (!currSession?.user) {
+        setManagerData(null)
+        setLoading(false)
+        return
      }
-     setLoading(false)
+     
+     if (isFetching.current) return
+     isFetching.current = true
+     setLoading(true)
+
+     try {
+       const userId = currSession.user.id
+       const userEmail = currSession.user.email
+
+       // 1. Buscar por ID en tabla Managers
+       let { data, error } = await supabase.from('Managers').select('*').eq('id', userId).maybeSingle()
+
+       // 2. Fallback por Email si no se encontró por ID
+       if (!data && userEmail) {
+          const { data: dataByEmail } = await supabase.from('Managers').select('*').eq('email', userEmail).maybeSingle()
+          if (dataByEmail) {
+             data = dataByEmail
+             // Vincular el ID correcto de auth
+             await supabase.from('Managers').update({ id: userId }).eq('email', userEmail)
+          }
+       }
+
+       if (data) {
+          setManagerData(data)
+       } else {
+          console.error('Cuenta sin permisos de manager:', userEmail, error)
+          await supabase.auth.signOut()
+          setManagerData(null)
+          setSession(null)
+          window.dispatchEvent(new CustomEvent('app-toast', { 
+            detail: { title: 'Acceso Denegado', body: `La cuenta ${userEmail} no está registrada en el sistema de Managers.` } 
+          }))
+       }
+     } catch (err) {
+       console.error('Error cargando manager:', err)
+     } finally {
+       isFetching.current = false
+       setLoading(false)
+     }
   }
 
   const [toastMessage, setToastMessage] = useState<{title: string; body: string} | null>(null)

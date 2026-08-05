@@ -33,15 +33,10 @@ export default function App() {
   }, [screen, activeConversation])
 
   const loadUserData = async (userId: string) => {
-    // 1. Evitar que un manager ingrese a la app de usuarios
+    // 1. Evitar que un manager ingrese a la app de usuarios (redirigir al portal en lugar de desloguear)
     const { data: managerData } = await supabase.from('Managers').select('id').eq('id', userId).maybeSingle()
     if (managerData) {
-       await supabase.auth.signOut()
-       setScreen('login')
-       setIsLoading(false)
-       setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acceso Denegado', body: 'Las cuentas de Manager deben ingresar por el Portal (/manage).' } }))
-       }, 500)
+       window.location.href = '/?manage=true'
        return
     }
 
