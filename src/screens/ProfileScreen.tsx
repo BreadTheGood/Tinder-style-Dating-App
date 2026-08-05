@@ -36,6 +36,18 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
      setJoining(false)
   }
 
+  const [showHistory, setShowHistory] = useState(false)
+
+  const activeEvents = events.filter(e => {
+     if (!e.end_datetime) return true
+     return new Date(e.end_datetime).getTime() > Date.now()
+  })
+
+  const pastEvents = events.filter(e => {
+     if (!e.end_datetime) return false
+     return new Date(e.end_datetime).getTime() <= Date.now()
+  })
+
   return (
     <div className="flex flex-col h-full overflow-y-auto" style={{ background: '#0d0d0f' }}>
       <div className="relative h-80 flex-shrink-0">
@@ -72,20 +84,34 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
         </div>
       </div>
 
+      {/* Mis Eventos Activos */}
       <div className="mx-5 mt-4 glass rounded-2xl p-4 mb-4">
-        <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Mis Eventos</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-semibold text-white/40 uppercase tracking-widest">Mis Eventos Activos</p>
+          {pastEvents.length > 0 && (
+             <button 
+               onClick={() => setShowHistory(!showHistory)} 
+               className="text-xs font-semibold text-[#ff6b8a] hover:underline"
+             >
+                {showHistory ? 'Ocultar historial' : `Historial (${pastEvents.length})`}
+             </button>
+          )}
+        </div>
         
         <div className="flex flex-col gap-2 mb-4">
-           {events.length === 0 ? (
-             <p className="text-white/40 text-sm">No estás en ningún evento actualmente.</p>
+           {activeEvents.length === 0 ? (
+             <p className="text-white/40 text-sm">No estás en ningún evento activo actualmente.</p>
            ) : (
-             events.map(e => (
+             activeEvents.map(e => (
                <div key={e.id} className="bg-white/5 border border-white/10 p-3 rounded-xl flex items-center justify-between">
                   <div>
                     <p className="text-white font-bold text-sm">{e.name || 'Evento'}</p>
                     <p className="text-[#f304eb] text-xs font-medium">#{e.code}</p>
                   </div>
-                  <div className="w-2 h-2 rounded-full bg-[#4ade80]" />
+                  <div className="flex items-center gap-1.5">
+                     <span className="text-[10px] text-[#4ade80] font-semibold uppercase tracking-wider">En vivo</span>
+                     <div className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
+                  </div>
                </div>
              ))
            )}
@@ -108,6 +134,27 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
           </button>
         </div>
       </div>
+
+      {/* Historial de Eventos Pasados */}
+      {showHistory && pastEvents.length > 0 && (
+        <div className="mx-5 glass rounded-2xl p-4 mb-4">
+          <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Historial de Eventos Pasados</p>
+          <div className="flex flex-col gap-2">
+             {pastEvents.map(e => {
+               const dateStr = e.start_datetime ? new Date(e.start_datetime).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : ''
+               return (
+                 <div key={e.id} className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center justify-between opacity-60">
+                    <div>
+                      <p className="text-white/80 font-semibold text-sm">{e.name || 'Evento'}</p>
+                      <p className="text-white/30 text-xs font-medium">{dateStr} • #{e.code}</p>
+                    </div>
+                    <span className="text-[10px] text-white/40 font-semibold uppercase">Finalizado</span>
+                 </div>
+               )
+             })}
+          </div>
+        </div>
+      )}
 
       <div className="mx-5 mb-28">
         <button onClick={onEdit} className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all active:scale-95 glass border border-white/10">Editar perfil</button>
