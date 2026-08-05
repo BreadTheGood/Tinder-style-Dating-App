@@ -19,6 +19,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   const [newEventDesc, setNewEventDesc] = useState('')
   const [newEventDate, setNewEventDate] = useState('')
   const [savingEvent, setSavingEvent] = useState(false)
+  const [eventFilter, setEventFilter] = useState<'all' | 'active' | 'finished'>('all')
 
   useEffect(() => {
     if (activeTab === 'managers' && isAdmin) {
@@ -30,7 +31,6 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
   const loadEvents = async () => {
     setLoading(true)
-    // Admins see all events, managers see only theirs
     let query = supabase.from('Events').select('*').order('start_datetime', { ascending: false })
     if (!isAdmin) {
        query = query.eq('manager_id', manager.id)
@@ -45,13 +45,9 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     if (!newEventName || !newEventDate) return
     setSavingEvent(true)
 
-    // Calculate start and end datetime
-    // Start datetime assumes 12:00 PM of that day (or we can use 00:00)
-    // The user said "todos los eventos duran 12hs", let's assume they start at 12:00 PM and end at 00:00 AM
     const startDate = new Date(newEventDate + 'T12:00:00')
     const endDate = new Date(startDate.getTime() + 12 * 60 * 60 * 1000)
-
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase() // Generamos un código genérico temporal
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase()
 
     const { error: dbErr } = await supabase.from('Events').insert({
        manager_id: manager.id,
@@ -90,17 +86,12 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     await supabase.from('Managers').update({ is_active: !currentStatus }).eq('id', id)
     loadManagers()
   }
-  
-
 
   const deleteManager = async (id: string) => {
     if (id === manager.id) {
        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción no permitida', body: 'No puedes eliminarte a ti mismo.' } }))
        return
     }
-    
-    // Instead of window.confirm, we handle this without an alert.
-    // For simplicity, since alerts are forbidden, we'll just execute it and show a success toast.
     await supabase.from('Managers').delete().eq('id', id)
     loadManagers()
     window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Eliminado', body: 'Manager eliminado permanentemente.' } }))
@@ -129,6 +120,34 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     }
     setCreating(false)
   }
+
+  const formatDateTime = (dateStr?: string) => {
+    if (!dateStr) return '-'
+    const d = new Date(dateStr)
+    return d.toLocaleDateString('es-ES', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    }) + ' hs'
+  }
+
+  const activeEventsList = eventsList.filter(e => {
+     if (!e.end_datetime) return true
+     return new Date(e.end_datetime).getTime() > Date.now()
+  })
+
+  const finishedEventsList = eventsList.filter(e => {
+     if (!e.end_datetime) return false
+     return new Date(e.end_datetime).getTime() <= Date.now()
+  })
+
+  const filteredEventsList = eventFilter === 'active' 
+    ? activeEventsList 
+    : eventFilter === 'finished' 
+    ? finishedEventsList 
+    : eventsList
 
   if (!isActive) {
      return (
@@ -182,14 +201,45 @@ export function ManagerDashboard({ manager }: { manager: any }) {
       <div className="flex-1 p-10 overflow-y-auto">
          {activeTab === 'events' && (
            <>
-             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">{isAdmin ? 'Todos los Eventos' : 'Tus Eventos'}</h1>
+             <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-800">{isAdmin ? 'Todos los Eventos' : 'Tus Eventos'}</h1>
+                  <p className="text-sm text-gray-500 mt-1">Gestiona eventos en curso y consulta el historial de finalizados.</p>
+                </div>
                 <button 
                   onClick={() => setShowEventForm(!showEventForm)}
                   className="bg-gradient-to-r from-[#f304eb] to-[#ff7043] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity"
                 >
                    {showEventForm ? 'Cancelar' : '+ Crear Evento'}
                 </button>
+             </div>
+
+             {/* Filtros de eventos */}
+             <div className="flex gap-2 mb-6 border-b border-gray-200 pb-3">
+               <button
+                 onClick={() => setEventFilter('all')}
+                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                   eventFilter === 'all' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'
+                 }`}
+               >
+                 Todos ({eventsList.length})
+               </button>
+               <button
+                 onClick={() => setEventFilter('active')}
+                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                   eventFilter === 'active' ? 'bg-green-600 text-white' : 'text-gray-500 hover:bg-gray-100'
+                 }`}
+               >
+                 En curso ({activeEventsList.length})
+               </button>
+               <button
+                 onClick={() => setEventFilter('finished')}
+                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                   eventFilter === 'finished' ? 'bg-gray-600 text-white' : 'text-gray-500 hover:bg-gray-100'
+                 }`}
+               >
+                 Finalizados ({finishedEventsList.length})
+               </button>
              </div>
 
              {showEventForm && (
@@ -206,9 +256,9 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                      </div>
                      <div className="flex gap-4">
                         <div className="flex-1">
-                           <label className="block text-sm font-semibold text-gray-600 mb-1">Fecha (Día, Mes, Año)</label>
+                           <label className="block text-sm font-semibold text-gray-600 mb-1">Fecha de Inicio (Día, Mes, Año)</label>
                            <input type="date" required value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" />
-                           <p className="text-xs text-gray-400 mt-1">Por defecto, el evento durará 12 horas desde el mediodía.</p>
+                           <p className="text-xs text-gray-400 mt-1">Por defecto, iniciará a las 12:00 hs y durará 12 horas (hasta las 00:00 hs).</p>
                         </div>
                         <div className="flex-1">
                            <label className="block text-sm font-semibold text-gray-600 mb-1">Lista de Códigos (Opcional)</label>
@@ -226,29 +276,50 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                </div>
              )}
 
-             {eventsList.length === 0 && !loading ? (
+             {filteredEventsList.length === 0 && !loading ? (
                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center text-gray-500 flex flex-col items-center">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                      <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-700 mb-1">Aún no hay eventos</h3>
-                  <p className="text-sm">Empieza creando tu primer evento para generar tickets y cargar la lista de invitados en CSV.</p>
+                  <h3 className="text-lg font-bold text-gray-700 mb-1">No hay eventos en esta categoría</h3>
+                  <p className="text-sm">Cambia de filtro o crea un nuevo evento.</p>
                </div>
              ) : (
                <div className="grid grid-cols-2 gap-6">
-                 {eventsList.map(e => {
-                   const startDate = new Date(e.start_datetime)
+                 {filteredEventsList.map(e => {
+                   const isOngoing = !e.end_datetime || new Date(e.end_datetime).getTime() > Date.now()
                    return (
                      <div key={e.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col relative overflow-hidden group">
-                       <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#f304eb] to-[#ff7043]" />
+                       <div className={`absolute top-0 left-0 w-1.5 h-full ${isOngoing ? 'bg-gradient-to-b from-[#f304eb] to-[#ff7043]' : 'bg-gray-300'}`} />
+                       
                        <div className="flex justify-between items-start mb-2">
-                         <h3 className="text-xl font-bold text-gray-900">{e.name}</h3>
-                         <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-widest">{e.code}</span>
+                         <div className="flex-1 pr-2">
+                           <h3 className="text-xl font-bold text-gray-900">{e.name}</h3>
+                           <p className="text-gray-400 text-xs font-mono mt-0.5">#{e.code}</p>
+                         </div>
+                         {isOngoing ? (
+                           <span className="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase flex items-center gap-1.5 flex-shrink-0">
+                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                             En curso
+                           </span>
+                         ) : (
+                           <span className="px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-bold rounded-full uppercase flex-shrink-0">
+                             Finalizado
+                           </span>
+                         )}
                        </div>
-                       <p className="text-gray-500 text-sm mb-6 flex-1">{e.description || 'Sin descripción'}</p>
-                       <div className="flex items-center text-sm font-semibold text-gray-700 bg-gray-50 p-3 rounded-xl">
-                          <svg className="w-5 h-5 mr-2 text-[#f304eb]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                          {startDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+
+                       <p className="text-gray-500 text-sm mb-4 flex-1">{e.description || 'Sin descripción'}</p>
+
+                       <div className="mt-auto pt-3 border-t border-gray-100 space-y-1.5 text-xs font-semibold">
+                          <div className="flex justify-between items-center text-gray-600">
+                             <span className="text-gray-400">Inicio:</span>
+                             <span className="text-gray-800">{formatDateTime(e.start_datetime)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-gray-600">
+                             <span className="text-gray-400">Expiración:</span>
+                             <span className={isOngoing ? 'text-green-700 font-bold' : 'text-gray-500'}>{formatDateTime(e.end_datetime)}</span>
+                          </div>
                        </div>
                      </div>
                    )
