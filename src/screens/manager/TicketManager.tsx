@@ -34,6 +34,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
       // Generar código aleatorio de 6-8 caracteres alfanuméricos
       const code = Math.random().toString(36).substring(2, 8).toUpperCase()
       newTickets.push({
+        id: crypto.randomUUID(),
         event_id: event.id,
         code: code,
         is_redeemed: false
@@ -66,6 +67,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
         if (validCodes.length === 0) throw new Error('No se encontraron códigos válidos en el archivo.')
 
         const newTickets = validCodes.map(code => ({
+          id: crypto.randomUUID(),
           event_id: event.id,
           code: code,
           is_redeemed: false
