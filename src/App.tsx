@@ -12,6 +12,7 @@ import { loadAppData, mockAppDataService } from './services/appDataService'
 import { supabaseAppDataService } from './services/supabaseAppDataService'
 import type { Conversation, Profile, Screen, UserProfile, Message } from './types'
 import { supabase } from './lib/supabase'
+import { FireIcon } from './components/icons'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('login')
@@ -230,9 +231,27 @@ export default function App() {
     setActiveConversation(null) // Si tocamos la barra inferior, salimos de cualquier chat
   }
 
-  const showNav = screen !== 'login' && screen !== 'chat' && screen !== 'onboarding'
+  const showNav = !isLoading && screen !== 'login' && screen !== 'chat' && screen !== 'onboarding'
 
   const renderScreen = () => {
+    if (isLoading) {
+      return (
+        <div className="relative h-full flex flex-col items-center justify-center overflow-hidden" style={{ background: '#0d0d0f' }}>
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vw] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #f304eb 0%, transparent 70%)' }} />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full opacity-15" style={{ background: 'radial-gradient(circle, #b004f3 0%, transparent 70%)' }} />
+          </div>
+          <div className="relative w-20 h-20 rounded-2xl gradient-brand flex items-center justify-center mb-5 shadow-lg animate-pulse" style={{ boxShadow: '0 8px 32px rgba(255,62,108,0.4)' }}>
+            <FireIcon size={36} className="text-white" />
+          </div>
+          <h1 className="text-3xl font-extrabold tracking-tight mb-2">
+            <span className="gradient-brand-text">swiper</span>
+          </h1>
+          <p className="text-xs text-white/40 font-semibold tracking-widest uppercase animate-pulse">Cargando...</p>
+        </div>
+      )
+    }
+
     switch (screen) {
       case 'login':
         return (
@@ -300,7 +319,14 @@ export default function App() {
                 const success = await supabaseAppDataService.updateProfile?.(data)
                 if (success) {
                   setRequiresPassword(false)
-                  setCurrentUser((prev) => (prev ? { ...prev, ...data } : prev))
+                  setIsLoading(true)
+                  const snap = await loadAppData(supabaseAppDataService).catch(() => null)
+                  if (snap) {
+                    setProfiles(snap.profiles)
+                    setConversations(snap.conversations)
+                    setCurrentUser(snap.currentUser)
+                  }
+                  setIsLoading(false)
                   setScreen('swipe')
                   setNavTab('swipe')
                 } else {
