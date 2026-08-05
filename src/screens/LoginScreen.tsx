@@ -156,17 +156,13 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
     setModalLoading(true)
     setModalError('')
 
-    // Intentar ver si el usuario existe (buscando en Profiles)
-    const { data } = await supabase.from('Profiles').select('*').eq('email', email).maybeSingle()
+    const { data: userExists } = await supabase.rpc('check_email_exists', { user_email: email })
     
     setModalLoading(false)
     
-    // Si la tabla Profiles no tiene columna email, error.code será '42703' o no habrá data.
-    // Si data existe, el usuario está registrado.
-    if (data) {
+    if (userExists) {
        setModalStep('password')
     } else {
-       // El usuario no existe o la consulta falló. Redirigimos a registro.
        setShowPasswordModal(false)
        setMode('register')
     }
