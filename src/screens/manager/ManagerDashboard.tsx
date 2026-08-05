@@ -86,6 +86,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
          description: newEventDesc,
          start_datetime: startDate.toISOString(),
          end_datetime: endDate.toISOString(),
+         status: 'en curso'
       }).eq('id', editingEventId)
 
       if (dbErr) {
@@ -104,7 +105,8 @@ export function ManagerDashboard({ manager }: { manager: any }) {
          start_datetime: startDate.toISOString(),
          end_datetime: endDate.toISOString(),
          code: code,
-         is_suspended: false
+         is_suspended: false,
+         status: 'en curso'
       })
 
       if (dbErr) {
@@ -120,9 +122,11 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
   const toggleSuspendEvent = async (evt: any) => {
     const newSuspendedState = !evt.is_suspended
+    const newStatus = newSuspendedState ? 'suspendido' : 'en curso'
     
     const { error } = await supabase.from('Events').update({
-      is_suspended: newSuspendedState
+      is_suspended: newSuspendedState,
+      status: newStatus
     }).eq('id', evt.id)
 
     if (error) {
