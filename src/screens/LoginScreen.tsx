@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { EyeIcon, FireIcon } from '../components/icons'
 import { supabase } from '../lib/supabase'
 
-const TEMP_PASSWORD = 'TempEventPassword2026!'
-
 export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean) => void }) {
   const [mode, setMode] = useState<'login' | 'ticket-code' | 'register'>('login')
   const [ticketCode, setTicketCode] = useState('')
@@ -14,15 +12,32 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
+  // Flotante de contraseña para código de evento
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [modalPassword, setModalPassword] = useState('')
+  const [validEvent, setValidEvent] = useState<any>(null)
+  const [modalLoading, setModalLoading] = useState(false)
+  const [modalError, setModalError] = useState('')
+
   const handleAuth = async () => {
+    setErrorMsg('')
+    
     if (mode === 'login' || mode === 'register') {
+      if (!email || !email.includes('@')) {
+        setErrorMsg('Por favor, ingresa un email válido.')
+        return
+      }
+      if (!password) {
+        setErrorMsg('Por favor, ingresa tu contraseña.')
+        return
+      }
+
       setLoading(true)
-      setErrorMsg('')
       
       if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) {
-          setErrorMsg('Credenciales incorrectas, por favor verifica tu email y contraseña.')
+          setErrorMsg('Credenciales incorrectas. Verifica tu email y contraseña.')
           setLoading(false)
           return
         }
@@ -34,55 +49,126 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
         }
         const { error } = await supabase.auth.signUp({ email, password })
         if (error) {
-          setErrorMsg('Las contraseñas no coinciden')
+          setErrorMsg(error.message)
           setLoading(false)
           return
         }
-        // If sign up is successful, Supabase might require email confirmation depending on your settings.
-        // If it doesn't, it will log the user in automatically.
       }
 
       setLoading(false)
-      onLogin() // Proceed to the app
+      onLogin()
     } else {
-      if (ticketCode !== 'EVENTO2026') {
-        setErrorMsg('Código de evento inválido')
+      // Modo: Usar Código de Evento
+      if (!ticketCode.trim()) {
+        setErrorMsg('Por favor, ingresa el código del evento.')
         return
       }
       if (!email || !email.includes('@')) {
-        setErrorMsg('Por favor, ingresa un email válido')
+        setErrorMsg('Por favor, ingresa un email válido.')
         return
       }
-      
+
       setLoading(true)
-      
-      // 1. Check if it's an abandoned user (has temp password)
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password: TEMP_PASSWORD })
-      
-      if (!signInError && signInData.session) {
-         setLoading(false)
-         onLogin(true) // Requires password update
-         return
+      const cleanCode = ticketCode.trim().toUpperCase()
+
+      // Validar el código de evento en Supabase real
+      const { data: eventData, error: eventErr } = await supabase
+        .from('Events')
+        .select('*')
+        .eq('code', cleanCode)
+        .maybeSingle()
+
+      if (eventErr || !eventData) {
+        setErrorMsg('Código de evento no válido o inexistente.')
+        setLoading(false)
+        return
       }
-      
-      // 2. Check if it's a completely new user
-      const { error: signUpError } = await supabase.auth.signUp({ email, password: TEMP_PASSWORD })
-      
-      if (signUpError) {
-         if (signUpError.message.toLowerCase().includes('already registered')) {
-            setErrorMsg('Este email ya tiene una cuenta. Por favor, ingresa tu contraseña.')
-            setMode('login')
-         } else {
-            setErrorMsg('Error: ' + signUpError.message)
-         }
-         setLoading(false)
-         return
+
+      if (eventData.is_suspended) {
+        setErrorMsg('Este evento se encuentra suspendido actualmente.')
+        setLoading(false)
+        return
       }
-      
-      // 3. New user signed up successfully
-      // Auto logged in.
+
+      if (eventData.end_datetime && new Date(eventData.end_datetime).getTime() <= Date.now()) {
+        setErrorMsg('Este evento ya ha finalizado.')
+        setLoading(false)
+        return
+      }
+
+      // El código es válido: Abrir el Flotante para pedir la Contraseña
+      setValidEvent(eventData)
+      setModalError('')
+      setModalPassword('')
+      setShowPasswordModal(true)
       setLoading(false)
-      onLogin(true)
+    }
+  }
+
+  const handleConfirmCodeLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!modalPassword) {
+      setModalError('Por favor, ingresa una contraseña.')
+      return
+    }
+
+    setModalLoading(true)
+    setModalError('')
+
+    // 1. Intentar iniciar sesión
+    const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+      email,
+      password: modalPassword
+    })
+
+    if (!signInErr && signInData.session) {
+       // Usuario existente inició sesión
+       await joinEventAfterLogin(signInData.session.user.id, validEvent.id)
+       setModalLoading(false)
+       setShowPasswordModal(false)
+       onLogin()
+       return
+    }
+
+    // 2. Si falló el inicio de sesión, intentar registrar como nuevo usuario
+    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+      email,
+      password: modalPassword
+    })
+
+    if (signUpErr) {
+       if (signUpErr.message.toLowerCase().includes('already registered')) {
+          setModalError('Contraseña incorrecta. Ya existe una cuenta registrada con este correo.')
+       } else {
+          setModalError('Error: ' + signUpErr.message)
+       }
+       setModalLoading(false)
+       return
+    }
+
+    if (signUpData.session) {
+       await joinEventAfterLogin(signUpData.session.user.id, validEvent.id)
+       setModalLoading(false)
+       setShowPasswordModal(false)
+       onLogin()
+    } else {
+       // Si requiere confirmación de email
+       setModalError('Registro iniciado. Por favor verifica tu correo para ingresar.')
+       setModalLoading(false)
+    }
+  }
+
+  const joinEventAfterLogin = async (userId: string, eventId: string) => {
+    try {
+      const { data: profile } = await supabase.from('Profiles').select('id').eq('user_id', userId).maybeSingle()
+      if (profile) {
+        await supabase.from('ProfileEvents').insert({
+          profile_id: profile.id,
+          event_id: eventId
+        })
+      }
+    } catch {
+      // Ignorar errores si ya estaba unido
     }
   }
 
@@ -110,7 +196,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
               {(['login', 'ticket-code'] as const).map((m) => (
                 <button
                   key={m}
-                  onClick={() => setMode(m)}
+                  onClick={() => { setMode(m); setErrorMsg(''); }}
                   className="flex-1 py-3 text-sm font-semibold transition-all duration-200"
                   style={mode === m ? { background: 'linear-gradient(135deg,#f304eb,#b004f3)', color: '#fff', borderRadius: 10 } : { color: 'rgba(255,255,255,0.4)' }}
                 >
@@ -127,10 +213,10 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                   <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Código del evento</label>
                   <input
                     type="text"
-                    placeholder="Ej. EVENTO2026"
+                    placeholder="Ej. ABC123"
                     value={ticketCode}
                     onChange={e => setTicketCode(e.target.value)}
-                    className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
+                    className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all uppercase"
                     style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
                     onFocus={(e) => (e.target.style.borderColor = 'rgba(249, 8, 165, 0.5)')}
                     onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
@@ -217,7 +303,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
             </>
           )}
 
-          {errorMsg && <p className="text-red-500 text-xs text-center mt-2">{errorMsg}</p>}
+          {errorMsg && <p className="text-red-500 text-xs text-center mt-3">{errorMsg}</p>}
 
           <button
             onClick={handleAuth}
@@ -225,7 +311,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
             className="w-full mt-6 py-4 rounded-xl font-bold text-white text-base transition-all active:scale-95 disabled:opacity-50"
             style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)', boxShadow: '0 8px 24px rgba(249, 0, 220, 0.35)' }}
           >
-            {loading ? 'Cargando...' : mode === 'login' ? 'Ingresar' : mode === 'register' ? 'Crear cuenta' : 'Ingresar con código'}
+            {loading ? 'Validando...' : mode === 'login' ? 'Ingresar' : mode === 'register' ? 'Crear cuenta' : 'Ingresar con código'}
           </button>
           
           {mode === 'login' && (
@@ -247,6 +333,67 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
           <span className="gradient-brand-text font-semibold">Política de privacidad</span>
         </p>
       </div>
+
+      {/* Flotante (Modal) para ingresar Contraseña al usar Código */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)' }}>
+          <div className="w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border border-white/10" style={{ background: '#18181f' }}>
+             <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gradient-to-r from-[#f304eb] to-[#ff7043] text-white uppercase tracking-wider">
+                  {validEvent?.name || 'Evento'}
+                </span>
+             </div>
+             
+             <h3 className="text-xl font-extrabold text-white mb-1">Ingresa tu contraseña</h3>
+             <p className="text-xs text-white/60 mb-5 leading-relaxed">
+               Accediendo con <span className="text-white font-semibold">{email}</span> al evento <span className="text-[#ff6b8a] font-semibold">{validEvent?.name}</span>.
+             </p>
+
+             <form onSubmit={handleConfirmCodeLogin} className="space-y-4">
+                <div>
+                  <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5 block">Contraseña</label>
+                  <div className="relative">
+                    <input
+                      type={showPass ? 'text' : 'password'}
+                      required
+                      autoFocus
+                      placeholder="••••••••"
+                      value={modalPassword}
+                      onChange={(e) => setModalPassword(e.target.value)}
+                      className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
+                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    />
+                    <button type="button" onClick={() => setShowPass((p) => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                      <EyeIcon size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                {modalError && (
+                  <p className="text-red-400 text-xs font-medium bg-red-500/10 p-2.5 rounded-lg border border-red-500/20">{modalError}</p>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordModal(false)}
+                    className="flex-1 py-3.5 rounded-xl font-semibold text-white/70 text-sm hover:bg-white/5 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={modalLoading}
+                    className="flex-1 py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50"
+                    style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)', boxShadow: '0 4px 16px rgba(249, 0, 220, 0.3)' }}
+                  >
+                    {modalLoading ? 'Ingresando...' : 'Confirmar'}
+                  </button>
+                </div>
+             </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
