@@ -38,6 +38,25 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
 
   const [showHistory, setShowHistory] = useState(false)
 
+  const getTimeRemaining = (endDatetime?: string) => {
+    if (!endDatetime) return null
+    const diffMs = new Date(endDatetime).getTime() - Date.now()
+    if (diffMs <= 0) return 'Finalizado'
+
+    const totalMinutes = Math.floor(diffMs / (1000 * 60))
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+
+    if (hours > 24) {
+      const days = Math.floor(hours / 24)
+      return `Quedan ${days}d ${hours % 24}h`
+    }
+    if (hours > 0) {
+      return `Finaliza en ${hours}h ${minutes}m`
+    }
+    return `Finaliza en ${minutes}m`
+  }
+
   const activeEvents = events.filter(e => {
      if (!e.end_datetime) return true
      return new Date(e.end_datetime).getTime() > Date.now()
@@ -102,18 +121,23 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
            {activeEvents.length === 0 ? (
              <p className="text-white/40 text-sm">No estás en ningún evento activo actualmente.</p>
            ) : (
-             activeEvents.map(e => (
-               <div key={e.id} className="bg-white/5 border border-white/10 p-3 rounded-xl flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-bold text-sm">{e.name || 'Evento'}</p>
-                    <p className="text-[#f304eb] text-xs font-medium">#{e.code}</p>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                     <span className="text-[10px] text-[#4ade80] font-semibold uppercase tracking-wider">En vivo</span>
-                     <div className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
-                  </div>
-               </div>
-             ))
+             activeEvents.map(e => {
+               const remainingText = getTimeRemaining(e.end_datetime)
+               return (
+                 <div key={e.id} className="bg-white/5 border border-white/10 p-3 rounded-xl flex items-center justify-between">
+                    <div>
+                      <p className="text-white font-bold text-sm">{e.name || 'Evento'}</p>
+                      {remainingText && (
+                        <p className="text-white/50 text-xs font-medium mt-0.5">{remainingText}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                       <span className="text-[10px] text-[#4ade80] font-semibold uppercase tracking-wider">En vivo</span>
+                       <div className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
+                    </div>
+                 </div>
+               )
+             })
            )}
         </div>
         
@@ -141,12 +165,12 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
           <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Historial de Eventos Pasados</p>
           <div className="flex flex-col gap-2">
              {pastEvents.map(e => {
-               const dateStr = e.start_datetime ? new Date(e.start_datetime).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : ''
+               const dateStr = e.start_datetime ? new Date(e.start_datetime).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
                return (
                  <div key={e.id} className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center justify-between opacity-60">
                     <div>
                       <p className="text-white/80 font-semibold text-sm">{e.name || 'Evento'}</p>
-                      <p className="text-white/30 text-xs font-medium">{dateStr} • #{e.code}</p>
+                      <p className="text-white/30 text-xs font-medium">{dateStr}</p>
                     </div>
                     <span className="text-[10px] text-white/40 font-semibold uppercase">Finalizado</span>
                  </div>
