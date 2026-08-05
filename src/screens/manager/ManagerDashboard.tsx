@@ -20,6 +20,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   const [newEventDesc, setNewEventDesc] = useState('')
   const [newEventDate, setNewEventDate] = useState('')
   const [newEventTime, setNewEventTime] = useState('12:00')
+  const [newEventCode, setNewEventCode] = useState('')
   const [savingEvent, setSavingEvent] = useState(false)
   const [eventFilter, setEventFilter] = useState<'all' | 'active' | 'finished' | 'suspended'>('all')
 
@@ -46,6 +47,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     setEditingEventId(evt.id)
     setNewEventName(evt.name || '')
     setNewEventDesc(evt.description || '')
+    setNewEventCode(evt.code || '')
     if (evt.start_datetime) {
       const d = new Date(evt.start_datetime)
       const yyyy = d.getFullYear()
@@ -68,6 +70,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     setNewEventDesc('')
     setNewEventDate('')
     setNewEventTime('12:00')
+    setNewEventCode('')
     setShowEventForm(false)
   }
 
@@ -81,13 +84,18 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     const endDate = new Date(startDate.getTime() + 12 * 60 * 60 * 1000)
 
     if (editingEventId) {
-      const { error: dbErr } = await supabase.from('Events').update({
+      const payload: any = {
          name: newEventName,
          description: newEventDesc,
          start_datetime: startDate.toISOString(),
          end_datetime: endDate.toISOString(),
          status: 'en curso'
-      }).eq('id', editingEventId)
+      }
+      if (newEventCode.trim() !== '') {
+         payload.code = newEventCode.trim()
+      }
+
+      const { error: dbErr } = await supabase.from('Events').update(payload).eq('id', editingEventId)
 
       if (dbErr) {
          window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error actualizando evento: ' + dbErr.message } }))
@@ -97,7 +105,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
          loadEvents()
       }
     } else {
-      const code = Math.random().toString(36).substring(2, 8).toUpperCase()
+      const code = newEventCode.trim() !== '' ? newEventCode.trim() : Math.random().toString(36).substring(2, 8).toUpperCase()
       const { error: dbErr } = await supabase.from('Events').insert({
          manager_id: manager.id,
          name: newEventName,
@@ -351,9 +359,16 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                         <label className="block text-sm font-semibold text-gray-600 mb-1">Nombre del Evento</label>
                         <input type="text" required value={newEventName} onChange={e => setNewEventName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" placeholder="Ej: Fiesta de Verano 2026" />
                      </div>
-                     <div>
-                        <label className="block text-sm font-semibold text-gray-600 mb-1">Descripción</label>
-                        <textarea rows={2} value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb] resize-none" placeholder="Breve descripción del evento..." />
+                     <div className="flex gap-4">
+                        <div className="flex-1">
+                           <label className="block text-sm font-semibold text-gray-600 mb-1">Descripción</label>
+                           <textarea rows={2} value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb] resize-none" placeholder="Breve descripción del evento..." />
+                        </div>
+                        <div className="w-48">
+                           <label className="block text-sm font-semibold text-gray-600 mb-1">Código del Evento</label>
+                           <input type="text" value={newEventCode} onChange={e => setNewEventCode(e.target.value.toUpperCase())} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb] uppercase" placeholder="Ej: FIESTA26" />
+                           <p className="text-[10px] text-gray-400 mt-1">Dejar vacío para auto-generar</p>
+                        </div>
                      </div>
                      <div className="flex gap-4">
                         <div className="flex-1">
