@@ -38,6 +38,14 @@ export default function App() {
      activeChatIdRef.current = (screen === 'chat' && activeConversation) ? (activeConversation.id || null) : null
   }, [screen, activeConversation])
 
+  useEffect(() => {
+    // Fallback: Si por alguna razón el evento PASSWORD_RECOVERY no se dispara a tiempo,
+    // atrapamos el recovery leyendo la URL directamente al cargar la app.
+    if (window.location.hash.includes('type=recovery')) {
+      setShowRecoveryModal(true)
+    }
+  }, [])
+
   const loadUserData = async (userId: string) => {
     // 1. Evitar que un manager ingrese a la app de usuarios (redirigir al portal en lugar de desloguear)
     const { data: managerData } = await supabase.from('Managers').select('id').eq('id', userId).maybeSingle()
@@ -100,19 +108,12 @@ export default function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return
-
-      if (event === 'TOKEN_REFRESHED' && currentUser) {
-        return
-      }
       
       if (event === 'PASSWORD_RECOVERY') {
         setShowRecoveryModal(true)
       }
 
-      if (session) {
-        setIsLoading(true)
-        await loadUserData(session.user.id)
-      } else {
+      if (event === 'SIGNED_OUT') {
         const mockSnap = await loadAppData(mockAppDataService).catch(() => null)
         if (mounted && mockSnap) {
           setProfiles(mockSnap.profiles)
@@ -121,6 +122,23 @@ export default function App() {
         setCurrentUser(null)
         setScreen('login')
         setIsLoading(false)
+        return
+      }
+
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+        if (session) {
+          setIsLoading(true)
+          await loadUserData(session.user.id)
+        } else {
+          const mockSnap = await loadAppData(mockAppDataService).catch(() => null)
+          if (mounted && mockSnap) {
+            setProfiles(mockSnap.profiles)
+            setConversations(mockSnap.conversations)
+          }
+          setCurrentUser(null)
+          setScreen('login')
+          setIsLoading(false)
+        }
       }
     })
 
