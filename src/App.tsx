@@ -26,6 +26,12 @@ export default function App() {
   const [requiresPassword, setRequiresPassword] = useState(false)
   const [toastMessage, setToastMessage] = useState<{title: string; body: string; image?: string} | null>(null)
   
+  const [showRecoveryModal, setShowRecoveryModal] = useState(false)
+  const [recoveryPassword, setRecoveryPassword] = useState('')
+  const [recoveryConfirm, setRecoveryConfirm] = useState('')
+  const [recoveryLoading, setRecoveryLoading] = useState(false)
+  const [recoveryError, setRecoveryError] = useState('')
+  
   // Ref para saber exactamente en qué chat está el usuario sin reiniciar el WebSocket
   const activeChatIdRef = useRef<string | number | null>(null)
   useEffect(() => {
@@ -97,6 +103,10 @@ export default function App() {
 
       if (event === 'TOKEN_REFRESHED' && currentUser) {
         return
+      }
+      
+      if (event === 'PASSWORD_RECOVERY') {
+        setShowRecoveryModal(true)
       }
 
       if (session) {
@@ -326,7 +336,7 @@ export default function App() {
     <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#050507' }}>
       <div className="relative w-full max-w-[390px] h-full max-h-[844px] overflow-hidden" style={{ background: '#0d0d0f' }}>
         
-        {/* Notificación Toast (Estilo celular) */}
+        {/* Global Toast Notification */}
         <div 
           className={`absolute top-6 left-4 right-4 z-[9999] transition-all duration-500 ease-in-out ${toastMessage ? 'translate-y-0 opacity-100' : '-translate-y-24 opacity-0 pointer-events-none'}`}
         >
@@ -355,6 +365,78 @@ export default function App() {
             </div>
           )}
         </div>
+
+        {showRecoveryModal && (
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4" style={{ background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(12px)' }}>
+            <div className="w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border border-white/10" style={{ background: '#18181f' }}>
+               <h3 className="text-xl font-extrabold text-white mb-4">Nueva Contraseña</h3>
+               <p className="text-xs text-white/60 mb-5 leading-relaxed">
+                 Has verificado tu correo exitosamente. Por favor ingresa tu nueva contraseña.
+               </p>
+
+               <form onSubmit={async (e) => {
+                  e.preventDefault()
+                  if (recoveryPassword.length < 6) {
+                     setRecoveryError('La contraseña debe tener al menos 6 caracteres.')
+                     return
+                  }
+                  if (recoveryPassword !== recoveryConfirm) {
+                     setRecoveryError('Las contraseñas no coinciden.')
+                     return
+                  }
+                  setRecoveryLoading(true)
+                  setRecoveryError('')
+                  const { error } = await supabase.auth.updateUser({ password: recoveryPassword })
+                  setRecoveryLoading(false)
+                  if (error) {
+                     setRecoveryError(error.message)
+                  } else {
+                     setShowRecoveryModal(false)
+                     window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Contraseña actualizada.' } }))
+                  }
+               }} className="space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5 block">Contraseña</label>
+                    <input
+                      type="password"
+                      required
+                      autoFocus
+                      placeholder="••••••••"
+                      value={recoveryPassword}
+                      onChange={(e) => setRecoveryPassword(e.target.value)}
+                      className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
+                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5 block">Confirmar</label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      value={recoveryConfirm}
+                      onChange={(e) => setRecoveryConfirm(e.target.value)}
+                      className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
+                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    />
+                  </div>
+
+                  {recoveryError && (
+                    <p className="text-red-400 text-xs font-medium bg-red-500/10 p-2.5 rounded-lg border border-red-500/20">{recoveryError}</p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={recoveryLoading}
+                    className="w-full py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50 mt-2"
+                    style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}
+                  >
+                    {recoveryLoading ? 'Guardando...' : 'Guardar y entrar'}
+                  </button>
+               </form>
+            </div>
+          </div>
+        )}
 
         {renderScreen()}
 

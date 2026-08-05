@@ -22,13 +22,10 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
 
   // Flotante de recuperación de contraseña
   const [showForgotModal, setShowForgotModal] = useState(false)
-  const [forgotStep, setForgotStep] = useState<'email' | 'code' | 'new_password'>('email')
   const [forgotEmail, setForgotEmail] = useState('')
-  const [forgotCode, setForgotCode] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmNewPassword, setConfirmNewPassword] = useState('')
   const [forgotLoading, setForgotLoading] = useState(false)
   const [forgotError, setForgotError] = useState('')
+  const [forgotSuccess, setForgotSuccess] = useState(false)
 
   const handleAuth = async () => {
     setErrorMsg('')
@@ -233,55 +230,18 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
     setForgotError('')
     setForgotLoading(true)
 
-    if (forgotStep === 'email') {
-      if (!forgotEmail || !forgotEmail.includes('@')) {
-        setForgotError('Ingresa un email válido.')
-        setForgotLoading(false)
-        return
-      }
-      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail)
-      if (error) {
-        setForgotError(error.message)
-      } else {
-        setForgotStep('code')
-      }
-    } else if (forgotStep === 'code') {
-      if (!forgotCode.trim()) {
-        setForgotError('Ingresa el código.')
-        setForgotLoading(false)
-        return
-      }
-      const { error } = await supabase.auth.verifyOtp({
-        email: forgotEmail,
-        token: forgotCode,
-        type: 'recovery'
-      })
-      if (error) {
-        setForgotError('Código inválido o expirado.')
-      } else {
-        setForgotStep('new_password')
-      }
-    } else if (forgotStep === 'new_password') {
-      if (!newPassword || newPassword.length < 6) {
-        setForgotError('La contraseña debe tener al menos 6 caracteres.')
-        setForgotLoading(false)
-        return
-      }
-      if (newPassword !== confirmNewPassword) {
-        setForgotError('Las contraseñas no coinciden.')
-        setForgotLoading(false)
-        return
-      }
-      const { error } = await supabase.auth.updateUser({ password: newPassword })
-      if (error) {
-        setForgotError(error.message)
-      } else {
-        setShowForgotModal(false)
-        setMode('login')
-        // Automatically login since verifyOtp created a session
-        onLogin()
-      }
+    if (!forgotEmail || !forgotEmail.includes('@')) {
+      setForgotError('Ingresa un email válido.')
+      setForgotLoading(false)
+      return
     }
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail)
+    if (error) {
+      setForgotError(error.message)
+    } else {
+      setForgotSuccess(true)
+    }
+    
     setForgotLoading(false)
   }
 
@@ -402,11 +362,8 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                   type="button"
                   onClick={() => {
                     setForgotEmail(email)
-                    setForgotStep('email')
+                    setForgotSuccess(false)
                     setForgotError('')
-                    setForgotCode('')
-                    setNewPassword('')
-                    setConfirmNewPassword('')
                     setShowForgotModal(true)
                   }}
                   className="text-xs font-semibold mt-3 block gradient-brand-text"
@@ -549,12 +506,29 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
       {showForgotModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)' }}>
           <div className="w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border border-white/10" style={{ background: '#18181f' }}>
-             <h3 className="text-xl font-extrabold text-white mb-4">
-               {forgotStep === 'email' ? 'Recuperar contraseña' : forgotStep === 'code' ? 'Ingresa el código' : 'Nueva contraseña'}
-             </h3>
+             <h3 className="text-xl font-extrabold text-white mb-4">Recuperar contraseña</h3>
 
-             <form onSubmit={handleForgotSubmit} className="space-y-4">
-                {forgotStep === 'email' && (
+             {forgotSuccess ? (
+                <div className="text-center py-4">
+                   <div className="w-16 h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-4">
+                     <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                     </svg>
+                   </div>
+                   <p className="text-sm text-white/80 font-medium mb-6">
+                     Te hemos enviado un correo con un enlace. Haz clic en él para crear tu nueva contraseña.
+                   </p>
+                   <button
+                     type="button"
+                     onClick={() => setShowForgotModal(false)}
+                     className="w-full py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95"
+                     style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}
+                   >
+                     Entendido
+                   </button>
+                </div>
+             ) : (
+               <form onSubmit={handleForgotSubmit} className="space-y-4">
                   <div>
                     <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5 block">Email registrado</label>
                     <input
@@ -568,80 +542,30 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                       style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
                     />
                   </div>
-                )}
 
-                {forgotStep === 'code' && (
-                  <div>
-                    <p className="text-xs text-white/60 mb-4">Te enviamos un código de recuperación a <span className="text-white font-semibold">{forgotEmail}</span>.</p>
-                    <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5 block">Código de 6 dígitos</label>
-                    <input
-                      type="text"
-                      required
-                      autoFocus
-                      placeholder="Ej: 123456"
-                      value={forgotCode}
-                      onChange={(e) => setForgotCode(e.target.value)}
-                      className="w-full px-4 py-3.5 rounded-xl text-sm font-bold tracking-widest text-white placeholder-white/20 outline-none transition-all text-center"
-                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
-                    />
-                  </div>
-                )}
+                  {forgotError && (
+                    <p className="text-red-400 text-xs font-medium bg-red-500/10 p-2.5 rounded-lg border border-red-500/20">{forgotError}</p>
+                  )}
 
-                {forgotStep === 'new_password' && (
-                  <>
-                    <div>
-                      <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5 block">Nueva Contraseña</label>
-                      <input
-                        type={showPass ? 'text' : 'password'}
-                        required
-                        autoFocus
-                        placeholder="••••••••"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
-                        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5 block">Confirmar Contraseña</label>
-                      <input
-                        type={showPass ? 'text' : 'password'}
-                        required
-                        placeholder="••••••••"
-                        value={confirmNewPassword}
-                        onChange={(e) => setConfirmNewPassword(e.target.value)}
-                        className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
-                        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
-                      />
-                    </div>
-                    <button type="button" onClick={() => setShowPass((p) => !p)} className="text-xs text-white/40 mt-1 block hover:text-white transition-colors">
-                      {showPass ? 'Ocultar contraseñas' : 'Mostrar contraseñas'}
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotModal(false)}
+                      className="flex-1 py-3.5 rounded-xl font-semibold text-white/70 text-sm hover:bg-white/5 transition-colors"
+                    >
+                      Cancelar
                     </button>
-                  </>
-                )}
-
-                {forgotError && (
-                  <p className="text-red-400 text-xs font-medium bg-red-500/10 p-2.5 rounded-lg border border-red-500/20">{forgotError}</p>
-                )}
-
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotModal(false)}
-                    className="flex-1 py-3.5 rounded-xl font-semibold text-white/70 text-sm hover:bg-white/5 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={forgotLoading}
-                    className="flex-1 py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}
-                  >
-                    {forgotLoading ? 'Cargando...' : forgotStep === 'email' ? 'Enviar Código' : forgotStep === 'code' ? 'Verificar' : 'Guardar'}
-                  </button>
-                </div>
-             </form>
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      className="flex-1 py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50"
+                      style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}
+                    >
+                      {forgotLoading ? 'Enviando...' : 'Enviar enlace'}
+                    </button>
+                  </div>
+               </form>
+             )}
           </div>
         </div>
       )}
