@@ -258,8 +258,8 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
         <div className="w-16 h-16 rounded-2xl gradient-brand flex items-center justify-center mb-5 shadow-lg" style={{ boxShadow: '0 8px 32px rgba(255,62,108,0.4)' }}>
           <FireIcon size={32} className="text-white" />
         </div>
-        <h1 className="text-4xl font-extrabold tracking-tight mb-1">
-          <span className="gradient-brand-text notranslate" translate="no">swiper</span>
+        <h1 className="text-5xl font-black italic tracking-tighter mb-4 transform -rotate-2">
+          <span className="gradient-brand-text notranslate" translate="no">gira!</span>
         </h1>
         <p className="text-sm text-white/40 font-medium tracking-wide">Swipea. Matchea. Conecta.</p>
       </div>

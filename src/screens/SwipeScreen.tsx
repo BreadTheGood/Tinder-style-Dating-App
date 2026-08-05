@@ -55,9 +55,9 @@ export function SwipeScreen({ onMatch, setConversations, profiles, isLoading }: 
     <div className="flex flex-col h-full" style={{ background: '#0d0d0f' }}>
       <div className="flex items-center justify-between px-5 pt-4 pb-4">
         <div className="w-9" />
-        <div className="flex items-center gap-2">
-          <FireIcon size={22} className="text-[#f304eb]" />
-          <span className="text-white font-extrabold text-xl tracking-tight notranslate" translate="no">swiper</span>
+        <div className="flex items-center gap-1.5">
+          <FireIcon size={26} className="text-[#f304eb] transform -rotate-12" />
+          <span className="text-white font-black italic text-3xl tracking-tighter leading-none notranslate" translate="no">gira!</span>
         </div>
       </div>
 
