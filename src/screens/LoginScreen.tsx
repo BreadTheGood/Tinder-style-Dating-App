@@ -235,7 +235,9 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
       setForgotLoading(false)
       return
     }
-    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail)
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: window.location.origin + window.location.pathname
+    })
     if (error) {
       setForgotError(error.message)
     } else {
