@@ -35,7 +35,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
       newTickets.push({
         event_id: event.id,
         code: code,
-        is_used: false
+        is_redeemed: false
       })
     }
 
@@ -57,7 +57,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
     const headers = ['Código', 'Estado (Usado)']
     const csvContent = [
       headers.join(','),
-      ...tickets.map(t => `${t.code},${t.is_used ? 'Si' : 'No'}`)
+      ...tickets.map(t => `${t.code},${t.is_redeemed ? 'Si' : 'No'}`)
     ].join('\n')
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
@@ -71,7 +71,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
     document.body.removeChild(link)
   }
 
-  const usedCount = tickets.filter(t => t.is_used).length
+  const usedCount = tickets.filter(t => t.is_redeemed).length
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 flex flex-col h-full animate-fade-in relative">
@@ -167,7 +167,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
                 {tickets.map(t => (
                   <div key={t.id || t.code} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-100">
                     <span className="font-mono font-bold text-gray-700 tracking-wider">{t.code}</span>
-                    {t.is_used ? (
+                    {t.is_redeemed ? (
                       <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">Usado</span>
                     ) : (
                       <span className="px-2 py-1 bg-gray-200 text-gray-500 text-[10px] font-bold rounded uppercase">Disponible</span>
