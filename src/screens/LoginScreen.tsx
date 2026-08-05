@@ -71,20 +71,42 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
       setLoading(true)
       const cleanCode = ticketCode.trim().toUpperCase()
 
-      // Validar el código de evento en Supabase real
-      const { data: eventData, error: eventErr } = await supabase
-        .from('Events')
-        .select('*')
+      let eventData = null
+      let matchedTicket = null
+
+      // 1. Validar si es un Ticket único (TicketCodes)
+      const { data: ticketData } = await supabase
+        .from('TicketCodes')
+        .select('*, Events(*)')
         .eq('code', cleanCode)
         .maybeSingle()
 
-      if (eventErr || !eventData) {
-        setErrorMsg('Código de evento no válido o inexistente.')
-        setLoading(false)
-        return
+      if (ticketData && ticketData.Events) {
+         if (ticketData.is_redeemed) {
+            setErrorMsg('Este ticket ya ha sido utilizado.')
+            setLoading(false)
+            return
+         }
+         eventData = ticketData.Events
+         matchedTicket = ticketData
+      } else {
+         // 2. Fallback: Buscar código general de Evento
+         const { data: eData } = await supabase
+           .from('Events')
+           .select('*')
+           .eq('code', cleanCode)
+           .maybeSingle()
+
+         if (eData) {
+            eventData = eData
+         } else {
+            setErrorMsg('Código no válido o inexistente.')
+            setLoading(false)
+            return
+         }
       }
 
-      if (eventData.is_suspended) {
+      if (eventData.status === 'suspendido') {
         setErrorMsg('Este evento se encuentra suspendido actualmente.')
         setLoading(false)
         return
@@ -100,6 +122,8 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
       setValidEvent(eventData)
       setModalError('')
       setModalPassword('')
+      // Store matched ticket in a ref or state if needed for later redemption
+      ;(window as any)._matchedTicket = matchedTicket
       setShowPasswordModal(true)
       setLoading(false)
     }
@@ -166,6 +190,13 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
           profile_id: profile.id,
           event_id: eventId
         })
+        
+        // Redimir el ticket si se usó uno
+        const matchedTicket = (window as any)._matchedTicket
+        if (matchedTicket) {
+           await supabase.from('TicketCodes').update({ is_redeemed: true }).eq('id', matchedTicket.id)
+           ;(window as any)._matchedTicket = null
+        }
       }
     } catch {
       // Ignorar errores si ya estaba unido
