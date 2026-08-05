@@ -105,7 +105,6 @@ export function ManagerDashboard({ manager }: { manager: any }) {
          start_datetime: startDate.toISOString(),
          end_datetime: endDate.toISOString(),
          code: code,
-         is_suspended: false,
          status: 'en curso'
       })
 
@@ -121,31 +120,22 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   }
 
   const toggleSuspendEvent = async (evt: any) => {
-    const newSuspendedState = !evt.is_suspended
-    const newStatus = newSuspendedState ? 'suspendido' : 'en curso'
+    const isCurrentlySuspended = evt.status === 'suspendido'
+    const newStatus = isCurrentlySuspended ? 'en curso' : 'suspendido'
     
     const { error } = await supabase.from('Events').update({
-      is_suspended: newSuspendedState,
       status: newStatus
     }).eq('id', evt.id)
 
     if (error) {
-      // Fallback si la columna is_suspended no ha sido agregada aún a la BD
-      const fallbackEnd = newSuspendedState ? new Date().toISOString() : new Date(Date.now() + 12*60*60*1000).toISOString()
-      const { error: fallbackErr } = await supabase.from('Events').update({
-        end_datetime: fallbackEnd
-      }).eq('id', evt.id)
-      
-      if (fallbackErr) {
-        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error al cambiar estado del evento: ' + fallbackErr.message } }))
-        return
-      }
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error al cambiar estado del evento: ' + error.message } }))
+      return
     }
 
     window.dispatchEvent(new CustomEvent('app-toast', { 
       detail: { 
-        title: newSuspendedState ? 'Evento Suspendido' : 'Evento Reanudado', 
-        body: newSuspendedState ? 'El evento ha sido suspendido exitosamente.' : 'El evento vuelve a estar activo.' 
+        title: !isCurrentlySuspended ? 'Evento Suspendido' : 'Evento Reanudado', 
+        body: !isCurrentlySuspended ? 'El evento ha sido suspendido exitosamente.' : 'El evento vuelve a estar activo.' 
       } 
     }))
     loadEvents()
@@ -227,18 +217,19 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   }
 
   const activeEventsList = eventsList.filter(e => {
-     if (e.is_suspended) return false
+     if (e.status === 'suspendido' || e.status === 'finalizado') return false
      if (!e.end_datetime) return true
      return new Date(e.end_datetime).getTime() > Date.now()
   })
 
   const finishedEventsList = eventsList.filter(e => {
-     if (e.is_suspended) return false
+     if (e.status === 'suspendido') return false
+     if (e.status === 'finalizado') return true
      if (!e.end_datetime) return false
      return new Date(e.end_datetime).getTime() <= Date.now()
   })
 
-  const suspendedEventsList = eventsList.filter(e => e.is_suspended)
+  const suspendedEventsList = eventsList.filter(e => e.status === 'suspendido')
 
   const filteredEventsList = eventFilter === 'active' 
     ? activeEventsList 
@@ -398,8 +389,8 @@ export function ManagerDashboard({ manager }: { manager: any }) {
              ) : (
                <div className="grid grid-cols-2 gap-6">
                  {filteredEventsList.map(e => {
-                   const isSuspended = !!e.is_suspended
-                   const isOngoing = !isSuspended && (!e.end_datetime || new Date(e.end_datetime).getTime() > Date.now())
+                   const isSuspended = e.status === 'suspendido'
+                   const isOngoing = !isSuspended && e.status !== 'finalizado' && (!e.end_datetime || new Date(e.end_datetime).getTime() > Date.now())
 
                    return (
                      <div key={e.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col relative overflow-hidden group">
