@@ -68,6 +68,24 @@ body {
 .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
 .animate-heart { animation: heartPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
+/* Prevenir que el autocompletado del navegador (Chrome/Safari/Edge) blanquee o altere el estilo de los campos */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active,
+input:-internal-autofill-selected {
+  -webkit-text-fill-color: #ffffff !important;
+  color: #ffffff !important;
+  caret-color: #ffffff !important;
+  transition: background-color 50000s ease-in-out 0s, color 50000s ease-in-out 0s !important;
+  background-color: transparent !important;
+}
+
+input:autofill {
+  color: #ffffff !important;
+  transition: background-color 50000s ease-in-out 0s, color 50000s ease-in-out 0s !important;
+}
+
 .gradient-brand {
   background: linear-gradient(135deg, #d407f3 0%, #b004f3 100%);
 }

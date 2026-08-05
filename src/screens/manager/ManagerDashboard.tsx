@@ -19,6 +19,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   const [newEventName, setNewEventName] = useState('')
   const [newEventDesc, setNewEventDesc] = useState('')
   const [newEventDate, setNewEventDate] = useState('')
+  const [newEventTime, setNewEventTime] = useState('12:00')
   const [savingEvent, setSavingEvent] = useState(false)
   const [eventFilter, setEventFilter] = useState<'all' | 'active' | 'finished' | 'suspended'>('all')
 
@@ -50,9 +51,13 @@ export function ManagerDashboard({ manager }: { manager: any }) {
       const yyyy = d.getFullYear()
       const mm = String(d.getMonth() + 1).padStart(2, '0')
       const dd = String(d.getDate()).padStart(2, '0')
+      const hh = String(d.getHours()).padStart(2, '0')
+      const min = String(d.getMinutes()).padStart(2, '0')
       setNewEventDate(`${yyyy}-${mm}-${dd}`)
+      setNewEventTime(`${hh}:${min}`)
     } else {
       setNewEventDate('')
+      setNewEventTime('12:00')
     }
     setShowEventForm(true)
   }
@@ -62,6 +67,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     setNewEventName('')
     setNewEventDesc('')
     setNewEventDate('')
+    setNewEventTime('12:00')
     setShowEventForm(false)
   }
 
@@ -70,7 +76,8 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     if (!newEventName || !newEventDate) return
     setSavingEvent(true)
 
-    const startDate = new Date(newEventDate + 'T12:00:00')
+    const timeString = newEventTime || '12:00'
+    const startDate = new Date(`${newEventDate}T${timeString}:00`)
     const endDate = new Date(startDate.getTime() + 12 * 60 * 60 * 1000)
 
     if (editingEventId) {
@@ -355,17 +362,15 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                      </div>
                      <div className="flex gap-4">
                         <div className="flex-1">
-                           <label className="block text-sm font-semibold text-gray-600 mb-1">Fecha de Inicio (Día, Mes, Año)</label>
+                           <label className="block text-sm font-semibold text-gray-600 mb-1">Fecha de Inicio</label>
                            <input type="date" required value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" />
-                           <p className="text-xs text-gray-400 mt-1">Por defecto, iniciará a las 12:00 hs y durará 12 horas (hasta las 00:00 hs).</p>
                         </div>
-                        <div className="flex-1">
-                           <label className="block text-sm font-semibold text-gray-600 mb-1">Lista de Códigos (Opcional)</label>
-                           <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Próximamente', body: 'La carga de CSV se integrará en la siguiente fase.' } }))} className="w-full bg-gray-100 border border-gray-200 border-dashed rounded-lg px-4 py-2.5 text-gray-500 font-medium hover:bg-gray-200 transition-colors">
-                              Subir archivo .csv
-                           </button>
+                        <div className="w-48">
+                           <label className="block text-sm font-semibold text-gray-600 mb-1">Hora de Inicio</label>
+                           <input type="time" required value={newEventTime} onChange={e => setNewEventTime(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" />
                         </div>
                      </div>
+                     <p className="text-xs text-gray-400 mt-1">Por defecto, el evento durará 12 horas a partir de la fecha y hora seleccionadas.</p>
                      <div className="pt-2 flex justify-end gap-3">
                         <button type="button" onClick={resetEventForm} className="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-bold hover:bg-gray-300 transition-colors">
                            Cancelar
