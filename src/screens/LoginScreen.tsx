@@ -98,7 +98,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
           <FireIcon size={32} className="text-white" />
         </div>
         <h1 className="text-4xl font-extrabold tracking-tight mb-1">
-          <span className="gradient-brand-text">swiper</span>
+          <span className="gradient-brand-text notranslate" translate="no">swiper</span>
         </h1>
         <p className="text-sm text-white/40 font-medium tracking-wide">Swipea. Matchea. Conecta.</p>
       </div>

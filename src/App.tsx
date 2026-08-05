@@ -230,7 +230,7 @@ export default function App() {
             <FireIcon size={36} className="text-white" />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight mb-2">
-            <span className="gradient-brand-text">swiper</span>
+            <span className="gradient-brand-text notranslate" translate="no">swiper</span>
           </h1>
           <p className="text-xs text-white/40 font-semibold tracking-widest uppercase animate-pulse">Cargando...</p>
         </div>
