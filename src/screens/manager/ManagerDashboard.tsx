@@ -15,11 +15,12 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
   const [eventsList, setEventsList] = useState<any[]>([])
   const [showEventForm, setShowEventForm] = useState(false)
+  const [editingEventId, setEditingEventId] = useState<string | null>(null)
   const [newEventName, setNewEventName] = useState('')
   const [newEventDesc, setNewEventDesc] = useState('')
   const [newEventDate, setNewEventDate] = useState('')
   const [savingEvent, setSavingEvent] = useState(false)
-  const [eventFilter, setEventFilter] = useState<'all' | 'active' | 'finished'>('all')
+  const [eventFilter, setEventFilter] = useState<'all' | 'active' | 'finished' | 'suspended'>('all')
 
   useEffect(() => {
     if (activeTab === 'managers' && isAdmin) {
@@ -40,35 +41,116 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     setLoading(false)
   }
 
-  const handleCreateEvent = async (e: React.FormEvent) => {
+  const startEditEvent = (evt: any) => {
+    setEditingEventId(evt.id)
+    setNewEventName(evt.name || '')
+    setNewEventDesc(evt.description || '')
+    if (evt.start_datetime) {
+      const d = new Date(evt.start_datetime)
+      const yyyy = d.getFullYear()
+      const mm = String(d.getMonth() + 1).padStart(2, '0')
+      const dd = String(d.getDate()).padStart(2, '0')
+      setNewEventDate(`${yyyy}-${mm}-${dd}`)
+    } else {
+      setNewEventDate('')
+    }
+    setShowEventForm(true)
+  }
+
+  const resetEventForm = () => {
+    setEditingEventId(null)
+    setNewEventName('')
+    setNewEventDesc('')
+    setNewEventDate('')
+    setShowEventForm(false)
+  }
+
+  const handleSaveEvent = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newEventName || !newEventDate) return
     setSavingEvent(true)
 
     const startDate = new Date(newEventDate + 'T12:00:00')
     const endDate = new Date(startDate.getTime() + 12 * 60 * 60 * 1000)
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase()
 
-    const { error: dbErr } = await supabase.from('Events').insert({
-       manager_id: manager.id,
-       name: newEventName,
-       description: newEventDesc,
-       start_datetime: startDate.toISOString(),
-       end_datetime: endDate.toISOString(),
-       code: code
-    })
+    if (editingEventId) {
+      const { error: dbErr } = await supabase.from('Events').update({
+         name: newEventName,
+         description: newEventDesc,
+         start_datetime: startDate.toISOString(),
+         end_datetime: endDate.toISOString(),
+      }).eq('id', editingEventId)
 
-    if (dbErr) {
-       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error creando evento: ' + dbErr.message } }))
+      if (dbErr) {
+         window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error actualizando evento: ' + dbErr.message } }))
+      } else {
+         window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Evento actualizado correctamente.' } }))
+         resetEventForm()
+         loadEvents()
+      }
     } else {
-       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Evento creado exitosamente.' } }))
-       setNewEventName('')
-       setNewEventDesc('')
-       setNewEventDate('')
-       setShowEventForm(false)
-       loadEvents()
+      const code = Math.random().toString(36).substring(2, 8).toUpperCase()
+      const { error: dbErr } = await supabase.from('Events').insert({
+         manager_id: manager.id,
+         name: newEventName,
+         description: newEventDesc,
+         start_datetime: startDate.toISOString(),
+         end_datetime: endDate.toISOString(),
+         code: code,
+         is_suspended: false
+      })
+
+      if (dbErr) {
+         window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error creando evento: ' + dbErr.message } }))
+      } else {
+         window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Evento creado exitosamente.' } }))
+         resetEventForm()
+         loadEvents()
+      }
     }
     setSavingEvent(false)
+  }
+
+  const toggleSuspendEvent = async (evt: any) => {
+    const newSuspendedState = !evt.is_suspended
+    
+    const { error } = await supabase.from('Events').update({
+      is_suspended: newSuspendedState
+    }).eq('id', evt.id)
+
+    if (error) {
+      // Fallback si la columna is_suspended no ha sido agregada aún a la BD
+      const fallbackEnd = newSuspendedState ? new Date().toISOString() : new Date(Date.now() + 12*60*60*1000).toISOString()
+      const { error: fallbackErr } = await supabase.from('Events').update({
+        end_datetime: fallbackEnd
+      }).eq('id', evt.id)
+      
+      if (fallbackErr) {
+        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error al cambiar estado del evento: ' + fallbackErr.message } }))
+        return
+      }
+    }
+
+    window.dispatchEvent(new CustomEvent('app-toast', { 
+      detail: { 
+        title: newSuspendedState ? 'Evento Suspendido' : 'Evento Reanudado', 
+        body: newSuspendedState ? 'El evento ha sido suspendido exitosamente.' : 'El evento vuelve a estar activo.' 
+      } 
+    }))
+    loadEvents()
+  }
+
+  const deleteEvent = async (eventId: string) => {
+    // Eliminar relaciones de ProfileEvents primero
+    await supabase.from('ProfileEvents').delete().eq('event_id', eventId).catch(() => null)
+    
+    const { error } = await supabase.from('Events').delete().eq('id', eventId)
+    if (error) {
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error eliminando evento: ' + error.message } }))
+    } else {
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Eliminado', body: 'Evento eliminado permanentemente.' } }))
+      loadEvents()
+    }
   }
 
   const loadManagers = async () => {
@@ -134,19 +216,25 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   }
 
   const activeEventsList = eventsList.filter(e => {
+     if (e.is_suspended) return false
      if (!e.end_datetime) return true
      return new Date(e.end_datetime).getTime() > Date.now()
   })
 
   const finishedEventsList = eventsList.filter(e => {
+     if (e.is_suspended) return false
      if (!e.end_datetime) return false
      return new Date(e.end_datetime).getTime() <= Date.now()
   })
+
+  const suspendedEventsList = eventsList.filter(e => e.is_suspended)
 
   const filteredEventsList = eventFilter === 'active' 
     ? activeEventsList 
     : eventFilter === 'finished' 
     ? finishedEventsList 
+    : eventFilter === 'suspended'
+    ? suspendedEventsList
     : eventsList
 
   if (!isActive) {
@@ -204,10 +292,13 @@ export function ManagerDashboard({ manager }: { manager: any }) {
              <div className="flex justify-between items-center mb-6">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-800">{isAdmin ? 'Todos los Eventos' : 'Tus Eventos'}</h1>
-                  <p className="text-sm text-gray-500 mt-1">Gestiona eventos en curso y consulta el historial de finalizados.</p>
+                  <p className="text-sm text-gray-500 mt-1">Crea, edita, suspende o elimina eventos para tus usuarios.</p>
                 </div>
                 <button 
-                  onClick={() => setShowEventForm(!showEventForm)}
+                  onClick={() => {
+                    if (showEventForm) resetEventForm()
+                    else setShowEventForm(true)
+                  }}
                   className="bg-gradient-to-r from-[#f304eb] to-[#ff7043] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity"
                 >
                    {showEventForm ? 'Cancelar' : '+ Crear Evento'}
@@ -233,6 +324,14 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                  En curso ({activeEventsList.length})
                </button>
                <button
+                 onClick={() => setEventFilter('suspended')}
+                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                   eventFilter === 'suspended' ? 'bg-amber-600 text-white' : 'text-gray-500 hover:bg-gray-100'
+                 }`}
+               >
+                 Suspendidos ({suspendedEventsList.length})
+               </button>
+               <button
                  onClick={() => setEventFilter('finished')}
                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
                    eventFilter === 'finished' ? 'bg-gray-600 text-white' : 'text-gray-500 hover:bg-gray-100'
@@ -244,8 +343,8 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
              {showEventForm && (
                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8 animate-fade-in">
-                  <h2 className="text-lg font-bold text-gray-800 mb-4">Detalles del Nuevo Evento</h2>
-                  <form onSubmit={handleCreateEvent} className="space-y-4">
+                  <h2 className="text-lg font-bold text-gray-800 mb-4">{editingEventId ? 'Editar Evento' : 'Detalles del Nuevo Evento'}</h2>
+                  <form onSubmit={handleSaveEvent} className="space-y-4">
                      <div>
                         <label className="block text-sm font-semibold text-gray-600 mb-1">Nombre del Evento</label>
                         <input type="text" required value={newEventName} onChange={e => setNewEventName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" placeholder="Ej: Fiesta de Verano 2026" />
@@ -267,9 +366,12 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                            </button>
                         </div>
                      </div>
-                     <div className="pt-2 flex justify-end">
-                        <button type="submit" disabled={savingEvent} className="bg-gray-900 text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50">
-                           {savingEvent ? 'Guardando...' : 'Guardar Evento'}
+                     <div className="pt-2 flex justify-end gap-3">
+                        <button type="button" onClick={resetEventForm} className="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-bold hover:bg-gray-300 transition-colors">
+                           Cancelar
+                        </button>
+                        <button type="submit" disabled={savingEvent} className="bg-gray-900 text-white px-8 py-2.5 rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50">
+                           {savingEvent ? 'Guardando...' : editingEventId ? 'Guardar Cambios' : 'Guardar Evento'}
                         </button>
                      </div>
                   </form>
@@ -287,17 +389,23 @@ export function ManagerDashboard({ manager }: { manager: any }) {
              ) : (
                <div className="grid grid-cols-2 gap-6">
                  {filteredEventsList.map(e => {
-                   const isOngoing = !e.end_datetime || new Date(e.end_datetime).getTime() > Date.now()
+                   const isSuspended = !!e.is_suspended
+                   const isOngoing = !isSuspended && (!e.end_datetime || new Date(e.end_datetime).getTime() > Date.now())
+
                    return (
                      <div key={e.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col relative overflow-hidden group">
-                       <div className={`absolute top-0 left-0 w-1.5 h-full ${isOngoing ? 'bg-gradient-to-b from-[#f304eb] to-[#ff7043]' : 'bg-gray-300'}`} />
+                       <div className={`absolute top-0 left-0 w-1.5 h-full ${isSuspended ? 'bg-amber-400' : isOngoing ? 'bg-gradient-to-b from-[#f304eb] to-[#ff7043]' : 'bg-gray-300'}`} />
                        
                        <div className="flex justify-between items-start mb-2">
                          <div className="flex-1 pr-2">
                            <h3 className="text-xl font-bold text-gray-900">{e.name}</h3>
                            <p className="text-gray-400 text-xs font-mono mt-0.5">#{e.code}</p>
                          </div>
-                         {isOngoing ? (
+                         {isSuspended ? (
+                           <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full uppercase flex-shrink-0">
+                             Suspendido
+                           </span>
+                         ) : isOngoing ? (
                            <span className="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase flex items-center gap-1.5 flex-shrink-0">
                              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                              En curso
@@ -320,6 +428,30 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                              <span className="text-gray-400">Expiración:</span>
                              <span className={isOngoing ? 'text-green-700 font-bold' : 'text-gray-500'}>{formatDateTime(e.end_datetime)}</span>
                           </div>
+                       </div>
+
+                       {/* Acciones de Edición / Suspensión / Eliminación */}
+                       <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100 justify-end">
+                          <button 
+                            onClick={() => startEditEvent(e)}
+                            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-lg transition-colors"
+                          >
+                            Editar
+                          </button>
+                          <button 
+                            onClick={() => toggleSuspendEvent(e)}
+                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                              isSuspended ? 'bg-green-100 hover:bg-green-200 text-green-700' : 'bg-amber-100 hover:bg-amber-200 text-amber-700'
+                            }`}
+                          >
+                            {isSuspended ? 'Reanudar' : 'Suspender'}
+                          </button>
+                          <button 
+                            onClick={() => deleteEvent(e.id)}
+                            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-600 text-xs font-bold rounded-lg transition-colors"
+                          >
+                            Eliminar
+                          </button>
                        </div>
                      </div>
                    )

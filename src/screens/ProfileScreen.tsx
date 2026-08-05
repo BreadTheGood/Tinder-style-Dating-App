@@ -58,11 +58,13 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
   }
 
   const activeEvents = events.filter(e => {
+     if (e.is_suspended) return false
      if (!e.end_datetime) return true
      return new Date(e.end_datetime).getTime() > Date.now()
   })
 
   const pastEvents = events.filter(e => {
+     if (e.is_suspended) return true
      if (!e.end_datetime) return false
      return new Date(e.end_datetime).getTime() <= Date.now()
   })

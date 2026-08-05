@@ -225,6 +225,14 @@ export const supabaseAppDataService: AppDataService = {
        return { success: false, error: 'Código de evento no válido o evento inexistente' }
     }
 
+    if (event.is_suspended) {
+       return { success: false, error: 'Este evento se encuentra suspendido actualmente.' }
+    }
+
+    if (event.end_datetime && new Date(event.end_datetime).getTime() <= Date.now()) {
+       return { success: false, error: 'Este evento ya ha finalizado.' }
+    }
+
     // Insertar en la tabla de relación
     const { error: insertErr } = await supabase.from('ProfileEvents').insert({
        profile_id: myProfile.id,
