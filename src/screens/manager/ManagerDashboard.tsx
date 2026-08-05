@@ -142,7 +142,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
   const deleteEvent = async (eventId: string) => {
     // Eliminar relaciones de ProfileEvents primero
-    await supabase.from('ProfileEvents').delete().eq('event_id', eventId).catch(() => null)
+    await supabase.from('ProfileEvents').delete().eq('event_id', eventId)
     
     const { error } = await supabase.from('Events').delete().eq('id', eventId)
     if (error) {
