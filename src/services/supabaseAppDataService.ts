@@ -53,7 +53,7 @@ export const supabaseAppDataService: AppDataService = {
         bio: p.bio || '',
         distance: '5 km', // Placeholder, not in DB
         job: '', // Placeholder, not in DB
-        image: images.length > 0 ? images[0] : 'https://via.placeholder.com/600x700?text=Sin+Foto',
+        image: images.length > 0 ? images[0] : 'https://placehold.co/600x700?text=Sin+Foto',
         images: images,
         tags: p.tags || [],
       }
@@ -102,7 +102,7 @@ export const supabaseAppDataService: AppDataService = {
         bio: otherProfileData.bio || '',
         distance: 'Cerca',
         job: '',
-        image: images.length > 0 ? images[0] : 'https://via.placeholder.com/600x700?text=Sin+Foto',
+        image: images.length > 0 ? images[0] : 'https://placehold.co/600x700?text=Sin+Foto',
         images,
         tags: otherProfileData.tags || [],
       }

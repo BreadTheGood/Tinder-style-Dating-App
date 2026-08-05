@@ -22,7 +22,7 @@ export function MatchModal({ profile, currentUser, onClose, onMessage }: { profi
 
           <div className="flex items-center justify-center gap-4 mb-8">
             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 shadow-xl">
-              <img src={currentUser?.images?.[0] || 'https://via.placeholder.com/200'} alt="Tú" className="w-full h-full object-cover" />
+              <img src={currentUser?.images?.[0] || 'https://placehold.co/200?text=Tu'} alt="Tú" className="w-full h-full object-cover" />
             </div>
             <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-lg">
               <HeartIcon filled size={14} className="text-white" />

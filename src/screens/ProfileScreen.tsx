@@ -73,7 +73,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
   return (
     <div className="flex flex-col h-full overflow-y-auto" style={{ background: '#0d0d0f' }}>
       <div className="relative h-80 flex-shrink-0">
-        <img src={me.images?.[0] || 'https://via.placeholder.com/600x700?text=Sin+Foto'} alt={me.name} className="w-full h-full object-cover" />
+        <img src={me.images?.[0] || 'https://placehold.co/600x700?text=Sin+Foto'} alt={me.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0d0d0f 0%, transparent 60%)' }} />
         <div className="absolute bottom-4 left-5">
           <h2 className="text-white font-extrabold text-3xl tracking-tight">{me.name}, {me.age}</h2>
