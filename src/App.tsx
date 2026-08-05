@@ -47,14 +47,22 @@ export default function App() {
   }, [])
 
   const loadUserData = async (userId: string) => {
-    // 1. Evitar que un manager ingrese a la app de usuarios (redirigir al portal en lugar de desloguear)
-    const { data: managerData } = await supabase.from('Managers').select('id').eq('id', userId).maybeSingle()
-    if (managerData) {
-       window.location.href = '/?manage=true'
-       return
-    }
-
+    console.log('[loadUserData] Starting for', userId)
     try {
+      console.log('[loadUserData] Checking if manager...')
+      // 1. Evitar que un manager ingrese a la app de usuarios
+      const { data: managerData, error: managerErr } = await supabase.from('Managers').select('id').eq('id', userId).maybeSingle()
+      if (managerErr && managerErr.code !== 'PGRST116') {
+         console.warn('[loadUserData] Manager check error:', managerErr)
+      }
+      if (managerData) {
+         console.log('[loadUserData] User is manager, redirecting...')
+         // Usar URL absoluta para GitHub Pages
+         window.location.href = window.location.origin + window.location.pathname + '?manage=true'
+         return
+      }
+
+      console.log('[loadUserData] Fetching app data...')
       // Timeout de 7 segundos para evitar carga infinita si la red se cuelga
       const timeoutPromise = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('El tiempo de espera ha caducado.')), 7000)
@@ -64,6 +72,8 @@ export default function App() {
         loadAppData(supabaseAppDataService),
         timeoutPromise
       ])
+      
+      console.log('[loadUserData] App data loaded:', snap ? 'SUCCESS' : 'NULL')
 
       if (snap && snap.currentUser) {
         setProfiles(snap.profiles)
@@ -71,9 +81,11 @@ export default function App() {
         setCurrentUser(snap.currentUser)
 
         if (!snap.currentUser.images || snap.currentUser.images.length === 0) {
+          console.log('[loadUserData] No images, routing to onboarding')
           setScreen('onboarding')
           setNavTab('profile')
         } else {
+          console.log('[loadUserData] Routing to swipe')
           setScreen('swipe')
           setNavTab('swipe')
         }
@@ -81,12 +93,13 @@ export default function App() {
         throw new Error('No se pudo cargar el perfil del usuario.')
       }
     } catch (err: any) {
-      console.error('Error cargando datos de la app:', err)
+      console.error('[loadUserData] Error:', err)
       window.dispatchEvent(new CustomEvent('app-toast', { 
         detail: { title: 'Error de Carga', body: err.message || 'Error al conectar con la base de datos.' } 
       }))
       setScreen('login')
     } finally {
+      console.log('[loadUserData] Finally, setting isLoading to false')
       setIsLoading(false)
     }
   }
@@ -108,12 +121,14 @@ export default function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return
-      
+      console.log('[AuthEvent]', event, 'Session ID:', session?.user?.id)
+
       if (event === 'PASSWORD_RECOVERY') {
         setShowRecoveryModal(true)
       }
 
       if (event === 'SIGNED_OUT') {
+        console.log('[AuthEvent] Signed out, loading mock data...')
         const mockSnap = await loadAppData(mockAppDataService).catch(() => null)
         if (mounted && mockSnap) {
           setProfiles(mockSnap.profiles)
@@ -127,9 +142,11 @@ export default function App() {
 
       if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
         if (session) {
+          console.log('[AuthEvent] Starting loadUserData for', session.user.id)
           setIsLoading(true)
           await loadUserData(session.user.id)
         } else {
+          console.log('[AuthEvent] No session, loading mock data...')
           const mockSnap = await loadAppData(mockAppDataService).catch(() => null)
           if (mounted && mockSnap) {
             setProfiles(mockSnap.profiles)
