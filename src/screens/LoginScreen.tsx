@@ -74,21 +74,35 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
       let eventData = null
       let matchedTicket = null
 
-      // 1. Validar si es un Ticket único (TicketCodes)
+      // 1. Validar si es un Ticket único (TicketCodes) sin JOIN para evitar errores de FK
       const { data: ticketData } = await supabase
         .from('TicketCodes')
-        .select('*, Events(*)')
+        .select('*')
         .eq('code', cleanCode)
         .maybeSingle()
 
-      if (ticketData && ticketData.Events) {
+      if (ticketData) {
          if (ticketData.is_redeemed) {
             setErrorMsg('Este ticket ya ha sido utilizado.')
             setLoading(false)
             return
          }
-         eventData = ticketData.Events
-         matchedTicket = ticketData
+         
+         // Buscar el evento asociado a este ticket
+         const { data: relatedEvent } = await supabase
+           .from('Events')
+           .select('*')
+           .eq('id', ticketData.event_id)
+           .maybeSingle()
+
+         if (relatedEvent) {
+            eventData = relatedEvent
+            matchedTicket = ticketData
+         } else {
+            setErrorMsg('El evento de este ticket ya no existe.')
+            setLoading(false)
+            return
+         }
       } else {
          // 2. Fallback: Buscar código general de Evento
          const { data: eData } = await supabase
