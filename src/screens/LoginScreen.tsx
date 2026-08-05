@@ -71,16 +71,31 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
       let eventData = null
       let matchedTicket = null
 
-      // 1. Validar si es un Ticket único (TicketCodes) sin JOIN para evitar errores de FK
-      const { data: ticketData } = await supabase
+      // 1. Buscar en TicketCodes
+      const { data: ticketData, error: ticketErr } = await supabase
         .from('TicketCodes')
         .select('*')
         .eq('code', cleanCode)
         .maybeSingle()
 
+      if (ticketErr && ticketErr.code !== 'PGRST116') {
+         console.error('Error TicketCodes:', ticketErr)
+      }
+
+      // 2. Buscar directo en Events
+      const { data: eData, error: eErr } = await supabase
+        .from('Events')
+        .select('*')
+        .eq('code', cleanCode)
+        .maybeSingle()
+
+      if (eErr && eErr.code !== 'PGRST116') {
+         console.error('Error Events:', eErr)
+      }
+
       if (ticketData) {
          if (ticketData.is_redeemed) {
-            setErrorMsg('Este ticket ya ha sido utilizado.')
+            setErrorMsg('Este ticket ya ha sido reclamado.')
             setLoading(false)
             return
          }
@@ -100,31 +115,22 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
             setLoading(false)
             return
          }
+      } else if (eData) {
+         eventData = eData
       } else {
-         // 2. Fallback: Buscar código general de Evento
-         const { data: eData } = await supabase
-           .from('Events')
-           .select('*')
-           .eq('code', cleanCode)
-           .maybeSingle()
-
-         if (eData) {
-            eventData = eData
-         } else {
-            setErrorMsg('Código no válido o inexistente.')
-            setLoading(false)
-            return
-         }
+         setErrorMsg('Código no válido o inexistente.')
+         setLoading(false)
+         return
       }
 
-      if (eventData.status === 'suspendido') {
-        setErrorMsg('Este evento se encuentra suspendido actualmente.')
+      if (eventData.status !== 'en curso') {
+        setErrorMsg('Este evento no se encuentra activo ("en curso").')
         setLoading(false)
         return
       }
 
       if (eventData.end_datetime && new Date(eventData.end_datetime).getTime() <= Date.now()) {
-        setErrorMsg('Este evento ya ha finalizado.')
+        setErrorMsg('Este evento ya ha finalizado por horario.')
         setLoading(false)
         return
       }
