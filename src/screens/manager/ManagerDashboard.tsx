@@ -82,15 +82,23 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     setSavingEvent(true)
 
     const timeString = newEventTime || '12:00'
-    const startDate = new Date(`${newEventDate}T${timeString}:00`)
-    const endDate = new Date(startDate.getTime() + 12 * 60 * 60 * 1000)
+    const startDateStr = `${newEventDate}T${timeString}:00`
+    const startD = new Date(startDateStr)
+    const endD = new Date(startD.getTime() + 12 * 60 * 60 * 1000)
+    
+    const y = endD.getFullYear()
+    const m = String(endD.getMonth() + 1).padStart(2, '0')
+    const d = String(endD.getDate()).padStart(2, '0')
+    const h = String(endD.getHours()).padStart(2, '0')
+    const min = String(endD.getMinutes()).padStart(2, '0')
+    const endDateStr = `${y}-${m}-${d}T${h}:${min}:00`
 
     if (editingEventId) {
       const payload: any = {
          name: newEventName,
          description: newEventDesc,
-         start_datetime: startDate.toISOString(),
-         end_datetime: endDate.toISOString(),
+         start_datetime: startDateStr,
+         end_datetime: endDateStr,
          status: 'en curso'
       }
       if (newEventCode.trim() !== '') {
@@ -112,8 +120,8 @@ export function ManagerDashboard({ manager }: { manager: any }) {
          manager_id: manager.id,
          name: newEventName,
          description: newEventDesc,
-         start_datetime: startDate.toISOString(),
-         end_datetime: endDate.toISOString(),
+         start_datetime: startDateStr,
+         end_datetime: endDateStr,
          code: code,
          status: 'en curso'
       })
