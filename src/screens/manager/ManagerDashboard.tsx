@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { managerSupabase as supabase } from '../../lib/managerSupabase'
+import { TicketManager } from './TicketManager'
 
 export function ManagerDashboard({ manager }: { manager: any }) {
   const isAdmin = manager.role === 'system_admin'
@@ -23,6 +24,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   const [newEventCode, setNewEventCode] = useState('')
   const [savingEvent, setSavingEvent] = useState(false)
   const [eventFilter, setEventFilter] = useState<'all' | 'active' | 'finished' | 'suspended'>('all')
+  const [managingTicketsFor, setManagingTicketsFor] = useState<any | null>(null)
 
   useEffect(() => {
     if (activeTab === 'managers' && isAdmin) {
@@ -297,7 +299,9 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
       {/* Main Content */}
       <div className="flex-1 p-10 overflow-y-auto">
-         {activeTab === 'events' && (
+         {activeTab === 'events' && managingTicketsFor ? (
+           <TicketManager event={managingTicketsFor} onBack={() => setManagingTicketsFor(null)} />
+         ) : activeTab === 'events' && !managingTicketsFor ? (
            <>
              <div className="flex justify-between items-center mb-6">
                 <div>
@@ -447,6 +451,13 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
                        {/* Acciones de Edición / Suspensión / Eliminación */}
                        <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100 justify-end">
+                          <button 
+                            onClick={() => setManagingTicketsFor(e)}
+                            className="mr-auto px-3 py-1.5 bg-[#f304eb]/10 hover:bg-[#f304eb]/20 text-[#f304eb] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
+                            Tickets
+                          </button>
                           <button 
                             onClick={() => startEditEvent(e)}
                             className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-lg transition-colors"
