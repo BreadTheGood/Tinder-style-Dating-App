@@ -99,7 +99,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
         <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Intereses</p>
         <div className="flex flex-wrap gap-2">
           {(me.tags || []).map((t) => (
-            <span key={t} className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(255,77,148,0.15)', color: '#ff4d94', border: '1px solid rgba(255,77,148,0.2)' }}>
+            <span key={t} className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(243,4,235,0.15)', color: '#f304eb', border: '1px solid rgba(243,4,235,0.2)' }}>
               {t}
             </span>
           ))}
@@ -113,7 +113,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
           {pastEvents.length > 0 && (
              <button 
                onClick={() => setShowHistory(!showHistory)} 
-               className="text-xs font-semibold text-[#ff4d94] hover:underline"
+               className="text-xs font-semibold text-[#f304eb] hover:underline"
              >
                 {showHistory ? 'Ocultar historial' : `Historial (${pastEvents.length})`}
              </button>
@@ -150,7 +150,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
             value={ticketCode} 
             onChange={e => setTicketCode(e.target.value)} 
             placeholder="Ingresar código de ticket..." 
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#ff4d94] uppercase placeholder:normal-case placeholder:text-white/30 transition-colors" 
+            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#f304eb] uppercase placeholder:normal-case placeholder:text-white/30 transition-colors" 
           />
           <button 
             onClick={handleJoin} 

@@ -87,11 +87,11 @@ input:autofill {
 }
 
 .gradient-brand {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff4d94 20%, #f304eb 40%, #b004f3 60%, #8a2be2 80%, #6600cc 100%);
+  background: linear-gradient(135deg, #ff2a85 0%, #ff00aa 20%, #f304eb 40%, #cc00b8 60%, #990088 80%, #5e0053 100%);
 }
 
 .gradient-brand-text {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff4d94 20%, #f304eb 40%, #b004f3 60%, #8a2be2 80%, #6600cc 100%);
+  background: linear-gradient(135deg, #ff2a85 0%, #ff00aa 20%, #f304eb 40%, #cc00b8 60%, #990088 80%, #5e0053 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
