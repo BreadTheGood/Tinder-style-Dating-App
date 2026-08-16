@@ -252,11 +252,11 @@ export const supabaseAppDataService: AppDataService = {
 
   async recordSwipe(targetId, action) {
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return false
+    if (!user) return { matchId: null }
 
     // Use our own profile ID to swipe
     const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
-    if (!myProfile) return false
+    if (!myProfile) return { matchId: null }
 
     const { error, data } = await supabase.from('Swipes').insert({
       id: crypto.randomUUID(),
@@ -268,7 +268,7 @@ export const supabaseAppDataService: AppDataService = {
     if (error || !data || data.length === 0) {
       console.error('Error saving swipe:', error)
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: error?.message || 'Fallo silencioso por RLS. Añade permisos a Swipes.' } }))
-      return false
+      return { matchId: null }
     }
 
     if (action === 'like') {
@@ -289,11 +289,12 @@ export const supabaseAppDataService: AppDataService = {
         if (matchError || !matchData || matchData.length === 0) {
           console.error("Error creating match", matchError)
           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: matchError?.message || 'Fallo silencioso RLS en Matches' } }))
+          return { matchId: null }
         }
-        return true
+        return { matchId: matchData[0].id }
       }
     }
-    return false
+    return { matchId: null }
   },
   
   async sendMessage(matchId: string, text: string) {

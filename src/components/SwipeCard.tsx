@@ -1,5 +1,5 @@
 import { useRef, useState, type PointerEvent, type CSSProperties } from 'react'
-import { LocationIcon } from './icons'
+
 import type { Profile } from '../types'
 
 export function SwipeCard({
@@ -104,10 +104,6 @@ export function SwipeCard({
           <div>
             <h2 className="text-white font-extrabold text-3xl tracking-tight leading-tight">{profile.name}, {profile.age}</h2>
             <p className="text-white/70 text-sm font-medium mt-0.5">{profile.job}</p>
-          </div>
-          <div className="flex items-center gap-1 text-white/50 text-xs font-semibold">
-            <LocationIcon size={12} className="text-white/40" />
-            {profile.distance}
           </div>
         </div>
         <p className="text-white/75 text-sm leading-relaxed mb-3">{profile.bio}</p>

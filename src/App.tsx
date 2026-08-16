@@ -204,8 +204,11 @@ export default function App() {
               return [{ id: match.id, profile: mappedProfile, messages: [], unread: 0 }, ...prev]
             })
 
-            // Show Match Modal
-            setMatchedProfile(mappedProfile)
+            // Show Match Modal solo si nosotros NO fuimos los que swipeamos (para evitar doble modal)
+            if (match.profile2_id === currentUser.id) {
+               setMatchedProfile(mappedProfile)
+               window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: '¡Nuevo Match!', body: `Has hecho match con ${mappedProfile.name}`, image: mappedProfile.image } }))
+            }
           }
         }
       })
@@ -324,7 +327,15 @@ export default function App() {
           />
         )
       case 'swipe':
-        return <SwipeScreen profiles={profiles} isLoading={isLoading} />
+        return <SwipeScreen profiles={profiles} isLoading={isLoading} onMatchLocally={(profile, matchId) => {
+          setConversations(prev => {
+            if (prev.find(c => c.id === matchId)) return prev
+            return [{ id: matchId, profile, messages: [], unread: 0 }, ...prev]
+          })
+          setMatchedProfile(profile)
+        }} onSwipe={(id) => {
+          setProfiles(prev => prev.filter(p => p.id !== id))
+        }} />
       case 'messages':
         return <MessagesScreen conversations={conversations} onOpenChat={handleOpenChat} />
       case 'chat':

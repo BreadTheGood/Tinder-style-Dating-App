@@ -4,7 +4,7 @@ import { SwipeCard } from '../components/SwipeCard'
 import type { Profile } from '../types'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
 
-export function SwipeScreen({ profiles, isLoading }: { profiles: Profile[]; isLoading: boolean }) {
+export function SwipeScreen({ profiles, isLoading, onMatchLocally, onSwipe }: { profiles: Profile[]; isLoading: boolean; onMatchLocally?: (profile: Profile, matchId: string) => void; onSwipe?: (id: string | number) => void }) {
   const [queue, setQueue] = useState<Profile[]>([])
   const [animating, setAnimating] = useState(false)
 
@@ -17,11 +17,16 @@ export function SwipeScreen({ profiles, isLoading }: { profiles: Profile[]; isLo
     setAnimating(true)
     const liked = queue[0]
 
-    supabaseAppDataService.recordSwipe?.(liked.id, 'like')
+    supabaseAppDataService.recordSwipe?.(liked.id, 'like').then(res => {
+      if (res?.matchId && onMatchLocally) {
+        onMatchLocally(liked, res.matchId)
+      }
+    })
 
     setTimeout(() => {
       setQueue((q) => q.slice(1))
       setAnimating(false)
+      if (onSwipe) onSwipe(liked.id)
     }, 400)
   }
 
@@ -35,6 +40,7 @@ export function SwipeScreen({ profiles, isLoading }: { profiles: Profile[]; isLo
     setTimeout(() => {
       setQueue((q) => q.slice(1))
       setAnimating(false)
+      if (onSwipe) onSwipe(disliked.id)
     }, 400)
   }
 

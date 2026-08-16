@@ -7,7 +7,7 @@ export interface AppDataService {
   getProfiles: () => Promise<Profile[]>
   getConversations: () => Promise<Conversation[]>
   getCurrentUser: () => Promise<UserProfile>
-  recordSwipe?: (targetId: string | number, action: 'like' | 'pass') => Promise<boolean>
+  recordSwipe?: (targetId: string | number, action: 'like' | 'pass') => Promise<{ matchId: string | null }>
   updateProfile?: (data: Partial<UserProfile>) => Promise<boolean>
   uploadPhoto?: (file: File) => Promise<string | false>
   deletePhoto?: (photoUrl: string) => Promise<boolean>
@@ -49,9 +49,8 @@ export const mockAppDataService: AppDataService = {
     await wait(300)
     return currentUser
   },
-  async recordSwipe(_targetId, action) {
-    await wait(300)
-    return action === 'like' && Math.random() > 0.4
+  async recordSwipe(_targetId, _action) {
+    return { matchId: null }
   },
   async updateProfile(data) {
     await wait(500)
