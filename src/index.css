@@ -104,6 +104,24 @@ input:autofill {
   --theme-color-2: #5e0053;
 }
 
+[data-theme="neon-night"] {
+  --theme-gradient: linear-gradient(135deg, #00ffff 0%, #0055ff 40%, #8a2be2 70%, #ff00ff 100%);
+  --theme-color-1: #00ffff;
+  --theme-color-2: #ff00ff;
+}
+
+[data-theme="acid-party"] {
+  --theme-gradient: linear-gradient(135deg, #ccff00 0%, #00ff87 40%, #00b8ff 100%);
+  --theme-color-1: #ccff00;
+  --theme-color-2: #00b8ff;
+}
+
+[data-theme="ultraviolet-fire"] {
+  --theme-gradient: linear-gradient(135deg, #ff3300 0%, #ff0066 40%, #9900ff 80%, #4a00e0 100%);
+  --theme-color-1: #ff3300;
+  --theme-color-2: #4a00e0;
+}
+
 .gradient-brand {
   background: var(--theme-gradient);
 }

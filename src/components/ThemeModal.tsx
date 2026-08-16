@@ -4,7 +4,10 @@ import { XIcon, HeartIcon } from './icons'
 const THEMES = [
   { id: 'original', name: 'Original (Fucsia a Naranja)', bg: 'linear-gradient(135deg, #f304eb 0%, #ff7043 100%)' },
   { id: 'warm-blue', name: 'Atardecer (Rosa a Azul)', bg: 'linear-gradient(135deg, #ff007f 0%, #d407f3 25%, #9d00ff 50%, #4d00ff 75%, #00d4ff 100%)' },
-  { id: 'warm-fuchsia', name: 'Fucsia Profundo (Actual)', bg: 'linear-gradient(135deg, #ff2a85 0%, #ff00aa 20%, #f304eb 40%, #cc00b8 60%, #990088 80%, #5e0053 100%)' }
+  { id: 'warm-fuchsia', name: 'Fucsia Profundo (Actual)', bg: 'linear-gradient(135deg, #ff2a85 0%, #ff00aa 20%, #f304eb 40%, #cc00b8 60%, #990088 80%, #5e0053 100%)' },
+  { id: 'neon-night', name: 'Cyberpunk (Cian a Magenta)', bg: 'linear-gradient(135deg, #00ffff 0%, #0055ff 40%, #8a2be2 70%, #ff00ff 100%)' },
+  { id: 'acid-party', name: 'Fiesta Ácida (Lima a Celeste)', bg: 'linear-gradient(135deg, #ccff00 0%, #00ff87 40%, #00b8ff 100%)' },
+  { id: 'ultraviolet-fire', name: 'Ultravioleta (Fuego a Púrpura)', bg: 'linear-gradient(135deg, #ff3300 0%, #ff0066 40%, #9900ff 80%, #4a00e0 100%)' }
 ]
 
 export function ThemeModal({ onClose }: { onClose: () => void }) {
@@ -62,12 +65,12 @@ export function ThemeModal({ onClose }: { onClose: () => void }) {
           </div>
 
           <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-4 mt-2">Colores</p>
-          <div className="flex items-center justify-center gap-6">
+          <div className="flex items-center justify-center gap-4 flex-wrap px-4">
             {THEMES.map((t) => (
               <button
                 key={t.id}
                 onClick={() => applyTheme(t.id)}
-                className={`w-12 h-12 rounded-full transition-all flex items-center justify-center ${activeTheme === t.id ? 'ring-2 ring-white scale-110 shadow-xl' : 'opacity-70 hover:opacity-100 hover:scale-105'}`}
+                className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${activeTheme === t.id ? 'ring-2 ring-white scale-110 shadow-xl' : 'opacity-70 hover:opacity-100 hover:scale-105'}`}
                 style={{ background: t.bg }}
                 title={t.name}
               />
