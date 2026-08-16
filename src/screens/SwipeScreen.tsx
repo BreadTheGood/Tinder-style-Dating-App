@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { HeartIcon, StarIcon, XIcon } from '../components/icons'
+import { HeartIcon, XIcon } from '../components/icons'
 import { SwipeCard } from '../components/SwipeCard'
 import type { Profile } from '../types'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
@@ -90,16 +90,9 @@ export function SwipeScreen({ profiles, isLoading, onMatchLocally, onSwipe, onVi
             <XIcon size={22} className="text-white/60" />
           </button>
           <button
-            onClick={handleDislike}
-            className="w-11 h-11 rounded-full flex items-center justify-center transition-all active:scale-90"
-            style={{ background: 'rgba(255,200,0,0.12)', border: '1.5px solid rgba(255,200,0,0.2)' }}
-          >
-            <StarIcon size={16} className="text-yellow-400" />
-          </button>
-          <button
             onClick={handleLike}
-            className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-90 shadow-lg"
-            style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)', boxShadow: '0 8px 24px rgb(255, 0, 200)' }}
+            className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-90 shadow-lg gradient-brand"
+            style={{ boxShadow: '0 8px 24px rgba(249, 0, 220, 0.35)' }}
           >
             <HeartIcon filled size={24} className="text-white" />
           </button>

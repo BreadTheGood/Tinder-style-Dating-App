@@ -192,7 +192,7 @@ export function OnboardingScreen({
       
       <div className="p-5 border-t border-white/10 bg-[#0d0d0f]">
         {errorMsg && <p className="text-red-500 text-xs text-center mb-3 font-medium animate-fade-in">{errorMsg}</p>}
-        <button onClick={handleNext} disabled={isSaving} className="w-full py-4 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all disabled:opacity-50" style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}>
+        <button onClick={handleNext} disabled={isSaving} className="w-full py-4 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all disabled:opacity-50 gradient-brand">
           {isSaving ? 'Guardando...' : (step === 3 && !requiresPassword) || step === 4 ? 'Finalizar y Entrar' : 'Siguiente'}
         </button>
       </div>

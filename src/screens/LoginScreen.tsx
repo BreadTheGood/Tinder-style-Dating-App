@@ -269,8 +269,8 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                 <button
                   key={m}
                   onClick={() => { setMode(m); setErrorMsg(''); }}
-                  className="flex-1 py-3 text-sm font-semibold transition-all duration-200"
-                  style={mode === m ? { background: 'linear-gradient(135deg,#f304eb,#b004f3)', color: '#fff', borderRadius: 10 } : { color: 'rgba(255,255,255,0.4)' }}
+                  className={`flex-1 py-3 text-sm font-semibold transition-all duration-200 ${mode === m ? 'gradient-brand text-white' : 'text-white/40'}`}
+                  style={mode === m ? { borderRadius: 10 } : {}}
                 >
                   {m === 'login' ? 'Iniciar sesión' : 'Usar código'}
                 </button>
@@ -378,8 +378,8 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
           <button
             onClick={handleAuth}
             disabled={loading}
-            className="w-full mt-6 py-4 rounded-xl font-bold text-white text-base transition-all active:scale-95 disabled:opacity-50"
-            style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)', boxShadow: '0 8px 24px rgba(249, 0, 220, 0.35)' }}
+            className="w-full mt-6 py-4 rounded-xl font-bold text-white text-base transition-all active:scale-95 disabled:opacity-50 gradient-brand"
+            style={{ boxShadow: '0 8px 24px rgba(249, 0, 220, 0.35)' }}
           >
             {loading ? 'Validando...' : mode === 'login' ? 'Ingresar' : mode === 'register' ? 'Crear cuenta' : 'Ingresar con código'}
           </button>
@@ -446,8 +446,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                    <button
                      type="submit"
                      disabled={modalLoading}
-                     className="flex-1 py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50"
-                     style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}
+                     className="flex-1 py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50 gradient-brand"
                    >
                      {modalLoading ? 'Buscando...' : 'Siguiente'}
                    </button>
@@ -489,8 +488,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                     <button
                       type="submit"
                       disabled={modalLoading}
-                      className="flex-1 py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50"
-                      style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}
+                      className="flex-1 py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50 gradient-brand"
                     >
                       {modalLoading ? 'Entrando...' : 'Ingresar'}
                     </button>
@@ -520,8 +518,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                    <button
                      type="button"
                      onClick={() => setShowForgotModal(false)}
-                     className="w-full py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95"
-                     style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}
+                     className="w-full py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 gradient-brand"
                    >
                      Entendido
                    </button>
@@ -557,8 +554,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                     <button
                       type="submit"
                       disabled={forgotLoading}
-                      className="flex-1 py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50"
-                      style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}
+                      className="flex-1 py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50 gradient-brand"
                     >
                       {forgotLoading ? 'Enviando...' : 'Enviar enlace'}
                     </button>

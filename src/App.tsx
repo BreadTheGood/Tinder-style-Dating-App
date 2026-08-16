@@ -513,8 +513,7 @@ export default function App() {
                   <button
                     type="submit"
                     disabled={recoveryLoading}
-                    className="w-full py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50 mt-2"
-                    style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}
+                    className="w-full py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-50 mt-2 gradient-brand"
                   >
                     {recoveryLoading ? 'Guardando...' : 'Guardar y entrar'}
                   </button>

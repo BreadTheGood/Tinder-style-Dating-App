@@ -154,7 +154,7 @@ export function PhotoEditor({ imageSrc, onCancel, onSave }: PhotoEditorProps) {
           <button onClick={onCancel} className="flex-1 py-4 rounded-xl font-bold text-white glass border border-white/10 active:scale-95 transition-transform">
             Cancelar
           </button>
-          <button onClick={handleSave} disabled={isSaving} className="flex-1 py-4 rounded-xl font-bold text-white active:scale-95 transition-transform disabled:opacity-50" style={{ background: 'linear-gradient(135deg,#f304eb,#b004f3)' }}>
+          <button onClick={handleSave} disabled={isSaving} className="flex-1 py-4 rounded-xl font-bold text-white active:scale-95 transition-transform disabled:opacity-50 gradient-brand">
             {isSaving ? 'Guardando...' : 'Aplicar'}
           </button>
         </div>

@@ -64,9 +64,9 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
         {conversation.messages.map((m) => (
           <div key={m.id} className={`flex ${m.from === 'me' ? 'justify-end' : 'justify-start'}`}>
             <div
-              className="max-w-[72%] px-4 py-2.5 rounded-2xl text-sm font-medium leading-relaxed"
+              className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm font-medium leading-relaxed ${m.from === 'me' ? 'gradient-brand text-white' : ''}`}
               style={m.from === 'me'
-                ? { background: 'linear-gradient(135deg,#ff3e6c,#ff7043)', color: '#fff', borderBottomRightRadius: 4 }
+                ? { borderBottomRightRadius: 4 }
                 : { background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)', borderBottomLeftRadius: 4 }
               }
             >
@@ -89,8 +89,8 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
         />
         <button
           onClick={send}
-          className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-90"
-          style={text.trim() ? { background: 'linear-gradient(135deg,#ff3e6c,#ff7043)', boxShadow: '0 4px 16px rgba(255,62,108,0.4)' } : { background: 'rgba(255,255,255,0.07)' }}
+          className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-90 ${text.trim() ? 'gradient-brand' : ''}`}
+          style={text.trim() ? { boxShadow: '0 4px 16px rgba(255,62,108,0.4)' } : { background: 'rgba(255,255,255,0.07)' }}
         >
           <SendIcon size={16} className="text-white" />
         </button>

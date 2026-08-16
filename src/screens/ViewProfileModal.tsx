@@ -53,8 +53,8 @@ export function ViewProfileModal({ profile, onClose, onMessage }: { profile: Pro
         {onMessage && (
           <button
             onClick={onMessage}
-            className="w-full py-4 rounded-xl font-bold text-white text-lg mt-4 transition-all active:scale-95"
-            style={{ background: 'linear-gradient(135deg,#f304eb,#ff7043)', boxShadow: '0 8px 24px rgba(255,62,108,0.35)' }}
+            className="w-full py-4 rounded-xl font-bold text-white text-lg mt-4 transition-all active:scale-95 gradient-brand"
+            style={{ boxShadow: '0 8px 24px rgba(255,62,108,0.35)' }}
           >
             Enviar mensaje
           </button>
