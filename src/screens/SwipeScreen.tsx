@@ -1,10 +1,10 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
+import { useEffect, useState } from 'react'
 import { HeartIcon, StarIcon, XIcon } from '../components/icons'
 import { SwipeCard } from '../components/SwipeCard'
-import type { Conversation, Profile } from '../types'
+import type { Profile } from '../types'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
 
-export function SwipeScreen({ onMatch, setConversations, profiles, isLoading }: { onMatch: (p: Profile) => void; conversations: Conversation[]; setConversations: Dispatch<SetStateAction<Conversation[]>>; profiles: Profile[]; isLoading: boolean }) {
+export function SwipeScreen({ profiles, isLoading }: { profiles: Profile[]; isLoading: boolean }) {
   const [queue, setQueue] = useState<Profile[]>([])
   const [animating, setAnimating] = useState(false)
 
@@ -17,20 +17,7 @@ export function SwipeScreen({ onMatch, setConversations, profiles, isLoading }: 
     setAnimating(true)
     const liked = queue[0]
 
-    // Registra en Supabase de forma asíncrona
-    supabaseAppDataService.recordSwipe?.(liked.id, 'like').then(isMatch => {
-      // Si la base de datos dice que es match
-      if (isMatch) {
-        onMatch(liked)
-        // Agregamos la conversacion localmente. No tenemos el match_id aquí fácilmente,
-        // pero se arreglará cuando recarguen o podemos mejorarlo luego con real-time Matches.
-        setConversations((c) => [{
-          profile: liked,
-          unread: 0,
-          messages: [],
-        }, ...c])
-      }
-    })
+    supabaseAppDataService.recordSwipe?.(liked.id, 'like')
 
     setTimeout(() => {
       setQueue((q) => q.slice(1))

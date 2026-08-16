@@ -174,6 +174,48 @@ export default function App() {
     return () => window.removeEventListener('app-toast', handleToast)
   }, [])
 
+  // Listen for real-time matches
+  useEffect(() => {
+    if (!currentUser) return
+
+    const channel = supabase
+      .channel('public:Matches')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Matches' }, async (payload) => {
+        const match = payload.new
+        if (match.profile1_id === currentUser.id || match.profile2_id === currentUser.id) {
+          const otherId = match.profile1_id === currentUser.id ? match.profile2_id : match.profile1_id
+          const { data: otherProfile } = await supabase.from('Profiles').select('*').eq('id', otherId).single()
+          
+          if (otherProfile) {
+            const mappedProfile: Profile = {
+              id: otherProfile.id,
+              name: otherProfile.name || 'Usuario',
+              age: otherProfile.age || 0,
+              bio: otherProfile.bio || '',
+              distance: 'Cerca',
+              job: '',
+              image: otherProfile.images?.[0] || 'https://placehold.co/600x700?text=Sin+Foto',
+              images: otherProfile.images || [],
+              tags: otherProfile.tags || []
+            }
+            
+            setConversations(prev => {
+              if (prev.find(c => c.id === match.id)) return prev
+              return [{ id: match.id, profile: mappedProfile, messages: [], unread: 0 }, ...prev]
+            })
+
+            // Show Match Modal
+            setMatchedProfile(mappedProfile)
+          }
+        }
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [currentUser])
+
   // Listen for real-time messages
   useEffect(() => {
     if (!currentUser || conversations.length === 0) return
@@ -231,7 +273,6 @@ export default function App() {
 
   const go = (s: Screen) => setScreen(s)
 
-  const handleMatch = (p: Profile) => setMatchedProfile(p)
 
   const handleMatchMessage = () => {
     setMatchedProfile(null)
@@ -283,7 +324,7 @@ export default function App() {
           />
         )
       case 'swipe':
-        return <SwipeScreen onMatch={handleMatch} conversations={conversations} setConversations={setConversations} profiles={profiles} isLoading={isLoading} />
+        return <SwipeScreen profiles={profiles} isLoading={isLoading} />
       case 'messages':
         return <MessagesScreen conversations={conversations} onOpenChat={handleOpenChat} />
       case 'chat':
