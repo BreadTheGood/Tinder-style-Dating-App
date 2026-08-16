@@ -1,5 +1,5 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
-import { FireIcon, HeartIcon, StarIcon, XIcon } from '../components/icons'
+import { HeartIcon, StarIcon, XIcon } from '../components/icons'
 import { SwipeCard } from '../components/SwipeCard'
 import type { Conversation, Profile } from '../types'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
@@ -55,25 +55,18 @@ export function SwipeScreen({ onMatch, setConversations, profiles, isLoading }: 
     <div className="flex flex-col h-full" style={{ background: '#0d0d0f' }}>
       <div className="flex items-center justify-between px-5 pt-4 pb-4">
         <div className="w-9" />
-        <div className="flex items-center gap-2">
-          <FireIcon size={22} className="text-[#f304eb]" />
-          <span className="text-white font-extrabold text-xl tracking-tight notranslate" translate="no">swiper</span>
+        <div className="flex items-center">
+          <span className="text-white font-extrabold text-xl tracking-[0.2em] notranslate" translate="no">G I R A</span>
         </div>
       </div>
 
       <div className="flex-1 relative mx-4 mb">
         {isLoading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-            <div className="w-20 h-20 rounded-full gradient-brand flex items-center justify-center opacity-30">
-              <FireIcon size={36} className="text-white" />
-            </div>
-            <p className="text-white/40 font-semibold text-center">Preparando tus matches…</p>
+            <p className="text-white/40 font-semibold text-center animate-pulse">Preparando tus matches…</p>
           </div>
         ) : queue.length === 0 ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-            <div className="w-20 h-20 rounded-full gradient-brand flex items-center justify-center opacity-30">
-              <FireIcon size={36} className="text-white" />
-            </div>
             <p className="text-white/40 font-semibold text-center">No hay más perfiles por ahora.<br />Vuelve más tarde ✨</p>
           </div>
         ) : (

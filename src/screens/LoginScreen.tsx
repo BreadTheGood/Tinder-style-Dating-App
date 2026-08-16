@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { EyeIcon, FireIcon } from '../components/icons'
+import { EyeIcon } from '../components/icons'
 import { supabase } from '../lib/supabase'
 
 export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean) => void }) {
@@ -255,11 +255,8 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
       </div>
 
       <div className="relative flex flex-col items-center pt-16 pb-8 px-8">
-        <div className="w-16 h-16 rounded-2xl gradient-brand flex items-center justify-center mb-5 shadow-lg" style={{ boxShadow: '0 8px 32px rgba(255,62,108,0.4)' }}>
-          <FireIcon size={32} className="text-white" />
-        </div>
-        <h1 className="text-4xl font-extrabold tracking-tight mb-1">
-          <span className="gradient-brand-text notranslate" translate="no">swiper</span>
+        <h1 className="text-4xl font-extrabold tracking-[0.2em] mb-1 mt-6">
+          <span className="gradient-brand-text notranslate" translate="no">G I R A</span>
         </h1>
         <p className="text-sm text-white/40 font-medium tracking-wide">Swipea. Matchea. Conecta.</p>
       </div>
