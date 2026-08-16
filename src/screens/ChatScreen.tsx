@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { BackIcon, SendIcon } from '../components/icons'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
-import type { Conversation, Message } from '../types'
+import type { Conversation, Message, Profile } from '../types'
 
-export function ChatScreen({ conversation, onBack, onUpdate }: { conversation: Conversation; onBack: () => void; onUpdate: (msgs: Message[]) => void }) {
+export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { conversation: Conversation; onBack: () => void; onUpdate: (msgs: Message[]) => void; onViewProfile?: (p: Profile) => void }) {
   const [text, setText] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -32,10 +32,14 @@ export function ChatScreen({ conversation, onBack, onUpdate }: { conversation: C
         <button onClick={onBack} className="w-9 h-9 rounded-full glass flex items-center justify-center flex-shrink-0">
           <BackIcon size={18} className="text-white/70" />
         </button>
-        <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800 flex-shrink-0" style={{ border: '1.5px solid rgba(255,62,108,0.4)' }}>
+        <div 
+          onClick={() => onViewProfile?.(conversation.profile)}
+          className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800 flex-shrink-0 cursor-pointer" 
+          style={{ border: '1.5px solid rgba(255,62,108,0.4)' }}
+        >
           <img src={conversation.profile.image} alt={conversation.profile.name} className="w-full h-full object-cover" />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 cursor-pointer" onClick={() => onViewProfile?.(conversation.profile)}>
           <p className="text-white font-bold text-sm">{conversation.profile.name}</p>
           <p className="text-white/40 text-xs font-medium">En línea ahora</p>
         </div>
@@ -46,7 +50,11 @@ export function ChatScreen({ conversation, onBack, onUpdate }: { conversation: C
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         <div className="text-center mb-4">
-          <div className="w-16 h-16 rounded-full overflow-hidden mx-auto mb-2 shadow-lg" style={{ border: '2px solid rgba(255,62,108,0.4)' }}>
+          <div 
+            onClick={() => onViewProfile?.(conversation.profile)}
+            className="w-16 h-16 rounded-full overflow-hidden mx-auto mb-2 shadow-lg cursor-pointer" 
+            style={{ border: '2px solid rgba(255,62,108,0.4)' }}
+          >
             <img src={conversation.profile.image} alt={conversation.profile.name} className="w-full h-full object-cover" />
           </div>
           <p className="text-white font-bold">{conversation.profile.name}</p>

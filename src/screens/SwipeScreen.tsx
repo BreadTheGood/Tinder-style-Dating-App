@@ -4,7 +4,7 @@ import { SwipeCard } from '../components/SwipeCard'
 import type { Profile } from '../types'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
 
-export function SwipeScreen({ profiles, isLoading, onMatchLocally, onSwipe }: { profiles: Profile[]; isLoading: boolean; onMatchLocally?: (profile: Profile, matchId: string) => void; onSwipe?: (id: string | number) => void }) {
+export function SwipeScreen({ profiles, isLoading, onMatchLocally, onSwipe, onViewProfile }: { profiles: Profile[]; isLoading: boolean; onMatchLocally?: (profile: Profile, matchId: string) => void; onSwipe?: (id: string | number) => void; onViewProfile?: (p: Profile) => void }) {
   const [queue, setQueue] = useState<Profile[]>([])
   const [animating, setAnimating] = useState(false)
 
@@ -73,6 +73,7 @@ export function SwipeScreen({ profiles, isLoading, onMatchLocally, onSwipe }: { 
                 onDislike={handleDislike}
                 isTop={fromTop === 0}
                 offset={fromTop}
+                onViewProfile={() => onViewProfile?.(p)}
               />
             )
           })

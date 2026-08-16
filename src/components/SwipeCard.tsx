@@ -8,12 +8,14 @@ export function SwipeCard({
   onDislike,
   isTop,
   offset = 0,
+  onViewProfile,
 }: {
   profile: Profile
   onLike: () => void
   onDislike: () => void
   isTop: boolean
   offset?: number
+  onViewProfile?: () => void
 }) {
   const [drag, setDrag] = useState({ x: 0, y: 0, dragging: false })
   const [swipeDir, setSwipeDir] = useState<'left' | 'right' | null>(null)
@@ -106,7 +108,15 @@ export function SwipeCard({
             <p className="text-white/70 text-sm font-medium mt-0.5">{profile.job}</p>
           </div>
         </div>
-        <p className="text-white/75 text-sm leading-relaxed mb-3">{profile.bio}</p>
+        <p className="text-white/75 text-sm leading-relaxed mb-3 line-clamp-2">{profile.bio}</p>
+        {(profile.bio?.length > 70 || profile.images?.length > 1 || profile.tags?.length > 0) && (
+          <button 
+            onClick={(e) => { e.stopPropagation(); onViewProfile?.(); }}
+            className="w-full py-2 mb-3 rounded-lg bg-white/5 border border-white/10 text-white/80 text-xs font-bold tracking-widest uppercase transition-colors hover:bg-white/10 active:scale-[0.98]"
+          >
+            Ver perfil completo
+          </button>
+        )}
         <div className="flex flex-wrap gap-2">
           {profile.tags.map((t) => (
             <span key={t} className="px-3 py-1 rounded-full text-xs font-semibold text-white/80" style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.1)' }}>

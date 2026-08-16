@@ -3,6 +3,7 @@ import { BottomNav } from './components/BottomNav'
 import { ChatScreen } from './screens/ChatScreen'
 import { LoginScreen } from './screens/LoginScreen'
 import { MatchModal } from './screens/MatchModal'
+import { ViewProfileModal } from './screens/ViewProfileModal'
 import { MessagesScreen } from './screens/MessagesScreen'
 import { ProfileScreen } from './screens/ProfileScreen'
 import { EditProfileScreen } from './screens/EditProfileScreen'
@@ -17,6 +18,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('login')
   const [navTab, setNavTab] = useState<'swipe' | 'messages' | 'profile'>('swipe')
   const [matchedProfile, setMatchedProfile] = useState<Profile | null>(null)
+  const [viewingProfile, setViewingProfile] = useState<Profile | null>(null)
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null)
   const [profiles, setProfiles] = useState<Profile[]>([])
@@ -335,9 +337,9 @@ export default function App() {
           setMatchedProfile(profile)
         }} onSwipe={(id) => {
           setProfiles(prev => prev.filter(p => p.id !== id))
-        }} />
+        }} onViewProfile={(p) => setViewingProfile(p)} />
       case 'messages':
-        return <MessagesScreen conversations={conversations} onOpenChat={handleOpenChat} />
+        return <MessagesScreen conversations={conversations} onOpenChat={handleOpenChat} onViewProfile={(p) => setViewingProfile(p)} />
       case 'chat':
         return activeConversation ? (
           <ChatScreen
@@ -347,6 +349,7 @@ export default function App() {
               setConversations((prev) => prev.map((c) => (c.profile.id === activeConversation.profile.id ? { ...c, messages: msgs } : c)))
               setActiveConversation((a) => (a ? { ...a, messages: msgs } : a))
             }}
+            onViewProfile={(p) => setViewingProfile(p)}
           />
         ) : null
       case 'profile':
@@ -525,6 +528,18 @@ export default function App() {
         {showNav && <BottomNav active={navTab} onChange={handleNavChange} unread={totalUnread} />}
 
         {matchedProfile && currentUser && <MatchModal profile={matchedProfile} currentUser={currentUser} onClose={() => setMatchedProfile(null)} onMessage={handleMatchMessage} />}
+        
+        {viewingProfile && (
+          <ViewProfileModal 
+            profile={viewingProfile} 
+            onClose={() => setViewingProfile(null)} 
+            onMessage={conversations.some(c => c.profile.id === viewingProfile.id) ? () => {
+              setViewingProfile(null)
+              const convo = conversations.find(c => c.profile.id === viewingProfile.id)
+              if (convo) handleOpenChat(convo)
+            } : undefined}
+          />
+        )}
       </div>
     </div>
   )

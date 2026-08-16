@@ -1,6 +1,6 @@
-import type { Conversation } from '../types'
+import type { Conversation, Profile } from '../types'
 
-export function MessagesScreen({ conversations, onOpenChat }: { conversations: Conversation[]; onOpenChat: (c: Conversation) => void }) {
+export function MessagesScreen({ conversations, onOpenChat, onViewProfile }: { conversations: Conversation[]; onOpenChat: (c: Conversation) => void; onViewProfile?: (p: Profile) => void }) {
   const recentMatches = conversations.slice(0, 4)
 
   return (
@@ -14,7 +14,7 @@ export function MessagesScreen({ conversations, onOpenChat }: { conversations: C
         <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">Nuevos matches</p>
         <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
           {recentMatches.map((c) => (
-            <button key={c.profile.id} onClick={() => onOpenChat(c)} className="flex flex-col items-center gap-1.5 flex-shrink-0">
+            <div key={c.profile.id} className="flex flex-col items-center gap-1.5 flex-shrink-0 cursor-pointer" onClick={() => onViewProfile?.(c.profile)}>
               <div className="relative">
                 <div className="w-16 h-16 rounded-full overflow-hidden" style={{ border: '2px solid #ff3ef9', padding: 2, background: '#0d0d0f' }}>
                   <img src={c.profile.image} alt={c.profile.name} className="w-full h-full rounded-full object-cover" />
@@ -26,7 +26,7 @@ export function MessagesScreen({ conversations, onOpenChat }: { conversations: C
                 )}
               </div>
               <span className="text-white/70 text-xs font-semibold">{c.profile.name}</span>
-            </button>
+            </div>
           ))}
         </div>
       </div>
