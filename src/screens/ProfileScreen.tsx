@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import type { UserProfile } from '../types'
 import { supabase } from '../lib/supabase'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
+import { ThemeModal } from '../components/ThemeModal'
 
 export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () => void }) {
   const me = user
   const [events, setEvents] = useState<any[]>([])
   const [ticketCode, setTicketCode] = useState('')
   const [joining, setJoining] = useState(false)
+  const [imgIdx, setImgIdx] = useState(0)
+  const [showThemeModal, setShowThemeModal] = useState(false)
 
   const fetchEvents = async () => {
      if (supabaseAppDataService.getMyEvents) {
@@ -73,8 +76,32 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
   return (
     <div className="flex flex-col h-full overflow-y-auto" style={{ background: '#0d0d0f' }}>
       <div className="relative h-80 flex-shrink-0">
-        <img src={me.images?.[0] || 'https://placehold.co/600x700?text=Sin+Foto'} alt={me.name} className="w-full h-full object-cover" />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0d0d0f 0%, transparent 60%)' }} />
+        <img src={me.images?.[imgIdx] || 'https://placehold.co/600x700?text=Sin+Foto'} alt={me.name} className="w-full h-full object-cover" />
+        
+        {me.images && me.images.length > 1 && (
+          <div className="absolute top-4 inset-x-4 flex gap-1.5 z-30">
+            {me.images.map((_, i) => (
+              <div key={i} className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)' }}>
+                 <div className="h-full w-full rounded-full transition-all duration-300" style={{ background: i === imgIdx ? '#fff' : 'rgba(255,255,255,0.4)', boxShadow: i === imgIdx ? '0 0 4px rgba(255,255,255,0.8)' : 'none' }} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {me.images && me.images.length > 1 && (
+          <>
+            <div 
+              className="absolute top-0 bottom-0 left-0 w-1/2 z-20"
+              onClick={() => setImgIdx(prev => Math.max(0, prev - 1))}
+            />
+            <div 
+              className="absolute top-0 bottom-0 right-0 w-1/2 z-20"
+              onClick={() => setImgIdx(prev => Math.min(me.images!.length - 1, prev + 1))}
+            />
+          </>
+        )}
+
+        <div className="absolute inset-0 pointer-events-none z-10" style={{ background: 'linear-gradient(to top, #0d0d0f 0%, transparent 60%)' }} />
         <div className="absolute bottom-4 left-5">
           <h2 className="text-white font-extrabold text-3xl tracking-tight">{me.name}, {me.age}</h2>
           <p className="text-white/60 text-sm font-medium">{me.job}</p>
@@ -184,9 +211,15 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
       )}
 
       <div className="mx-5 mb-28">
+        <button onClick={() => setShowThemeModal(true)} className="w-full mb-3 py-4 rounded-xl font-bold text-white text-sm transition-all active:scale-95 glass border border-white/10 flex items-center justify-center gap-2">
+           <svg className="w-4 h-4 text-[#f304eb]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+           Estilos
+        </button>
         <button onClick={onEdit} className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all active:scale-95 glass border border-white/10">Editar perfil</button>
         <button onClick={() => supabase.auth.signOut()} className="w-full mt-3 py-4 rounded-xl font-bold text-red-500 text-sm transition-all active:scale-95 bg-white/5 border border-red-500/20 hover:bg-red-500/10">Cerrar sesión</button>
       </div>
+
+      {showThemeModal && <ThemeModal onClose={() => setShowThemeModal(false)} />}
     </div>
   )
 }

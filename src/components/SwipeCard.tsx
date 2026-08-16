@@ -73,22 +73,38 @@ export function SwipeCard({
       </div>
 
       {profile.images.length > 1 && (
-        <div className="absolute top-3 inset-x-3 flex gap-1.5 z-20">
+        <div className="absolute top-4 inset-x-4 flex gap-1.5 z-30">
           {profile.images.map((_, i) => (
-            <button
-              key={i}
-              onClick={(e) => {
-                e.stopPropagation()
-                setImgIdx(i)
-              }}
-              className="flex-1 h-1 rounded-full transition-all"
-              style={{ background: i === imgIdx ? '#fff' : 'rgba(255,255,255,0.35)' }}
-            />
+            <div key={i} className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)' }}>
+               <div className="h-full w-full rounded-full transition-all duration-300" style={{ background: i === imgIdx ? '#fff' : 'rgba(255,255,255,0.4)', boxShadow: i === imgIdx ? '0 0 4px rgba(255,255,255,0.8)' : 'none' }} />
+            </div>
           ))}
         </div>
       )}
 
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)' }} />
+      {/* Tap zones for photo navigation */}
+      {profile.images.length > 1 && (
+        <>
+          <div 
+            className="absolute top-0 bottom-32 left-0 w-1/2 z-20"
+            onClick={(e) => {
+               if (drag.dragging) return
+               e.stopPropagation()
+               setImgIdx(prev => Math.max(0, prev - 1))
+            }}
+          />
+          <div 
+            className="absolute top-0 bottom-32 right-0 w-1/2 z-20"
+            onClick={(e) => {
+               if (drag.dragging) return
+               e.stopPropagation()
+               setImgIdx(prev => Math.min(profile.images.length - 1, prev + 1))
+            }}
+          />
+        </>
+      )}
+
+      <div className="absolute inset-0 pointer-events-none z-10" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)' }} />
 
       {isTop && (
         <>

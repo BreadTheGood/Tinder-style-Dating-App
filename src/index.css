@@ -86,12 +86,30 @@ input:autofill {
   transition: background-color 50000s ease-in-out 0s, color 50000s ease-in-out 0s !important;
 }
 
+:root {
+  --theme-gradient: linear-gradient(135deg, #f304eb 0%, #b004f3 100%);
+  --theme-color-1: #f304eb;
+  --theme-color-2: #ff7043;
+}
+
+[data-theme="warm-blue"] {
+  --theme-gradient: linear-gradient(135deg, #ff007f 0%, #d407f3 25%, #9d00ff 50%, #4d00ff 75%, #00d4ff 100%);
+  --theme-color-1: #ff007f;
+  --theme-color-2: #00d4ff;
+}
+
+[data-theme="warm-fuchsia"] {
+  --theme-gradient: linear-gradient(135deg, #ff2a85 0%, #ff00aa 20%, #f304eb 40%, #cc00b8 60%, #990088 80%, #5e0053 100%);
+  --theme-color-1: #ff2a85;
+  --theme-color-2: #5e0053;
+}
+
 .gradient-brand {
-  background: linear-gradient(135deg, #ff2a85 0%, #ff00aa 20%, #f304eb 40%, #cc00b8 60%, #990088 80%, #5e0053 100%);
+  background: var(--theme-gradient);
 }
 
 .gradient-brand-text {
-  background: linear-gradient(135deg, #ff2a85 0%, #ff00aa 20%, #f304eb 40%, #cc00b8 60%, #990088 80%, #5e0053 100%);
+  background: var(--theme-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
