@@ -191,9 +191,9 @@ export function BarPortal({ event }: { event: any }) {
                     
                     {/* CONFIRMACIÓN DE MERCADO PAGO */}
                     {transaction.mp_payment_id && (
-                       <div className="flex items-center gap-2 mt-2 text-sm text-green-700 font-medium bg-green-50 px-3 py-1.5 rounded-lg w-max border border-green-200">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                          Pago de Mercado Pago #{transaction.mp_payment_id}
+                       <div className="flex items-start sm:items-center gap-2 mt-2 text-sm text-green-700 font-medium bg-green-50 px-3 py-1.5 rounded-lg border border-green-200 w-full sm:w-fit max-w-full">
+                          <svg className="w-4 h-4 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          <span className="break-all">Pago MP #{transaction.mp_payment_id}</span>
                        </div>
                     )}
                  </div>
