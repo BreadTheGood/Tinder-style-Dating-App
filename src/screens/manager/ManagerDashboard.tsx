@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react'
 import { managerSupabase as supabase } from '../../lib/managerSupabase'
 import { TicketManager } from './TicketManager'
 import { DrinkManager } from './DrinkManager'
+import { BarPortal } from './BarPortal'
 
 export function ManagerDashboard({ manager }: { manager: any }) {
   const isAdmin = manager.role === 'system_admin'
   const isActive = manager.is_active
 
-  const [activeTab, setActiveTab] = useState<'events' | 'managers' | 'settings'>('events')
+  const [activeTab, setActiveTab] = useState<'events' | 'managers' | 'settings' | 'bar'>('events')
   const [managersList, setManagersList] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [newEmail, setNewEmail] = useState('')
@@ -307,6 +308,12 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                 Managers
               </button>
             )}
+            <button 
+              onClick={() => setActiveTab('bar')} 
+              className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'bar' ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800'}`}
+            >
+              🍷 Modo Barra
+            </button>
             <button 
               onClick={() => setActiveTab('settings')} 
               className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'settings' ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800'}`}
@@ -660,6 +667,10 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                </div>
              </form>
            </div>
+         )}
+
+         {activeTab === 'bar' && (
+           <BarPortal />
          )}
       </div>
     </div>
