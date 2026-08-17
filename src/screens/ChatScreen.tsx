@@ -81,6 +81,20 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
         {conversation.messages.map((m) => {
           const codeMatch = m.text.match(/(DRINK-[A-Z0-9]+)/)
           const isDrink = codeMatch !== null
+          
+          let drinkTitle = m.text.split('\n')[0]
+          if (isDrink) {
+             const inviteMatch = m.text.match(/¡Te he invitado (\d+)x (.+)!/)
+             if (inviteMatch) {
+                const qty = inviteMatch[1]
+                const name = inviteMatch[2]
+                if (m.from === 'me') {
+                   drinkTitle = `🍹 Has invitado ${qty}x ${name}`
+                } else {
+                   drinkTitle = `🍹 ${conversation.profile.name} te ha invitado ${qty}x ${name}`
+                }
+             }
+          }
 
           return (
             <div key={m.id} className={`flex ${m.from === 'me' ? 'justify-end' : 'justify-start'}`}>
@@ -93,7 +107,7 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
               >
                 {isDrink ? (
                    <div>
-                      <p className="font-bold">{m.text.split('\n')[0]}</p>
+                      <p className="font-bold">{drinkTitle}</p>
                       <button 
                         onClick={() => setShowQR(codeMatch[1])}
                         className={`w-full mt-2 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1 ${m.from === 'me' ? 'bg-white/20 hover:bg-white/30' : 'bg-black/20 hover:bg-black/30'}`}
