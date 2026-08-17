@@ -398,9 +398,8 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
         </p>
 
         <p className="text-center text-xs text-white/40 pb-8 leading-relaxed font-medium">
-          ¿Te interesa tener la app en tus eventos?{' '}
           <a href="mailto:contacto@gira.app" className="text-[var(--theme-color-1)] font-bold hover:underline">
-            Contáctanos
+            Contactanos
           </a>
         </p>
       </div>
