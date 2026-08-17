@@ -85,19 +85,24 @@ serve(async (req) => {
                 let finalMatchId = match?.id
 
                 if (!match) {
-                   const { data: newMatch } = await supabaseAdmin.from('Matches').insert({
+                   const { data: newMatch, error: matchError } = await supabaseAdmin.from('Matches').insert({
+                      id: crypto.randomUUID(),
                       profile1_id: tx.sender_id,
                       profile2_id: tx.receiver_id
                    }).select('id').single()
+                   
+                   if (matchError) console.error("Match insert error:", matchError)
                    finalMatchId = newMatch?.id
                 }
 
                 if (finalMatchId) {
-                   await supabaseAdmin.from('Messages').insert({
+                   const { error: msgError } = await supabaseAdmin.from('Messages').insert({
+                      id: crypto.randomUUID(),
                       match_id: finalMatchId,
                       sender_id: tx.sender_id,
                       content: `🍹 ¡Te he invitado ${tx.quantity}x ${drink.name}! \nAquí está tu código para canjear en la barra:\n\n**${qrCodeStr}**\n\nMuestra este mensaje en la barra.`
                    })
+                   if (msgError) console.error("Msg insert error:", msgError)
                 }
              }
           }
