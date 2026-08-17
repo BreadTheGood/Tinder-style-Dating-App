@@ -292,6 +292,7 @@ export default function App() {
 
         setConversations(prev => prev.map(conv => {
           if (conv.id === newMessage.match_id) {
+            if (conv.blockedByMe) return conv;
             const msg: Message = {
               id: newMessage.id,
               text: newMessage.content,
