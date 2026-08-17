@@ -436,11 +436,10 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return false
 
-    // 1. Delete the match (this removes the conversation for both)
-    await supabase.from('Matches').delete().eq('id', matchId)
+    // 1. Delete the match via RPC to bypass any RLS limitations on DELETE
+    await supabase.rpc('unmatch_user', { p_match_id: parseInt(matchId) })
 
     // 2. Change our interaction to 'pass' so they don't show up again in our feed
-    // We already have `recordSwipe(targetId, 'pass')` which does exactly this:
     if (this.recordSwipe) {
        await this.recordSwipe(targetId, 'pass')
     }

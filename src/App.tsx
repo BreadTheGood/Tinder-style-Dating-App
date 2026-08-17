@@ -191,7 +191,13 @@ export default function App() {
     window.addEventListener('app-toast', handleToast)
     window.addEventListener('app-reload-data', handleReload)
     window.addEventListener('app-match-deleted', handleMatchDeleted)
+
+    const interval = setInterval(() => {
+       handleReload()
+    }, 60000)
+
     return () => {
+      clearInterval(interval)
       window.removeEventListener('app-toast', handleToast)
       window.removeEventListener('app-reload-data', handleReload)
       window.removeEventListener('app-match-deleted', handleMatchDeleted)
