@@ -336,7 +336,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
               </span>
             </div>
             <button onClick={() => supabase.auth.signOut()} className="w-full py-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg text-sm font-bold transition-colors">
-              Cerrar Sesión
+              Cerrar sesión
             </button>
          </div>
       </div>
@@ -356,7 +356,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
            <>
              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-800">{isAdmin ? 'Todos los Eventos' : 'Tus Eventos'}</h1>
+                  <h1 className="text-3xl font-bold text-gray-800">{isAdmin ? 'Todos los eventos' : 'Tus eventos'}</h1>
                   <p className="text-sm text-gray-500 mt-1">Crea, edita, suspende o elimina eventos para tus usuarios.</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -365,7 +365,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                     className="flex-1 md:flex-none bg-blue-100 text-blue-700 px-5 py-2.5 rounded-lg font-bold shadow-sm hover:bg-blue-200 transition-colors flex items-center justify-center gap-2"
                   >
                     <BarChart3 className="w-5 h-5" />
-                    Métricas Globales
+                    Métricas globales
                   </button>
                   <button 
                     onClick={() => {
@@ -374,7 +374,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                     }}
                     className="flex-1 md:flex-none bg-[var(--theme-color-1)] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity whitespace-nowrap"
                   >
-                     {showEventForm ? 'Cancelar' : '+ Crear Evento'}
+                     {showEventForm ? 'Cancelar' : '+ Crear evento'}
                   </button>
                 </div>
              </div>

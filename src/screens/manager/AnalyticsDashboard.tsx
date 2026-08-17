@@ -53,43 +53,43 @@ export function AnalyticsDashboard({ eventId, onBack }: { eventId: string, onBac
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 overflow-hidden">
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="w-12 h-12 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-600" title="Cantidad de personas que se han unido al evento">
             <Users className="w-6 h-6" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-500 truncate" title="Cantidad de perfiles distintos registrados en los eventos">Asistentes únicos</p>
-            <p className="text-2xl font-bold text-gray-900 truncate">{summary.total_attendees || 0}</p>
+            <p className="text-sm font-medium text-gray-500 break-words" title="Cantidad de perfiles distintos registrados en los eventos">Asistentes únicos</p>
+            <p className="text-2xl font-bold text-gray-900 break-all">{summary.total_attendees || 0}</p>
           </div>
         </div>
         
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 overflow-hidden">
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="w-12 h-12 flex-shrink-0 rounded-full bg-purple-100 flex items-center justify-center text-purple-600" title="Cantidad total de tragos regalados a través de la app">
             <GlassWater className="w-6 h-6" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-500 truncate">Tragos Invitados</p>
-            <p className="text-2xl font-bold text-gray-900 truncate">{summary.total_drinks_sold || 0}</p>
+            <p className="text-sm font-medium text-gray-500 break-words">Tragos invitados</p>
+            <p className="text-2xl font-bold text-gray-900 break-all">{summary.total_drinks_sold || 0}</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 overflow-hidden">
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="w-12 h-12 flex-shrink-0 rounded-full bg-green-100 flex items-center justify-center text-green-600" title="Ganancia bruta generada por las ventas">
             <DollarSign className="w-6 h-6" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-500 truncate">Ingresos Totales</p>
-            <p className="text-2xl font-bold text-gray-900 truncate">${summary.total_revenue || 0}</p>
+            <p className="text-sm font-medium text-gray-500 break-words">Ingresos totales</p>
+            <p className="text-2xl font-bold text-gray-900 break-all">${summary.total_revenue || 0}</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 overflow-hidden">
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="w-12 h-12 flex-shrink-0 rounded-full bg-orange-100 flex items-center justify-center text-orange-600" title="Cantidad de pagos procesados y aprobados">
             <TrendingUp className="w-6 h-6" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-500 truncate">Ventas</p>
-            <p className="text-2xl font-bold text-gray-900 truncate">{summary.total_transactions || 0}</p>
+            <p className="text-sm font-medium text-gray-500 break-words">Ventas</p>
+            <p className="text-2xl font-bold text-gray-900 break-all">{summary.total_transactions || 0}</p>
           </div>
         </div>
       </div>

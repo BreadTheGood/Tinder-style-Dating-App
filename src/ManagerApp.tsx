@@ -61,7 +61,7 @@ export function ManagerApp() {
      
      if (isFetching.current) return
      isFetching.current = true
-     setLoading(true)
+     if (!managerData) setLoading(true)
 
      try {
        const userId = currSession.user.id
