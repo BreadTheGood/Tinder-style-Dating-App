@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { managerSupabase as supabase } from '../../lib/managerSupabase'
 import { TicketManager } from './TicketManager'
 import { DrinkManager } from './DrinkManager'
+import { AnalyticsDashboard } from './AnalyticsDashboard'
 
 export function ManagerDashboard({ manager }: { manager: any }) {
   const isAdmin = manager.role === 'system_admin'
@@ -28,6 +29,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   const [eventFilter, setEventFilter] = useState<'all' | 'active' | 'finished' | 'suspended'>('all')
   const [managingTicketsFor, setManagingTicketsFor] = useState<any | null>(null)
   const [managingDrinksFor, setManagingDrinksFor] = useState<any | null>(null)
+  const [viewingAnalyticsFor, setViewingAnalyticsFor] = useState<string | null>(null)
 
   const [mpToken, setMpToken] = useState(manager.mp_access_token || '')
   const [savingSettings, setSavingSettings] = useState(false)
@@ -340,13 +342,16 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
       {/* Main Content */}
       <div className="flex-1 p-10 overflow-y-auto">
-         {activeTab === 'events' && managingTicketsFor && (
+        {activeTab === 'events' && viewingAnalyticsFor && (
+          <AnalyticsDashboard eventId={viewingAnalyticsFor} onBack={() => setViewingAnalyticsFor(null)} />
+        )}
+        {activeTab === 'events' && managingTicketsFor && (
            <TicketManager event={managingTicketsFor} onBack={() => setManagingTicketsFor(null)} />
-         )}
-         {activeTab === 'events' && managingDrinksFor && (
+        )}
+        {activeTab === 'events' && managingDrinksFor && (
            <DrinkManager event={managingDrinksFor} onBack={() => setManagingDrinksFor(null)} />
-         )}
-         {activeTab === 'events' && !managingTicketsFor && !managingDrinksFor && (
+        )}
+        {activeTab === 'events' && !managingTicketsFor && !managingDrinksFor && !viewingAnalyticsFor && (
            <>
              <div className="flex justify-between items-center mb-6">
                 <div>
@@ -546,7 +551,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                        </div>
 
                        {/* Acciones de Edición / Suspensión / Eliminación */}
-                       <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100 justify-end">
+                       <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100 justify-end flex-wrap">
                           <button 
                             onClick={() => setManagingTicketsFor(e)}
                             className="mr-auto px-3 py-1.5 bg-[var(--theme-color-1)]/10 hover:bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
@@ -555,8 +560,15 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                             Tickets
                           </button>
                           <button 
+                            onClick={() => setViewingAnalyticsFor(e.id)}
+                            className="mr-auto px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                          >
+                            <span>📊</span>
+                            Métricas
+                          </button>
+                          <button 
                             onClick={() => setManagingDrinksFor(e)}
-                            className="mr-auto px-3 py-1.5 bg-[var(--theme-color-1)]/10 hover:bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                            className="px-3 py-1.5 bg-[var(--theme-color-1)]/10 hover:bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
                           >
                             <span>🍹</span>
                             Tragos
