@@ -14,13 +14,13 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
       
       const { data: activeEvents } = await supabase
          .from('Events')
-         .select('id, end_datetime, is_suspended')
+         .select('id, end_datetime, status')
          .in('id', eventIds);
 
       if (activeEvents && activeEvents.length > 0) {
          const activeEventIds = activeEvents
             .filter((ev: any) => {
-               if (ev.is_suspended) return false;
+               if (ev.status === 'suspendido') return false;
                if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
                return true;
             })
@@ -127,13 +127,13 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
             // Validate which of these events are active
             const { data: activeEvents } = await supabase
                .from('Events')
-               .select('id, end_datetime, is_suspended')
+               .select('id, end_datetime, status')
                .in('id', eventIds);
 
             if (activeEvents && activeEvents.length > 0) {
                const activeEventIds = activeEvents
                   .filter((ev: any) => {
-                     if (ev.is_suspended) return false;
+                     if (ev.status === 'suspendido') return false;
                      if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
                      return true;
                   })

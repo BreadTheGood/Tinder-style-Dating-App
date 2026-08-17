@@ -37,7 +37,7 @@ export function DrinkModal({ partnerId, onClose, onSend }: { partnerId: string |
           .filter((ev: any) => {
             if (Array.isArray(ev)) ev = ev[0];
             if (!ev) return false;
-            return !ev.is_suspended && (!ev.end_datetime || new Date(ev.end_datetime).getTime() > Date.now())
+            return ev.status !== 'suspendido' && (!ev.end_datetime || new Date(ev.end_datetime).getTime() > Date.now())
           })
           .map((ev: any) => Array.isArray(ev) ? ev[0] : ev)
         
