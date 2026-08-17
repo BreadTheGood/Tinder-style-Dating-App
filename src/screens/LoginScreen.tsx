@@ -390,11 +390,18 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
           )}
         </div>
 
-        <p className="text-center text-xs text-white/20 mt-6 pb-8 leading-relaxed">
+        <p className="text-center text-xs text-white/20 mt-6 pb-2 leading-relaxed">
           Al continuar, aceptas nuestros{' '}
           <span className="text-[var(--theme-color-1)] font-semibold">Términos de uso</span>{' '}
           y{' '}
           <span className="text-[var(--theme-color-1)] font-semibold">Política de privacidad</span>
+        </p>
+
+        <p className="text-center text-xs text-white/40 pb-8 leading-relaxed font-medium">
+          ¿Te interesa tener la app en tus eventos?{' '}
+          <a href="mailto:contacto@gira.app" className="text-[var(--theme-color-1)] font-bold hover:underline">
+            Contáctanos
+          </a>
         </p>
       </div>
 
