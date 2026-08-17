@@ -6,9 +6,14 @@ import { ManagerDashboard } from './screens/manager/ManagerDashboard'
 export function ManagerApp() {
   const [session, setSession] = useState<any>(null)
   const [managerData, setManagerData] = useState<any>(null)
+  const managerDataRef = useRef<any>(null)
   const [loading, setLoading] = useState(true)
 
   const isFetching = useRef(false)
+
+  useEffect(() => {
+    managerDataRef.current = managerData
+  }, [managerData])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -20,7 +25,9 @@ export function ManagerApp() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       if (session) {
-         fetchManagerData(session)
+         if (_event === 'INITIAL_SESSION' || !managerDataRef.current) {
+            fetchManagerData(session)
+         }
       } else {
          localStorage.removeItem('manager_login_time')
          setManagerData(null)
@@ -61,7 +68,7 @@ export function ManagerApp() {
      
      if (isFetching.current) return
      isFetching.current = true
-     if (!managerData) setLoading(true)
+     if (!managerDataRef.current) setLoading(true)
 
      try {
        const userId = currSession.user.id
