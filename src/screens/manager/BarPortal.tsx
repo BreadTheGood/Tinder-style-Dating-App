@@ -57,22 +57,27 @@ export function BarPortal({ event }: { event: any }) {
     if (error || !tx) {
       setErrorMsg('Código no encontrado, inválido, o no pertenece a este evento.')
     } else {
-      if (tx.status === 'approved') {
-         // Auto redeem
-         const { data: success } = await supabase.rpc('redeem_drink', {
-            p_qr_code: searchCodeStr,
-            p_bar_password: event.bar_password
-         })
-         if (success) {
-            tx.status = 'redeemed'
-            window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Trago entregado y validado automáticamente.' } }))
-            loadTransactions() // reload history
-            setCode('')
-         } else {
-            setErrorMsg('Hubo un error al intentar canjear el código automáticamente.')
-         }
-      }
       setTransaction(tx)
+    }
+    setLoading(false)
+  }
+
+  const markAsRedeemed = async () => {
+    if (!transaction) return
+    setLoading(true)
+    
+    const { data: success, error } = await supabase.rpc('redeem_drink', {
+       p_qr_code: code.trim().toUpperCase(),
+       p_bar_password: event.bar_password
+    })
+
+    if (error || !success) {
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'No se pudo canjear el trago.' } }))
+    } else {
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Trago entregado y validado correctamente.' } }))
+      setTransaction({ ...transaction, status: 'redeemed' })
+      setCode('')
+      loadTransactions()
     }
     setLoading(false)
   }
@@ -102,6 +107,25 @@ export function BarPortal({ event }: { event: any }) {
            setIsClosed(true)
            setClosureCode(data.code)
            setTotalAmount(data.total)
+        }
+        setLoading(false)
+     }
+  }
+
+  const handleReopenRegister = async () => {
+     if (window.confirm('¿Estás seguro de que quieres reabrir la caja? Se podrán volver a canjear tragos.')) {
+        setLoading(true)
+        const { data: success, error } = await supabase.rpc('reopen_bar_register', {
+           p_event_code: event.code,
+           p_bar_password: event.bar_password
+        })
+        if (error || !success) {
+           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'No se pudo reabrir la caja.' } }))
+        } else {
+           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Caja Abierta', body: 'El evento vuelve a estar activo.' } }))
+           setIsClosed(false)
+           setClosureCode('')
+           loadTransactions()
         }
         setLoading(false)
      }
@@ -204,6 +228,23 @@ export function BarPortal({ event }: { event: any }) {
                     )}
                  </div>
               </div>
+
+              {transaction.status === 'approved' && (
+                 <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-6 text-center animate-fade-in">
+                    <h3 className="text-2xl font-black text-green-800 mb-2 flex items-center justify-center gap-2">
+                       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                       ¡QR Válido!
+                    </h3>
+                    <p className="text-green-700 mb-6 font-medium">Confirma la entrega de {transaction.quantity}x {transaction.drink_name}</p>
+                    <button 
+                      onClick={markAsRedeemed}
+                      disabled={loading}
+                      className="w-full bg-green-600 text-white text-xl font-bold py-4 rounded-xl shadow-lg hover:bg-green-700 active:scale-[0.98] transition-all disabled:opacity-50"
+                    >
+                       {loading ? 'Procesando...' : 'Aceptar'}
+                    </button>
+                 </div>
+              )}
            </div>
         </div>
       )}
@@ -212,10 +253,19 @@ export function BarPortal({ event }: { event: any }) {
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
            <h2 className="text-xl font-bold text-gray-800 m-0">Historial de Tragos del Evento</h2>
            {isClosed ? (
-              <div className="bg-red-50 text-red-700 px-4 py-2 rounded-lg border border-red-200">
-                 <p className="text-sm font-bold m-0 uppercase">Caja Cerrada</p>
-                 <p className="text-xs m-0">Total: <span className="font-mono text-base font-black">${totalAmount}</span></p>
-                 <p className="text-[10px] font-mono opacity-80 m-0 mt-0.5">CÓDIGO: {closureCode}</p>
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                 <div className="bg-red-50 text-red-700 px-4 py-2 rounded-lg border border-red-200 text-center sm:text-left w-full sm:w-auto">
+                    <p className="text-sm font-bold m-0 uppercase">Caja Cerrada</p>
+                    <p className="text-xs m-0">Total: <span className="font-mono text-base font-black">${totalAmount}</span></p>
+                    <p className="text-[10px] font-mono opacity-80 m-0 mt-0.5">CÓDIGO: {closureCode}</p>
+                 </div>
+                 <button 
+                    onClick={handleReopenRegister}
+                    disabled={loading}
+                    className="bg-white text-gray-700 font-bold py-2 px-4 rounded-lg text-xs border border-gray-300 hover:bg-gray-50 transition-colors self-stretch sm:self-auto disabled:opacity-50"
+                 >
+                    Reabrir Caja
+                 </button>
               </div>
            ) : (
               <button 
