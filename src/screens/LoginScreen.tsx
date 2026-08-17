@@ -288,10 +288,8 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                     placeholder="Ej. ABC123"
                     value={ticketCode}
                     onChange={e => setTicketCode(e.target.value)}
-                    className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all uppercase"
-                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
-                    onFocus={(e) => (e.target.style.borderColor = 'rgba(249, 8, 165, 0.5)')}
-                    onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+                    className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all uppercase focus:border-[var(--theme-color-1)] border border-transparent"
+                    style={{ background: 'rgba(255,255,255,0.06)' }}
                   />
                 </div>
               </div>
@@ -307,10 +305,8 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                   placeholder="tu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
-                  onFocus={(e) => (e.target.style.borderColor = 'rgb(249, 8, 165)')}
-                  onBlur={(e) => (e.target.style.borderColor = 'rgba(165, 2, 183, 0.08)')}
+                  className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all focus:border-[var(--theme-color-1)] border border-transparent"
+                  style={{ background: 'rgba(255,255,255,0.06)' }}
                 />
               </div>
 
@@ -324,10 +320,8 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all"
-                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
-                    onFocus={(e) => (e.target.style.borderColor = 'rgba(249, 8, 165, 0.5)')}
-                    onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+                    className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm font-medium text-white placeholder-white/20 outline-none transition-all focus:border-[var(--theme-color-1)] border border-transparent"
+                    style={{ background: 'rgba(255,255,255,0.06)' }}
                   />
                   <button onClick={() => setShowPass((p) => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
                     <EyeIcon size={16} />
@@ -365,7 +359,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                     setForgotError('')
                     setShowForgotModal(true)
                   }}
-                  className="text-xs font-semibold mt-3 block gradient-brand-text"
+                  className="text-xs font-semibold mt-3 block text-[var(--theme-color-1)]"
                 >
                   ¿Olvidaste tu contraseña?
                 </button>
@@ -379,14 +373,14 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
             onClick={handleAuth}
             disabled={loading}
             className="w-full mt-6 py-4 rounded-xl font-bold text-white text-base transition-all active:scale-95 disabled:opacity-50 gradient-brand"
-            style={{ boxShadow: '0 8px 24px rgba(249, 0, 220, 0.35)' }}
+            style={{ boxShadow: '0 8px 24px color-mix(in srgb, var(--theme-color-1) 35%, transparent)' }}
           >
             {loading ? 'Validando...' : mode === 'login' ? 'Ingresar' : mode === 'register' ? 'Crear cuenta' : 'Ingresar con código'}
           </button>
           
           {mode === 'login' && (
             <button onClick={() => setMode('register')} className="w-full mt-4 text-xs font-semibold text-white/50 hover:text-white transition-colors">
-              ¿No tienes cuenta? <span className="gradient-brand-text">Regístrate</span>
+              ¿No tienes cuenta? <span className="text-[var(--theme-color-1)]">Regístrate</span>
             </button>
           )}
           {mode === 'register' && (
@@ -398,9 +392,9 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
 
         <p className="text-center text-xs text-white/20 mt-6 pb-8 leading-relaxed">
           Al continuar, aceptas nuestros{' '}
-          <span className="gradient-brand-text font-semibold">Términos de uso</span>{' '}
+          <span className="text-[var(--theme-color-1)] font-semibold">Términos de uso</span>{' '}
           y{' '}
-          <span className="gradient-brand-text font-semibold">Política de privacidad</span>
+          <span className="text-[var(--theme-color-1)] font-semibold">Política de privacidad</span>
         </p>
       </div>
 

@@ -111,7 +111,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
       <div className="mx-5 mt-4 grid grid-cols-3 gap-3">
         {(me.stats || []).map((s) => (
           <div key={s.label} className="glass rounded-2xl py-4 text-center">
-            <div className="gradient-brand-text font-extrabold text-2xl">{s.value}</div>
+            <div className="text-[var(--theme-color-1)] font-extrabold text-2xl">{s.value}</div>
             <div className="text-white/40 text-xs font-semibold mt-0.5">{s.label}</div>
           </div>
         ))}
