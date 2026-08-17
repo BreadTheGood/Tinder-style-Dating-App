@@ -21,6 +21,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
          const activeEventIds = activeEvents
             .filter((ev: any) => {
                if (ev.status === 'suspendido') return false;
+               if (ev.status === 'finalizado') return false;
                if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
                return true;
             })

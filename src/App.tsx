@@ -181,11 +181,20 @@ export default function App() {
          }
        }
     }
+    const handleMatchDeleted = (e: any) => {
+       if (activeChatIdRef.current === e.detail.matchId) {
+          setScreen('messages')
+          setActiveConversation(null)
+          setToastMessage({ title: 'Chat eliminado', body: 'El match o evento ha finalizado.' })
+       }
+    }
     window.addEventListener('app-toast', handleToast)
     window.addEventListener('app-reload-data', handleReload)
+    window.addEventListener('app-match-deleted', handleMatchDeleted)
     return () => {
       window.removeEventListener('app-toast', handleToast)
       window.removeEventListener('app-reload-data', handleReload)
+      window.removeEventListener('app-match-deleted', handleMatchDeleted)
     }
   }, [currentUser])
 
@@ -234,6 +243,19 @@ export default function App() {
                window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: '¡Nuevo Match!', body: `Has hecho match con ${mappedProfile.name}`, image: mappedProfile.image } }))
             }
           }
+        }
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'Matches' }, (payload) => {
+        const deletedMatch = payload.old
+        if (deletedMatch) {
+           setConversations(prev => {
+             const newConvs = prev.filter(c => c.id !== deletedMatch.id)
+             if (newConvs.length !== prev.length) {
+                // Return to messages list if currently chatting with the deleted match
+                window.dispatchEvent(new CustomEvent('app-match-deleted', { detail: { matchId: deletedMatch.id } }))
+             }
+             return newConvs
+           })
         }
       })
       .subscribe()

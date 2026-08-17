@@ -455,6 +455,24 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                               </button>
                               <button 
                                 type="button"
+                                onClick={async () => {
+                                   if (confirm('¿Estás seguro de que quieres finalizar este evento? Todos los chats de los usuarios en este evento se borrarán si no comparten otro evento.')) {
+                                      const { error } = await supabase.rpc('finalize_event', { p_event_id: editingEventId })
+                                      if (error) {
+                                         window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error al finalizar evento: ' + error.message } }))
+                                      } else {
+                                         window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Evento Finalizado', body: 'El evento ha finalizado y se han limpiado los chats.' } }))
+                                         setEditingEventId(null)
+                                         loadEvents()
+                                      }
+                                   }
+                                }}
+                                className="px-4 py-2.5 bg-gray-900 text-white hover:bg-black rounded-lg font-bold transition-colors text-sm"
+                              >
+                                Finalizar Evento
+                              </button>
+                              <button 
+                                type="button"
                                 onClick={() => deleteEvent(editingEventId)}
                                 className="px-4 py-2.5 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg font-bold transition-colors text-sm"
                               >
