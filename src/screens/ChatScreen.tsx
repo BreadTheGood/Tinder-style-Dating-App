@@ -120,13 +120,6 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
         <DrinkModal 
           partnerId={conversation.profile.id} 
           onClose={() => setShowDrinkModal(false)}
-          onSend={(msgText) => {
-             const msg: Message = { id: Date.now(), text: msgText, from: 'me', time: 'Ahora' }
-             onUpdate([...conversation.messages, msg])
-             if (conversation.id) {
-               supabaseAppDataService.sendMessage!(conversation.id, msgText)
-             }
-          }}
         />
       )}
     </div>
