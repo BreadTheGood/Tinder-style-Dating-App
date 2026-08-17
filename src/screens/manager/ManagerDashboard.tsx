@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { managerSupabase as supabase } from '../../lib/managerSupabase'
 import { TicketManager } from './TicketManager'
 import { DrinkManager } from './DrinkManager'
-import { BarPortal } from './BarPortal'
 
 export function ManagerDashboard({ manager }: { manager: any }) {
   const isAdmin = manager.role === 'system_admin'
@@ -24,6 +23,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   const [newEventDate, setNewEventDate] = useState('')
   const [newEventTime, setNewEventTime] = useState('12:00')
   const [newEventCode, setNewEventCode] = useState('')
+  const [newEventBarPassword, setNewEventBarPassword] = useState('')
   const [savingEvent, setSavingEvent] = useState(false)
   const [eventFilter, setEventFilter] = useState<'all' | 'active' | 'finished' | 'suspended'>('all')
   const [managingTicketsFor, setManagingTicketsFor] = useState<any | null>(null)
@@ -56,6 +56,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     setNewEventName(evt.name || '')
     setNewEventDesc(evt.description || '')
     setNewEventCode(evt.code || '')
+    setNewEventBarPassword(evt.bar_password || '')
     if (evt.start_datetime) {
       const d = new Date(evt.start_datetime)
       const yyyy = d.getFullYear()
@@ -79,6 +80,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     setNewEventDate('')
     setNewEventTime('12:00')
     setNewEventCode('')
+    setNewEventBarPassword('')
     setShowEventForm(false)
   }
 
@@ -110,6 +112,11 @@ export function ManagerDashboard({ manager }: { manager: any }) {
       if (newEventCode.trim() !== '') {
          payload.code = newEventCode.trim()
       }
+      if (newEventBarPassword.trim() !== '') {
+         payload.bar_password = newEventBarPassword.trim()
+      } else {
+         payload.bar_password = null
+      }
 
       const { error: dbErr } = await supabase.from('Events').update(payload).eq('id', editingEventId)
 
@@ -122,6 +129,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
       }
     } else {
       const code = newEventCode.trim() !== '' ? newEventCode.trim() : Math.random().toString(36).substring(2, 8).toUpperCase()
+      const bPass = newEventBarPassword.trim() !== '' ? newEventBarPassword.trim() : null
       const { error: dbErr } = await supabase.from('Events').insert({
          manager_id: manager.id,
          name: newEventName,
@@ -129,6 +137,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
          start_datetime: startDateStr,
          end_datetime: endDateStr,
          code: code,
+         bar_password: bPass,
          status: 'en curso'
       })
 
@@ -309,12 +318,6 @@ export function ManagerDashboard({ manager }: { manager: any }) {
               </button>
             )}
             <button 
-              onClick={() => setActiveTab('bar')} 
-              className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'bar' ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800'}`}
-            >
-              🍷 Modo Barra
-            </button>
-            <button 
               onClick={() => setActiveTab('settings')} 
               className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'settings' ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800'}`}
             >
@@ -410,10 +413,16 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                            <label className="block text-sm font-semibold text-gray-600 mb-1">Descripción</label>
                            <textarea rows={2} value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)] resize-none" placeholder="Breve descripción del evento..." />
                         </div>
-                        <div className="w-48">
-                           <label className="block text-sm font-semibold text-gray-600 mb-1">Código del Evento</label>
-                           <input type="text" value={newEventCode} onChange={e => setNewEventCode(e.target.value.toUpperCase())} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)] uppercase" placeholder="Ej: FIESTA26" />
-                           <p className="text-[10px] text-gray-400 mt-1">Dejar vacío para auto-generar</p>
+                        <div className="w-48 flex flex-col gap-4">
+                           <div>
+                              <label className="block text-sm font-semibold text-gray-600 mb-1">Código del Evento</label>
+                              <input type="text" value={newEventCode} onChange={e => setNewEventCode(e.target.value.toUpperCase())} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)] uppercase" placeholder="Ej: FIESTA26" />
+                           </div>
+                           <div>
+                              <label className="block text-sm font-semibold text-gray-600 mb-1">Contraseña de Barra</label>
+                              <input type="text" value={newEventBarPassword} onChange={e => setNewEventBarPassword(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder="Contraseña secreta" />
+                              <p className="text-[10px] text-gray-400 mt-1">Para acceso a empleados</p>
+                           </div>
                         </div>
                      </div>
                      <div className="flex gap-4">
@@ -667,10 +676,6 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                </div>
              </form>
            </div>
-         )}
-
-         {activeTab === 'bar' && (
-           <BarPortal />
          )}
       </div>
     </div>

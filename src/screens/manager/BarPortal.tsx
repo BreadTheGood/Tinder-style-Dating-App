@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { managerSupabase as supabase } from '../../lib/managerSupabase'
 
-export function BarPortal() {
+export function BarPortal({ event }: { event: any }) {
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [transaction, setTransaction] = useState<any>(null)
@@ -22,15 +22,13 @@ export function BarPortal() {
        return
     }
 
-    // Busca la transacción (el RLS se encarga de que el manager solo vea las de sus eventos)
-    const { data: tx, error } = await supabase
-      .from('Transactions')
-      .select('*, Drinks(name, icon), Profiles!Transactions_sender_id_fkey(name)')
-      .eq('qr_code', searchCodeStr)
-      .maybeSingle()
+    const { data: tx, error } = await supabase.rpc('get_drink_details', {
+       p_qr_code: searchCodeStr,
+       p_bar_password: event.bar_password
+    })
 
     if (error || !tx) {
-      setErrorMsg('Código no encontrado o no pertenece a tus eventos.')
+      setErrorMsg('Código no encontrado, inválido, o no pertenece a este evento.')
     } else {
       setTransaction(tx)
     }
@@ -40,12 +38,13 @@ export function BarPortal() {
   const markAsRedeemed = async () => {
     if (!transaction) return
     setLoading(true)
-    const { error } = await supabase
-      .from('Transactions')
-      .update({ status: 'redeemed' })
-      .eq('id', transaction.id)
+    
+    const { data: success, error } = await supabase.rpc('redeem_drink', {
+       p_qr_code: code.trim().toUpperCase(),
+       p_bar_password: event.bar_password
+    })
 
-    if (error) {
+    if (error || !success) {
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'No se pudo canjear.' } }))
     } else {
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Trago entregado y código invalidado.' } }))
@@ -57,7 +56,6 @@ export function BarPortal() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Modo Barra (Canje)</h1>
       <p className="text-gray-500 mb-8">
         Ingresa el código que te muestra el usuario para validar su compra y entregar el trago.
       </p>
@@ -100,17 +98,17 @@ export function BarPortal() {
                     <span className="px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-full uppercase">Pago Pendiente</span>
                  )}
               </div>
-              <p className="text-sm text-gray-500">Comprado por: <span className="font-bold text-gray-800">{transaction.Profiles?.name || 'Desconocido'}</span></p>
+              <p className="text-sm text-gray-500">Comprado por: <span className="font-bold text-gray-800">{transaction.buyer_name || 'Desconocido'}</span></p>
            </div>
 
            <div className="p-6">
               <div className="flex items-center gap-6 mb-8">
                  <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center text-4xl">
-                    {transaction.Drinks?.icon || '🥃'}
+                    {transaction.drink_icon || '🥃'}
                  </div>
                  <div>
                     <h3 className="text-3xl font-extrabold text-gray-800 mb-1">
-                       {transaction.quantity}x {transaction.Drinks?.name || 'Trago Eliminado'}
+                       {transaction.quantity}x {transaction.drink_name || 'Trago Eliminado'}
                     </h3>
                     
                     {/* CONFIRMACIÓN DE MERCADO PAGO */}
@@ -134,7 +132,7 @@ export function BarPortal() {
               )}
               {transaction.status === 'redeemed' && (
                  <div className="text-center p-4 bg-gray-100 text-gray-500 rounded-xl font-bold uppercase">
-                    Este trago ya fue entregado a las {new Date(transaction.updated_at || transaction.created_at).toLocaleTimeString()}
+                    Este trago ya fue entregado
                  </div>
               )}
            </div>
