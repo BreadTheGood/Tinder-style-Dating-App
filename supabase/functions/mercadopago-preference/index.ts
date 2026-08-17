@@ -81,7 +81,7 @@ serve(async (req) => {
       },
       auto_return: "approved",
       external_reference: transaction.id,
-      notification_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/mercadopago-webhook`
+      notification_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/mercadopago-webhook?tx=${transaction.id}`
     }
 
     const mpResponse = await fetch('https://api.mercadopago.com/checkout/preferences', {

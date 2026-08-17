@@ -31,12 +31,25 @@ serve(async (req) => {
        body = {}
     }
 
-    // Como no sabemos fácilmente qué token usar para validar el pago en MP desde el webhook (a menos que guardemos el token), 
-    // asumiremos el MP_ACCESS_TOKEN global para la consulta, o confiaremos ciegamente en el ID de preferencia si se pasa.
-    // Por seguridad, MercadoPago exige llamar a su API: GET /v1/payments/:id
-    // Buscamos a ver si alguien configuró el evento o usamos el global.
-    
-    const mpAccessToken = Deno.env.get('MP_ACCESS_TOKEN')
+    // Obtener transaction ID de la query params si viene
+    const txParam = url.searchParams.get('tx')
+
+    let mpAccessToken = Deno.env.get('MP_ACCESS_TOKEN')
+    let transactionId = txParam
+
+    // Si viene txParam, buscamos el token real del manager
+    if (txParam) {
+       const { data: txData } = await supabaseAdmin.from('Transactions').select('event_id').eq('id', txParam).single()
+       if (txData) {
+          const { data: evData } = await supabaseAdmin.from('Events').select('manager_id').eq('id', txData.event_id).single()
+          if (evData) {
+             const { data: mData } = await supabaseAdmin.from('Managers').select('mp_access_token').eq('id', evData.manager_id).single()
+             if (mData?.mp_access_token) {
+                mpAccessToken = mData.mp_access_token
+             }
+          }
+       }
+    }
     
     if (mpAccessToken) {
        const paymentRes = await fetch(`https://api.mercadopago.com/v1/payments/${id}`, {
@@ -69,9 +82,19 @@ serve(async (req) => {
                    .or(`and(profile1_id.eq.${tx.sender_id},profile2_id.eq.${tx.receiver_id}),and(profile1_id.eq.${tx.receiver_id},profile2_id.eq.${tx.sender_id})`)
                    .single()
 
-                if (match) {
+                let finalMatchId = match?.id
+
+                if (!match) {
+                   const { data: newMatch } = await supabaseAdmin.from('Matches').insert({
+                      profile1_id: tx.sender_id,
+                      profile2_id: tx.receiver_id
+                   }).select('id').single()
+                   finalMatchId = newMatch?.id
+                }
+
+                if (finalMatchId) {
                    await supabaseAdmin.from('Messages').insert({
-                      match_id: match.id,
+                      match_id: finalMatchId,
                       sender_id: tx.sender_id,
                       content: `🍹 ¡Te he invitado ${tx.quantity}x ${drink.name}! \nAquí está tu código para canjear en la barra:\n\n**${qrCodeStr}**\n\nMuestra este mensaje en la barra.`
                    })
