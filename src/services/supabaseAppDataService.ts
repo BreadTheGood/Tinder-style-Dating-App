@@ -28,7 +28,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
         .in('event_id', activeEventIds);
       
       if (partnerEvents) {
-        partnerEvents.forEach((pe: any) => validPartnerIds.add(pe.profile_id));
+        partnerEvents.forEach((pe: any) => validPartnerIds.add(String(pe.profile_id)));
       }
     }
 
@@ -41,7 +41,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
     const swipeIdsToDelete: number[] = [];
     if (swipes) {
       for (const swipe of swipes) {
-        const partnerId = swipe.swiper_id === myProfileId ? swipe.swiped_on_id : swipe.swiper_id;
+        const partnerId = String(swipe.swiper_id === myProfileId ? swipe.swiped_on_id : swipe.swiper_id);
         if (!validPartnerIds.has(partnerId)) {
           swipeIdsToDelete.push(swipe.id);
         }
@@ -63,7 +63,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
     const matchIdsToDelete: number[] = [];
     if (matches) {
       for (const match of matches) {
-        const partnerId = match.profile1_id === myProfileId ? match.profile2_id : match.profile1_id;
+        const partnerId = String(match.profile1_id === myProfileId ? match.profile2_id : match.profile1_id);
         if (!validPartnerIds.has(partnerId)) {
           matchIdsToDelete.push(match.id);
         }
@@ -132,13 +132,13 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
                 .in('event_id', activeEventIds);
               
               if (partnerEvents) {
-                partnerEvents.forEach((pe: any) => validPartnerIds.add(pe.profile_id));
+                partnerEvents.forEach((pe: any) => validPartnerIds.add(String(pe.profile_id)));
               }
             }
           }
 
           // Only keep profiles that share an active event
-          filteredData = filteredData.filter(p => validPartnerIds.has(p.id));
+          filteredData = filteredData.filter(p => validPartnerIds.has(String(p.id)));
 
           // Also remove profiles we already swiped on
           const { data: swipedData } = await supabase.from('Swipes').select('swiped_on_id').eq('swiper_id', myProfile.id)
