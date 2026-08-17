@@ -3,11 +3,13 @@ import { DrinkModal } from '../components/DrinkModal'
 import { BackIcon, SendIcon, GlassWaterIcon } from '../components/icons'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
 import type { Conversation, Message, Profile } from '../types'
+import { QRCodeSVG } from 'qrcode.react'
 
 export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { conversation: Conversation; onBack: () => void; onUpdate: (msgs: Message[]) => void; onViewProfile?: (p: Profile) => void }) {
   const [text, setText] = useState('')
   const [showMenu, setShowMenu] = useState(false)
   const [showDrinkModal, setShowDrinkModal] = useState(false)
+  const [showQR, setShowQR] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -76,19 +78,37 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
           <p className="text-white/30 text-xs font-medium mt-0.5">¡Hicieron match! Empieza la conversación</p>
         </div>
 
-        {conversation.messages.map((m) => (
-          <div key={m.id} className={`flex ${m.from === 'me' ? 'justify-end' : 'justify-start'}`}>
-            <div
-              className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm font-medium leading-relaxed ${m.from === 'me' ? 'gradient-brand text-white' : ''}`}
-              style={m.from === 'me'
-                ? { borderBottomRightRadius: 4 }
-                : { background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)', borderBottomLeftRadius: 4 }
-              }
-            >
-              {m.text}
+        {conversation.messages.map((m) => {
+          const codeMatch = m.text.match(/(DRINK-[A-Z0-9]+)/)
+          const isDrink = codeMatch !== null
+
+          return (
+            <div key={m.id} className={`flex ${m.from === 'me' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm font-medium leading-relaxed ${m.from === 'me' ? 'gradient-brand text-white' : ''}`}
+                style={m.from === 'me'
+                  ? { borderBottomRightRadius: 4 }
+                  : { background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)', borderBottomLeftRadius: 4 }
+                }
+              >
+                {isDrink ? (
+                   <div>
+                      <p className="font-bold">{m.text.split('\n')[0]}</p>
+                      <button 
+                        onClick={() => setShowQR(codeMatch[1])}
+                        className={`w-full mt-2 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1 ${m.from === 'me' ? 'bg-white/20 hover:bg-white/30' : 'bg-black/20 hover:bg-black/30'}`}
+                      >
+                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                         Presiona para mostrar el QR
+                      </button>
+                   </div>
+                ) : (
+                   m.text
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
         <div ref={bottomRef} />
       </div>
 
@@ -121,6 +141,30 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
           partnerId={conversation.profile.id} 
           onClose={() => setShowDrinkModal(false)}
         />
+      )}
+
+      {showQR && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+           <div className="bg-white rounded-3xl w-full max-w-sm p-8 flex flex-col items-center text-center shadow-2xl relative animate-scale-up">
+              <button 
+                onClick={() => setShowQR(null)}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-gray-500"
+              >
+                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+              
+              <h2 className="text-2xl font-black text-gray-800 mb-2 mt-2">Tu Código de Trago</h2>
+              <p className="text-sm text-gray-500 mb-6 font-medium">Muestra este código al empleado de la barra para que te entregue el trago.</p>
+              
+              <div className="bg-gray-50 p-4 rounded-2xl mb-6 shadow-inner border border-gray-100">
+                 <QRCodeSVG value={showQR} size={200} />
+              </div>
+              
+              <p className="text-lg font-mono font-bold text-gray-800 tracking-widest bg-gray-100 px-6 py-3 rounded-xl border border-gray-200">
+                 {showQR}
+              </p>
+           </div>
+        </div>
       )}
     </div>
   )
