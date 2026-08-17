@@ -271,8 +271,8 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar */}
       <div className="w-64 bg-gray-900 text-white p-6 flex flex-col">
-         <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--theme-color-1)] to-[var(--theme-color-2)] mb-8">
-           Manager Portal
+         <h2 className="text-2xl font-bold text-[var(--theme-color-1)] mb-8 tracking-widest notranslate" translate="no">
+           G I R A <span className="text-white">Manager</span>
          </h2>
 
          <nav className="flex-1 space-y-2">
@@ -322,7 +322,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                     if (showEventForm) resetEventForm()
                     else setShowEventForm(true)
                   }}
-                  className="bg-gradient-to-r from-[var(--theme-color-1)] to-[var(--theme-color-2)] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity"
+                  className="bg-[var(--theme-color-1)] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity"
                 >
                    {showEventForm ? 'Cancelar' : '+ Crear Evento'}
                 </button>
@@ -422,7 +422,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
                    return (
                      <div key={e.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col relative overflow-hidden group">
-                       <div className={`absolute top-0 left-0 w-1.5 h-full ${isSuspended ? 'bg-amber-400' : isOngoing ? 'bg-gradient-to-b from-[var(--theme-color-1)] to-[var(--theme-color-2)]' : 'bg-gray-300'}`} />
+                       <div className={`absolute top-0 left-0 w-1.5 h-full ${isSuspended ? 'bg-amber-400' : isOngoing ? 'bg-[var(--theme-color-1)]' : 'bg-gray-300'}`} />
                        
                        <div className="flex justify-between items-start mb-2">
                          <div className="flex-1 pr-2">

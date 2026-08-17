@@ -43,7 +43,7 @@ export function ThemeModal({ onClose }: { onClose: () => void }) {
                
                <div className="mb-2 text-center relative z-10">
                  <div className="font-extrabold tracking-widest text-[11px] gradient-brand-text mb-0.5">G I R A</div>
-                 <div className="text-[5px] text-white/40 font-medium tracking-wide">Girá. Matcheá. Conectá.</div>
+                 <div className="text-[5px] text-white/40 font-medium tracking-wide">Conectá. Matcheá. Girá.</div>
                </div>
 
                <div className="w-full space-y-1.5 mt-2 relative z-10">

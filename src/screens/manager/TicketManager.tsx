@@ -164,7 +164,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
               <button 
                 type="submit" 
                 disabled={generating}
-                className="flex-1 bg-gradient-to-r from-[var(--theme-color-1)] to-[var(--theme-color-2)] text-white rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="flex-1 bg-[var(--theme-color-1)] text-white rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {generating ? 'Generando...' : 'Generar'}
               </button>

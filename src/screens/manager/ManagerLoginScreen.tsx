@@ -29,7 +29,7 @@ export function ManagerLoginScreen() {
       <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-extrabold text-white">Portal de Managers</h2>
+            <h2 className="text-3xl font-extrabold text-white tracking-widest notranslate" translate="no">G I R A <span className="text-[var(--theme-color-1)]">Manager</span></h2>
             <p className="text-gray-400 mt-2 text-sm">Inicia sesión para gestionar eventos</p>
           </div>
           
@@ -61,7 +61,7 @@ export function ManagerLoginScreen() {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-gradient-to-r from-[var(--theme-color-1)] to-[var(--theme-color-2)] text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50"
+              className="w-full bg-[var(--theme-color-1)] text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50"
             >
               {loading ? 'Ingresando...' : 'Ingresar'}
             </button>

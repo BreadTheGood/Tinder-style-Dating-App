@@ -258,7 +258,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
         <h1 className="text-4xl font-extrabold tracking-[0.2em] mb-1 mt-6">
           <span className="gradient-brand-text notranslate" translate="no">G I R A</span>
         </h1>
-        <p className="text-sm text-white/40 font-medium tracking-wide">Girá. Matcheá. Conectá.</p>
+        <p className="text-sm text-white/40 font-medium tracking-wide">Conectá. Matcheá. Girá.</p>
       </div>
 
       <div className="relative flex-1 flex flex-col justify-start mx-5">
