@@ -183,8 +183,20 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
                       La charla está interesante... ¿Qué tal si invitas un trago para romper el hielo?
                     </p>
                     <button 
-                      onClick={() => setShowDrinkModal(true)}
-                      className="bg-[var(--theme-color-1)] text-white text-xs font-bold py-2 px-4 rounded-xl w-full shadow-lg shadow-[var(--theme-color-1)]/20 transition-transform active:scale-95"
+                      onClick={() => {
+                         if (conversation.blockedByMe) return;
+                         if (conversation.blockedByThem) {
+                            window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'No permitido', body: 'No podes enviarle un trago a este usuario' } }))
+                            return;
+                         }
+                         setShowDrinkModal(true)
+                      }}
+                      disabled={conversation.blockedByMe || conversation.blockedByThem}
+                      className={`text-white text-xs font-bold py-2 px-4 rounded-xl w-full transition-transform active:scale-95 ${
+                        conversation.blockedByMe || conversation.blockedByThem 
+                        ? 'bg-gray-600 opacity-50 cursor-not-allowed'
+                        : 'bg-[var(--theme-color-1)] shadow-lg shadow-[var(--theme-color-1)]/20'
+                      }`}
                     >
                       Invitar un trago 🍹
                     </button>
