@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
+import { managerSupabase as supabase } from '../../lib/managerSupabase'
 
 export function DrinkManager({ event, onBack }: { event: any, onBack: () => void }) {
   const [drinks, setDrinks] = useState<any[]>([])
