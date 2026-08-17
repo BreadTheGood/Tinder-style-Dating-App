@@ -124,7 +124,6 @@ export function BarPortal({ event }: { event: any }) {
         } else {
            window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Caja Abierta', body: 'El evento vuelve a estar activo.' } }))
            setIsClosed(false)
-           setClosureCode('')
            loadTransactions()
         }
         setLoading(false)
