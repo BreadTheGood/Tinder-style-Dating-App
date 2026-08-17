@@ -40,7 +40,7 @@ export function DatePicker({ value, onChange }: { value: string; onChange: (v: s
       <select 
         value={day} 
         onChange={e => { setDay(e.target.value); handleUpdate(e.target.value, month, year) }}
-        className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[#f304eb] appearance-none text-center cursor-pointer"
+        className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] appearance-none text-center cursor-pointer"
         style={{ colorScheme: 'dark' }}
       >
         <option value="" disabled className="text-white/40">Día</option>
@@ -62,7 +62,7 @@ export function DatePicker({ value, onChange }: { value: string; onChange: (v: s
           }
           handleUpdate(newDay, newMonth, year) 
         }}
-        className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[#f304eb] appearance-none text-center cursor-pointer"
+        className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] appearance-none text-center cursor-pointer"
         style={{ colorScheme: 'dark' }}
       >
         <option value="" disabled className="text-white/40">Mes</option>
@@ -84,7 +84,7 @@ export function DatePicker({ value, onChange }: { value: string; onChange: (v: s
           }
           handleUpdate(newDay, month, newYear) 
         }}
-        className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[#f304eb] appearance-none text-center cursor-pointer"
+        className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] appearance-none text-center cursor-pointer"
         style={{ colorScheme: 'dark' }}
       >
         <option value="" disabled className="text-white/40">Año</option>

@@ -125,7 +125,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
       </button>
 
       <h2 className="text-3xl font-bold text-gray-900 mb-2">Gestión de Tickets</h2>
-      <p className="text-gray-500 mb-8 font-medium">Evento: <span className="text-[#f304eb]">{event.name}</span></p>
+      <p className="text-gray-500 mb-8 font-medium">Evento: <span className="text-[var(--theme-color-1)]">{event.name}</span></p>
 
       <div className="grid grid-cols-3 gap-6 mb-10">
         <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
@@ -147,7 +147,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
         <div className="flex flex-col gap-6">
           <div className="bg-gray-900 rounded-xl p-6 text-white shadow-lg">
             <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
-              <svg className="w-5 h-5 text-[#f304eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+              <svg className="w-5 h-5 text-[var(--theme-color-1)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
               Generar Nuevos Tickets
             </h3>
             <p className="text-sm text-gray-400 mb-6">El sistema creará códigos únicos alfanuméricos que tus invitados podrán usar en la app.</p>
@@ -159,12 +159,12 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
                 max="1000"
                 value={generateCount}
                 onChange={e => setGenerateCount(Number(e.target.value))}
-                className="w-24 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-center text-white font-bold focus:outline-none focus:border-[#f304eb]" 
+                className="w-24 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-center text-white font-bold focus:outline-none focus:border-[var(--theme-color-1)]" 
               />
               <button 
                 type="submit" 
                 disabled={generating}
-                className="flex-1 bg-gradient-to-r from-[#f304eb] to-[#ff7043] text-white rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="flex-1 bg-gradient-to-r from-[var(--theme-color-1)] to-[var(--theme-color-2)] text-white rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {generating ? 'Generando...' : 'Generar'}
               </button>
@@ -192,7 +192,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
             <button 
               onClick={downloadCSV}
               disabled={tickets.length === 0}
-              className="text-sm font-bold text-[#f304eb] hover:text-[#ff7043] transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              className="text-sm font-bold text-[var(--theme-color-1)] hover:text-[var(--theme-color-2)] transition-colors disabled:opacity-50 flex items-center gap-1.5"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
               Descargar CSV

@@ -83,11 +83,11 @@ export function EditProfileScreen({
     <div className="flex flex-col h-full bg-[#0d0d0f] text-white">
       {/* Encabezado */}
       <div className="flex items-center justify-between px-5 pt-4 pb-4 border-b border-white/10">
-        <button onClick={onBack} className="text-[#f304eb] font-semibold active:scale-95 transition-all">
+        <button onClick={onBack} className="text-[var(--theme-color-1)] font-semibold active:scale-95 transition-all">
           Cancelar
         </button>
         <span className="font-extrabold text-lg tracking-tight">Editar Perfil</span>
-        <button onClick={handleSave} disabled={isSaving} className="text-[#f304eb] font-bold active:scale-95 transition-all disabled:opacity-50">
+        <button onClick={handleSave} disabled={isSaving} className="text-[var(--theme-color-1)] font-bold active:scale-95 transition-all disabled:opacity-50">
           {isSaving ? 'Guardando...' : 'Guardar'}
         </button>
       </div>
@@ -103,7 +103,7 @@ export function EditProfileScreen({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[#f304eb] transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] transition-colors"
               placeholder="¿Cómo te llamas?"
             />
           </div>
@@ -115,7 +115,7 @@ export function EditProfileScreen({
 
           <div>
             <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Género</label>
-            <select value={gender} onChange={e => setGender(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[#f304eb] appearance-none">
+            <select value={gender} onChange={e => setGender(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] appearance-none">
               <option value="female" className="text-black">Mujer</option>
               <option value="male" className="text-black">Hombre</option>
               <option value="other" className="text-black">Otro</option>
@@ -128,7 +128,7 @@ export function EditProfileScreen({
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[#f304eb] transition-colors resize-none"
+              className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] transition-colors resize-none"
               placeholder="Cuéntanos un poco sobre ti..."
               maxLength={500}
             />
@@ -142,7 +142,7 @@ export function EditProfileScreen({
                 <button
                   key={tag}
                   onClick={() => toggleTag(tag)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${tags.includes(tag) ? 'bg-[#f304eb] border-[#f304eb] text-white' : 'bg-white/5 border-white/20 text-white/60 hover:text-white'}`}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${tags.includes(tag) ? 'bg-[var(--theme-color-1)] border-[var(--theme-color-1)] text-white' : 'bg-white/5 border-white/20 text-white/60 hover:text-white'}`}
                 >
                   {tag}
                 </button>
@@ -175,7 +175,7 @@ export function EditProfileScreen({
               
               <div 
                 onClick={() => fileInputRef.current?.click()}
-                className="aspect-[3/4] bg-white/5 border-2 border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center text-white/40 cursor-pointer hover:bg-white/10 hover:border-[#f304eb] transition-all"
+                className="aspect-[3/4] bg-white/5 border-2 border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center text-white/40 cursor-pointer hover:bg-white/10 hover:border-[var(--theme-color-1)] transition-all"
               >
                 <span className="text-3xl pb-1">+</span>
               </div>

@@ -134,7 +134,7 @@ export function PhotoEditor({ imageSrc, onCancel, onSave }: PhotoEditorProps) {
             step={0.1}
             aria-labelledby="Zoom"
             onChange={(e) => setZoom(Number(e.target.value))}
-            className="w-full accent-[#f304eb]"
+            className="w-full accent-[var(--theme-color-1)]"
           />
         </div>
         <div>
@@ -147,7 +147,7 @@ export function PhotoEditor({ imageSrc, onCancel, onSave }: PhotoEditorProps) {
             step={1}
             aria-labelledby="Rotation"
             onChange={(e) => setRotation(Number(e.target.value))}
-            className="w-full accent-[#f304eb]"
+            className="w-full accent-[var(--theme-color-1)]"
           />
         </div>
         <div className="flex gap-4">

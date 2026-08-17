@@ -16,7 +16,7 @@ export function BottomNav({ active, onChange, unread }: { active: 'swipe' | 'mes
             key={item.key}
             onClick={() => onChange(item.key)}
             className="relative flex flex-col items-center gap-1 transition-all active:scale-90"
-            style={{ color: isActive ? '#f304eb' : 'rgba(255,255,255,0.3)' }}
+            style={{ color: isActive ? 'var(--theme-color-1)' : 'rgba(255,255,255,0.3)' }}
           >
             {item.icon}
             <span className="text-[10px] font-semibold">{item.label}</span>

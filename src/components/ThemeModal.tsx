@@ -37,11 +37,28 @@ export function ThemeModal({ onClose }: { onClose: () => void }) {
           
           <div className="flex gap-4 overflow-x-auto pb-4 snap-x" style={{ scrollbarWidth: 'none' }}>
             {/* Login Preview */}
-            <div className="min-w-[140px] h-[220px] bg-[#0d0d0f] rounded-2xl border border-white/10 p-3 flex flex-col justify-end snap-center relative overflow-hidden">
-               <div className="absolute top-1/3 inset-x-4 h-10 bg-white/5 rounded-lg border border-white/5" />
-               <div className="absolute top-1/2 inset-x-4 h-10 bg-white/5 rounded-lg border border-white/5" />
-               <div className="w-full h-8 rounded-lg mt-auto gradient-brand" />
-               <div className="absolute top-3 left-3 text-[10px] font-bold text-white/40">Login</div>
+            <div className="min-w-[140px] h-[220px] bg-[#0d0d0f] rounded-2xl border border-white/10 p-3 flex flex-col items-center justify-center snap-center relative overflow-hidden">
+               <div className="absolute top-[-10%] left-[-10%] w-[80px] h-[80px] rounded-full opacity-30" style={{ background: 'radial-gradient(circle, var(--theme-color-1) 0%, transparent 70%)' }} />
+               <div className="absolute bottom-[20%] right-[-10%] w-[60px] h-[60px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, var(--theme-color-2) 0%, transparent 70%)' }} />
+               
+               <div className="mb-2 text-center relative z-10">
+                 <div className="font-extrabold tracking-widest text-[11px] gradient-brand-text mb-0.5">G I R A</div>
+                 <div className="text-[5px] text-white/40 font-medium tracking-wide">Girá. Matcheá. Conectá.</div>
+               </div>
+
+               <div className="w-full space-y-1.5 mt-2 relative z-10">
+                 <div className="w-full h-6 bg-white/5 border border-white/10 rounded px-2 flex items-center">
+                   <div className="w-8 h-1 bg-white/20 rounded-full" />
+                 </div>
+                 <div className="w-full h-6 gradient-brand rounded flex items-center justify-center">
+                   <div className="w-12 h-1.5 bg-white/80 rounded-full" />
+                 </div>
+                 <div className="w-full h-6 bg-white/5 border border-white/10 rounded flex items-center justify-center">
+                   <div className="w-16 h-1 bg-white/40 rounded-full" />
+                 </div>
+               </div>
+
+               <div className="absolute top-2 left-2 text-[8px] font-bold text-white/30 uppercase">Login</div>
             </div>
 
             {/* Swipe Preview */}

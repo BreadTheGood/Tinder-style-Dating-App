@@ -308,8 +308,8 @@ export default function App() {
       return (
         <div className="relative h-full flex flex-col items-center justify-center overflow-hidden" style={{ background: '#0d0d0f' }}>
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vw] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #f304eb 0%, transparent 70%)' }} />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full opacity-15" style={{ background: 'radial-gradient(circle, #b004f3 0%, transparent 70%)' }} />
+            <div className="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vw] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, var(--theme-color-1) 0%, transparent 70%)' }} />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full opacity-15" style={{ background: 'radial-gradient(circle, var(--theme-color-2) 0%, transparent 70%)' }} />
           </div>
           <h1 className="text-3xl font-extrabold tracking-[0.2em] mb-2 mt-8">
             <span className="gradient-brand-text notranslate" translate="no">G I R A</span>
@@ -446,7 +446,7 @@ export default function App() {
                 <p className="text-white font-bold text-sm mb-0.5">{toastMessage.title}</p>
                 <p className="text-white/70 text-xs font-medium truncate">{toastMessage.body}</p>
               </div>
-              <div className="w-2 h-2 rounded-full bg-[#f304eb] flex-shrink-0" />
+              <div className="w-2 h-2 rounded-full bg-[var(--theme-color-1)] flex-shrink-0" />
             </div>
           )}
         </div>

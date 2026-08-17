@@ -271,7 +271,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar */}
       <div className="w-64 bg-gray-900 text-white p-6 flex flex-col">
-         <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#f304eb] to-[#ff7043] mb-8">
+         <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--theme-color-1)] to-[var(--theme-color-2)] mb-8">
            Manager Portal
          </h2>
 
@@ -295,7 +295,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
          <div className="pt-6 border-t border-gray-800 mt-auto">
             <p className="text-sm text-gray-400 mb-4 truncate" title={manager.email}>{manager.email}</p>
             <div className="flex gap-2 mb-4">
-              <span className="text-xs px-2 py-1 bg-[#f304eb]/20 text-[#f304eb] rounded font-bold uppercase tracking-wide">
+              <span className="text-xs px-2 py-1 bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] rounded font-bold uppercase tracking-wide">
                 {isAdmin ? 'ADMIN' : 'MANAGER'}
               </span>
             </div>
@@ -322,7 +322,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                     if (showEventForm) resetEventForm()
                     else setShowEventForm(true)
                   }}
-                  className="bg-gradient-to-r from-[#f304eb] to-[#ff7043] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity"
+                  className="bg-gradient-to-r from-[var(--theme-color-1)] to-[var(--theme-color-2)] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity"
                 >
                    {showEventForm ? 'Cancelar' : '+ Crear Evento'}
                 </button>
@@ -370,27 +370,27 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                   <form onSubmit={handleSaveEvent} className="space-y-4">
                      <div>
                         <label className="block text-sm font-semibold text-gray-600 mb-1">Nombre del Evento</label>
-                        <input type="text" required value={newEventName} onChange={e => setNewEventName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" placeholder="Ej: Fiesta de Verano 2026" />
+                        <input type="text" required value={newEventName} onChange={e => setNewEventName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder="Ej: Fiesta de Verano 2026" />
                      </div>
                      <div className="flex gap-4">
                         <div className="flex-1">
                            <label className="block text-sm font-semibold text-gray-600 mb-1">Descripción</label>
-                           <textarea rows={2} value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb] resize-none" placeholder="Breve descripción del evento..." />
+                           <textarea rows={2} value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)] resize-none" placeholder="Breve descripción del evento..." />
                         </div>
                         <div className="w-48">
                            <label className="block text-sm font-semibold text-gray-600 mb-1">Código del Evento</label>
-                           <input type="text" value={newEventCode} onChange={e => setNewEventCode(e.target.value.toUpperCase())} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb] uppercase" placeholder="Ej: FIESTA26" />
+                           <input type="text" value={newEventCode} onChange={e => setNewEventCode(e.target.value.toUpperCase())} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)] uppercase" placeholder="Ej: FIESTA26" />
                            <p className="text-[10px] text-gray-400 mt-1">Dejar vacío para auto-generar</p>
                         </div>
                      </div>
                      <div className="flex gap-4">
                         <div className="flex-1">
                            <label className="block text-sm font-semibold text-gray-600 mb-1">Fecha de Inicio</label>
-                           <input type="date" required value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" />
+                           <input type="date" required value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" />
                         </div>
                         <div className="w-48">
                            <label className="block text-sm font-semibold text-gray-600 mb-1">Hora de Inicio</label>
-                           <input type="time" required value={newEventTime} onChange={e => setNewEventTime(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" />
+                           <input type="time" required value={newEventTime} onChange={e => setNewEventTime(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" />
                         </div>
                      </div>
                      <p className="text-xs text-gray-400 mt-1">Por defecto, el evento durará 12 horas a partir de la fecha y hora seleccionadas.</p>
@@ -422,7 +422,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
 
                    return (
                      <div key={e.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col relative overflow-hidden group">
-                       <div className={`absolute top-0 left-0 w-1.5 h-full ${isSuspended ? 'bg-amber-400' : isOngoing ? 'bg-gradient-to-b from-[#f304eb] to-[#ff7043]' : 'bg-gray-300'}`} />
+                       <div className={`absolute top-0 left-0 w-1.5 h-full ${isSuspended ? 'bg-amber-400' : isOngoing ? 'bg-gradient-to-b from-[var(--theme-color-1)] to-[var(--theme-color-2)]' : 'bg-gray-300'}`} />
                        
                        <div className="flex justify-between items-start mb-2">
                          <div className="flex-1 pr-2">
@@ -462,7 +462,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                        <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100 justify-end">
                           <button 
                             onClick={() => setManagingTicketsFor(e)}
-                            className="mr-auto px-3 py-1.5 bg-[#f304eb]/10 hover:bg-[#f304eb]/20 text-[#f304eb] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                            className="mr-auto px-3 py-1.5 bg-[var(--theme-color-1)]/10 hover:bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
                             Tickets
@@ -509,15 +509,15 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                 <form onSubmit={handleCreateManager} className="flex gap-4 items-end">
                    <div className="flex-1">
                       <label className="block text-sm font-semibold text-gray-600 mb-1">UID del Usuario (Supabase)</label>
-                      <input type="text" required value={newAuthId} onChange={e => setNewAuthId(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" placeholder="123e4567-e89b-12d3..." />
+                      <input type="text" required value={newAuthId} onChange={e => setNewAuthId(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder="123e4567-e89b-12d3..." />
                    </div>
                    <div className="flex-1">
                       <label className="block text-sm font-semibold text-gray-600 mb-1">Correo Electrónico</label>
-                      <input type="email" required value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]" placeholder="nuevo@manager.com" />
+                      <input type="email" required value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder="nuevo@manager.com" />
                    </div>
                    <div className="w-40">
                       <label className="block text-sm font-semibold text-gray-600 mb-1">Rol</label>
-                      <select value={newRole} onChange={e => setNewRole(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[#f304eb]">
+                      <select value={newRole} onChange={e => setNewRole(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]">
                          <option value="event_manager">Manager</option>
                          <option value="system_admin">Admin</option>
                       </select>
@@ -549,7 +549,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                                <div className="text-xs text-gray-400 font-mono mt-0.5">{m.id}</div>
                             </td>
                             <td className="px-6 py-4">
-                               <span className={`px-2.5 py-1 rounded text-xs font-bold uppercase ${m.role === 'system_admin' ? 'bg-[#f304eb]/10 text-[#f304eb]' : 'bg-gray-100 text-gray-600'}`}>
+                               <span className={`px-2.5 py-1 rounded text-xs font-bold uppercase ${m.role === 'system_admin' ? 'bg-[var(--theme-color-1)]/10 text-[var(--theme-color-1)]' : 'bg-gray-100 text-gray-600'}`}>
                                  {m.role === 'system_admin' ? 'Admin' : 'Manager'}
                                </span>
                             </td>

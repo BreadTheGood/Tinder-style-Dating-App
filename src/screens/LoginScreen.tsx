@@ -250,15 +250,15 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden" style={{ background: '#0d0d0f' }}>
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vw] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #f304eb 0%, transparent 70%)' }} />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full opacity-15" style={{ background: 'radial-gradient(circle, #b004f3 0%, transparent 70%)' }} />
+        <div className="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vw] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, var(--theme-color-1) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full opacity-15" style={{ background: 'radial-gradient(circle, var(--theme-color-2) 0%, transparent 70%)' }} />
       </div>
 
       <div className="relative flex flex-col items-center pt-16 pb-8 px-8">
         <h1 className="text-4xl font-extrabold tracking-[0.2em] mb-1 mt-6">
           <span className="gradient-brand-text notranslate" translate="no">G I R A</span>
         </h1>
-        <p className="text-sm text-white/40 font-medium tracking-wide">Swipea. Matchea. Conecta.</p>
+        <p className="text-sm text-white/40 font-medium tracking-wide">Girá. Matcheá. Conectá.</p>
       </div>
 
       <div className="relative flex-1 flex flex-col justify-start mx-5">
@@ -409,7 +409,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)' }}>
           <div className="w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border border-white/10" style={{ background: '#18181f' }}>
              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gradient-to-r from-[#f304eb] to-[#ff7043] text-white uppercase tracking-wider">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gradient-to-r from-[var(--theme-color-1)] to-[var(--theme-color-2)] text-white uppercase tracking-wider">
                   {validEvent?.name || 'Evento'}
                 </span>
              </div>

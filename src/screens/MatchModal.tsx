@@ -7,12 +7,12 @@ export function MatchModal({ profile, currentUser, onClose, onMessage }: { profi
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
       <div className="animate-fade-in w-full max-w-sm text-center">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full opacity-30" style={{ background: 'radial-gradient(circle, #f304eb, transparent 70%)' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full opacity-30" style={{ background: 'radial-gradient(circle, var(--theme-color-1), transparent 70%)' }} />
         </div>
 
         <div className="relative z-10">
           <div className="animate-heart mb-4 inline-block">
-            <HeartIcon filled size={64} className="text-[#f304eb]" style={{ filter: 'drop-shadow(0 0 20px rgba(255, 0, 149, 0.8))' } as CSSProperties} />
+            <HeartIcon filled size={64} className="text-[var(--theme-color-1)]" style={{ filter: 'drop-shadow(0 0 20px rgba(255, 0, 149, 0.8))' } as CSSProperties} />
           </div>
 
           <div className="gradient-brand-text font-extrabold text-4xl tracking-tight mb-1">¡Match!</div>
@@ -27,7 +27,7 @@ export function MatchModal({ profile, currentUser, onClose, onMessage }: { profi
             <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-lg">
               <HeartIcon filled size={14} className="text-white" />
             </div>
-            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#f304eb]/50 shadow-xl" style={{ boxShadow: '0 0 24px rgba(255,62,108,0.4)' }}>
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[var(--theme-color-1)]/50 shadow-xl" style={{ boxShadow: '0 0 24px rgba(255,62,108,0.4)' }}>
               <img src={profile.image} alt={profile.name} className="w-full h-full object-cover" />
             </div>
           </div>

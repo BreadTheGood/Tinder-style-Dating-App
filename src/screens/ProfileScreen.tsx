@@ -126,7 +126,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
         <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Intereses</p>
         <div className="flex flex-wrap gap-2">
           {(me.tags || []).map((t) => (
-            <span key={t} className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(243,4,235,0.15)', color: '#f304eb', border: '1px solid rgba(243,4,235,0.2)' }}>
+            <span key={t} className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: 'color-mix(in srgb, var(--theme-color-1) 15%, transparent)', color: 'var(--theme-color-1)', border: '1px solid color-mix(in srgb, var(--theme-color-1) 20%, transparent)' }}>
               {t}
             </span>
           ))}
@@ -140,7 +140,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
           {pastEvents.length > 0 && (
              <button 
                onClick={() => setShowHistory(!showHistory)} 
-               className="text-xs font-semibold text-[#f304eb] hover:underline"
+               className="text-xs font-semibold text-[var(--theme-color-1)] hover:underline"
              >
                 {showHistory ? 'Ocultar historial' : `Historial (${pastEvents.length})`}
              </button>
@@ -177,7 +177,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
             value={ticketCode} 
             onChange={e => setTicketCode(e.target.value)} 
             placeholder="Ingresar código de ticket..." 
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#f304eb] uppercase placeholder:normal-case placeholder:text-white/30 transition-colors" 
+            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[var(--theme-color-1)] uppercase placeholder:normal-case placeholder:text-white/30 transition-colors" 
           />
           <button 
             onClick={handleJoin} 
@@ -212,7 +212,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
 
       <div className="mx-5 mb-28">
         <button onClick={() => setShowThemeModal(true)} className="w-full mb-3 py-4 rounded-xl font-bold text-white text-sm transition-all active:scale-95 glass border border-white/10 flex items-center justify-center gap-2">
-           <svg className="w-4 h-4 text-[#f304eb]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+           <svg className="w-4 h-4 text-[var(--theme-color-1)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
            Estilos
         </button>
         <button onClick={onEdit} className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all active:scale-95 glass border border-white/10">Editar perfil</button>

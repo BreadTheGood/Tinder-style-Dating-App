@@ -43,7 +43,7 @@ export function ManagerLoginScreen() {
                 required 
                 value={email} 
                 onChange={e => setEmail(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#f304eb]"
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--theme-color-1)]"
                 placeholder="manager@app.com"
               />
             </div>
@@ -54,14 +54,14 @@ export function ManagerLoginScreen() {
                 required 
                 value={password} 
                 onChange={e => setPassword(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#f304eb]"
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--theme-color-1)]"
                 placeholder="••••••••"
               />
             </div>
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-gradient-to-r from-[#f304eb] to-[#ff7043] text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-[var(--theme-color-1)] to-[var(--theme-color-2)] text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50"
             >
               {loading ? 'Ingresando...' : 'Ingresar'}
             </button>
