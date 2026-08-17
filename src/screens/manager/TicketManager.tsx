@@ -124,16 +124,16 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
 
-      <h2 className="text-3xl font-bold text-gray-900 mb-2">Gestión de Tickets</h2>
+      <h2 className="text-3xl font-bold text-gray-900 mb-2">Gestión de tickets</h2>
       <p className="text-gray-500 mb-8 font-medium">Evento: <span className="text-[var(--theme-color-1)]">{event.name}</span></p>
 
       <div className="grid grid-cols-3 gap-6 mb-10">
         <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-          <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1">Total Generados</p>
+          <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1">Total generados</p>
           <p className="text-4xl font-extrabold text-gray-900">{tickets.length}</p>
         </div>
         <div className="bg-green-50 rounded-xl p-5 border border-green-100">
-          <p className="text-sm font-bold text-green-600 uppercase tracking-wide mb-1">Tickets Usados</p>
+          <p className="text-sm font-bold text-green-600 uppercase tracking-wide mb-1">Tickets usados</p>
           <p className="text-4xl font-extrabold text-green-700">{usedCount}</p>
         </div>
         <div className="bg-blue-50 rounded-xl p-5 border border-blue-100">
@@ -188,7 +188,7 @@ export function TicketManager({ event, onBack }: { event: any, onBack: () => voi
         {/* Panel de Lista */}
         <div className="bg-white border border-gray-200 rounded-xl flex flex-col overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-            <h3 className="font-bold text-gray-800">Lista de Códigos</h3>
+            <h3 className="font-bold text-gray-800">Lista de códigos</h3>
             <button 
               onClick={downloadCSV}
               disabled={tickets.length === 0}

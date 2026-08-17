@@ -335,7 +335,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                 <>
                   <br />
                   <div>
-                    <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Confirmar Contraseña</label>
+                    <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Confirmar contraseña</label>
                     <div className="relative">
                       <input
                         type={showPass ? 'text' : 'password'}
@@ -420,7 +420,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
              {modalStep === 'email' ? (
                <form onSubmit={handleModalEmailNext} className="space-y-4">
                  <div>
-                   <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5 block">Tu Email</label>
+                   <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-1.5 block">Tu email</label>
                    <input
                      type="email"
                      required

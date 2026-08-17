@@ -103,7 +103,7 @@ export function BarPortal({ event }: { event: any }) {
         if (error || !data) {
            window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'No se pudo cerrar la caja.' } }))
         } else {
-           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Caja Cerrada', body: 'El evento ha finalizado exitosamente.' } }))
+           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Caja cerrada', body: 'El evento ha finalizado exitosamente.' } }))
            setIsClosed(true)
            setClosureCode(data.code)
            setTotalAmount(data.total)
@@ -148,7 +148,7 @@ export function BarPortal({ event }: { event: any }) {
       {showScanner && (
          <div className="fixed inset-0 z-[100] bg-black flex flex-col animate-fade-in">
             <div className="p-4 flex justify-between items-center bg-black/80 absolute top-0 left-0 right-0 z-10 backdrop-blur-md border-b border-white/10">
-               <span className="text-white font-bold text-lg tracking-wide">Escáner de Tragos</span>
+               <span className="text-white font-bold text-lg tracking-wide">Escáner de tragos</span>
                <button onClick={() => setShowScanner(false)} className="text-white p-2 hover:bg-white/10 rounded-full transition-colors">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                </button>
@@ -200,10 +200,10 @@ export function BarPortal({ event }: { event: any }) {
               <div className="flex justify-between items-center mb-2">
                  <h2 className="text-xl font-bold text-gray-800">Detalle de trago</h2>
                  {transaction.status === 'redeemed' && (
-                    <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full uppercase">Ya Entregado</span>
+                    <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full uppercase">Ya entregado</span>
                  )}
                  {transaction.status === 'pending' && (
-                    <span className="px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-full uppercase">Pago Pendiente</span>
+                    <span className="px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-full uppercase">Pago pendiente</span>
                  )}
               </div>
               <p className="text-sm text-gray-500">De <span className="font-bold text-gray-800">{transaction.buyer_name || 'Alguien'}</span> para <span className="font-bold text-gray-800">{transaction.receiver_name || 'Alguien'}</span></p>
@@ -250,11 +250,11 @@ export function BarPortal({ event }: { event: any }) {
 
       <div className="mt-12">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
-           <h2 className="text-xl font-bold text-gray-800 m-0">Historial de Tragos del Evento</h2>
+           <h2 className="text-xl font-bold text-gray-800 m-0">Historial de tragos del evento</h2>
            {isClosed ? (
               <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
                  <div className="bg-red-50 text-red-700 px-4 py-2 rounded-lg border border-red-200 text-center sm:text-left w-full sm:w-auto">
-                    <p className="text-sm font-bold m-0 uppercase">Caja Cerrada</p>
+                    <p className="text-sm font-bold m-0 uppercase">Caja cerrada</p>
                     <p className="text-xs m-0">Total: <span className="font-mono text-base font-black">${totalAmount}</span></p>
                     <p className="text-[10px] font-mono opacity-80 m-0 mt-0.5">CÓDIGO: {closureCode}</p>
                  </div>

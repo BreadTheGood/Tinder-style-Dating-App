@@ -117,7 +117,7 @@ export function BarApp() {
         
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm font-bold text-gray-400 mb-1">Código del Evento</label>
+            <label className="block text-sm font-bold text-gray-400 mb-1">Código del evento</label>
             <input 
               type="text" 
               value={code} 
@@ -127,7 +127,7 @@ export function BarApp() {
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-400 mb-1">Contraseña de Barra</label>
+            <label className="block text-sm font-bold text-gray-400 mb-1">Contraseña de barra</label>
             <input 
               type="password" 
               value={password} 

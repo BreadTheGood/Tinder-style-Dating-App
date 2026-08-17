@@ -89,19 +89,19 @@ export function OnboardingScreen({
     <div className="flex flex-col h-full bg-[#0d0d0f] text-white">
       <div className="p-5 flex items-center justify-between border-b border-white/10">
          <div className="text-white/40 text-sm font-semibold">Paso {step} de {requiresPassword ? '4' : '3'}</div>
-         <span className="font-bold text-[var(--theme-color-1)]">Completar Perfil</span>
+         <span className="font-bold text-[var(--theme-color-1)]">Completar perfil</span>
       </div>
       
       <div className="flex-1 overflow-y-auto p-6">
         {step === 1 && (
           <div className="space-y-6 animate-fade-in">
-            <h2 className="text-2xl font-extrabold mb-6">Tus Datos</h2>
+            <h2 className="text-2xl font-extrabold mb-6">Tus datos</h2>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Nombre</label>
               <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" placeholder="¿Cómo te llamas?" />
             </div>
             <div>
-              <label className="text-white/60 text-sm font-medium">Fecha de Nacimiento</label>
+              <label className="text-white/60 text-sm font-medium">Fecha de nacimiento</label>
               <DatePicker value={birthdate} onChange={setBirthdate} />
             </div>
             <div>
@@ -117,7 +117,7 @@ export function OnboardingScreen({
         
         {step === 2 && (
           <div className="space-y-6 animate-fade-in">
-            <h2 className="text-2xl font-extrabold mb-6">Sobre Ti</h2>
+            <h2 className="text-2xl font-extrabold mb-6">Sobre ti</h2>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Biografía</label>
               <textarea value={bio} onChange={e => setBio(e.target.value)} className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white resize-none focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" placeholder="Cuéntanos un poco sobre tus gustos, hobbies..." maxLength={500} />
@@ -142,7 +142,7 @@ export function OnboardingScreen({
 
         {step === 3 && (
           <div className="space-y-6 animate-fade-in">
-            <h2 className="text-2xl font-extrabold mb-6">Tus Fotos</h2>
+            <h2 className="text-2xl font-extrabold mb-6">Tus fotos</h2>
             <div className="grid grid-cols-3 gap-3">
               {localImages.map((img, idx) => (
                 <div key={idx} className="aspect-[3/4] bg-white/10 rounded-xl overflow-hidden relative border border-white/10">

@@ -532,7 +532,7 @@ export default function App() {
         {showRecoveryModal && (
           <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4" style={{ background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(12px)' }}>
             <div className="w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border border-white/10" style={{ background: '#18181f' }}>
-               <h3 className="text-xl font-extrabold text-white mb-4">Nueva Contraseña</h3>
+               <h3 className="text-xl font-extrabold text-white mb-4">Nueva contraseña</h3>
                <p className="text-xs text-white/60 mb-5 leading-relaxed">
                  Has verificado tu correo exitosamente. Por favor ingresa tu nueva contraseña.
                </p>

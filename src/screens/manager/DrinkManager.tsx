@@ -63,7 +63,7 @@ export function DrinkManager({ event, onBack }: { event: any, onBack: () => void
           <button onClick={onBack} className="text-gray-400 hover:text-white mb-2 text-sm transition-colors">
             ← Volver a Eventos
           </button>
-          <h2 className="text-2xl font-bold text-white">Carta de Tragos</h2>
+          <h2 className="text-2xl font-bold text-white">Carta de tragos</h2>
           <p className="text-gray-400 mt-1">Gestiona el menú de {event.name}</p>
         </div>
       </div>
@@ -71,7 +71,7 @@ export function DrinkManager({ event, onBack }: { event: any, onBack: () => void
       <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1">
           <form onSubmit={handleAddDrink} className="bg-white/5 p-5 rounded-xl border border-white/5 space-y-4">
-            <h3 className="font-bold text-white">Añadir Trago</h3>
+            <h3 className="font-bold text-white">Añadir trago</h3>
             
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-1">Nombre</label>
@@ -121,7 +121,7 @@ export function DrinkManager({ event, onBack }: { event: any, onBack: () => void
         </div>
 
         <div className="md:col-span-2 space-y-4">
-          <h3 className="font-bold text-white mb-4">Menú Actual ({drinks.length})</h3>
+          <h3 className="font-bold text-white mb-4">Menú actual ({drinks.length})</h3>
           
           {loading ? (
             <p className="text-gray-400">Cargando...</p>

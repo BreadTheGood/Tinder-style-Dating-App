@@ -290,9 +290,9 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   if (!isActive) {
      return (
        <div className="flex h-screen flex-col items-center justify-center bg-gray-900 p-6 text-center">
-         <h1 className="text-3xl text-red-500 mb-4 font-bold">Cuenta Desactivada</h1>
+         <h1 className="text-3xl text-red-500 mb-4 font-bold">Cuenta desactivada</h1>
          <p className="text-gray-400 mb-8">Tu cuenta de manager ha sido suspendida por un administrador del sistema.</p>
-         <button onClick={() => supabase.auth.signOut()} className="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700">Cerrar Sesión</button>
+         <button onClick={() => supabase.auth.signOut()} className="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700">Cerrar sesión</button>
        </div>
      )
   }
@@ -420,7 +420,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                   <h2 className="text-lg font-bold text-gray-800 mb-4">{editingEventId ? 'Editar Evento' : 'Detalles del Nuevo Evento'}</h2>
                   <form onSubmit={handleSaveEvent} className="space-y-4">
                      <div>
-                        <label className="block text-sm font-semibold text-gray-600 mb-1">Nombre del Evento</label>
+                        <label className="block text-sm font-semibold text-gray-600 mb-1">Nombre del evento</label>
                         <input type="text" required value={newEventName} onChange={e => setNewEventName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder="Ej: Fiesta de Verano 2026" />
                      </div>
                      <div className="flex gap-4">
@@ -430,11 +430,11 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                         </div>
                         <div className="w-48 flex flex-col gap-4">
                            <div>
-                              <label className="block text-sm font-semibold text-gray-600 mb-1">Código del Evento</label>
+                              <label className="block text-sm font-semibold text-gray-600 mb-1">Código del evento</label>
                               <input type="text" value={newEventCode} onChange={e => setNewEventCode(e.target.value.toUpperCase())} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)] uppercase" placeholder="Ej: FIESTA26" />
                            </div>
                            <div>
-                              <label className="block text-sm font-semibold text-gray-600 mb-1">Contraseña de Barra</label>
+                              <label className="block text-sm font-semibold text-gray-600 mb-1">Contraseña de barra</label>
                               <input type="text" value={newEventBarPassword} onChange={e => setNewEventBarPassword(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder="Ej: barra2026" />
                               <p className="text-[10px] text-gray-400 mt-1">Para acceso a empleados</p>
                            </div>
@@ -442,11 +442,11 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                      </div>
                      <div className="flex gap-4">
                         <div className="flex-1">
-                           <label className="block text-sm font-semibold text-gray-600 mb-1">Fecha de Inicio</label>
+                           <label className="block text-sm font-semibold text-gray-600 mb-1">Fecha de inicio</label>
                            <input type="date" required value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" />
                         </div>
                         <div className="w-48">
-                           <label className="block text-sm font-semibold text-gray-600 mb-1">Hora de Inicio</label>
+                           <label className="block text-sm font-semibold text-gray-600 mb-1">Hora de inicio</label>
                            <input type="time" required value={newEventTime} onChange={e => setNewEventTime(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" />
                         </div>
                      </div>
@@ -500,7 +500,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                               Cancelar
                            </button>
                            <button type="submit" disabled={savingEvent} className="bg-gray-900 text-white px-8 py-2.5 rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50">
-                              {savingEvent ? 'Guardando...' : editingEventId ? 'Guardar Cambios' : 'Guardar Evento'}
+                              {savingEvent ? 'Guardando...' : editingEventId ? 'Guardar cambios' : 'Guardar Evento'}
                            </button>
                         </div>
                      </div>
@@ -601,20 +601,20 @@ export function ManagerDashboard({ manager }: { manager: any }) {
          {activeTab === 'managers' && isAdmin && (
            <>
              <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Gestión de Managers</h1>
+                <h1 className="text-3xl font-bold text-gray-800">Gestión de managers</h1>
              </div>
 
              {/* Formulario de Creación */}
              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-                <h2 className="text-lg font-bold text-gray-800 mb-1">Vincular Manager Existente</h2>
+                <h2 className="text-lg font-bold text-gray-800 mb-1">Vincular manager existente</h2>
                 <p className="text-sm text-gray-500 mb-4">Primero crea el usuario en Supabase (Authentication &gt; Users) y pega aquí su UID.</p>
                 <form onSubmit={handleCreateManager} className="flex gap-4 items-end">
                    <div className="flex-1">
-                      <label className="block text-sm font-semibold text-gray-600 mb-1">UID del Usuario (Supabase)</label>
+                      <label className="block text-sm font-semibold text-gray-600 mb-1">UID del usuario (Supabase)</label>
                       <input type="text" required value={newAuthId} onChange={e => setNewAuthId(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder="123e4567-e89b-12d3..." />
                    </div>
                    <div className="flex-1">
-                      <label className="block text-sm font-semibold text-gray-600 mb-1">Correo Electrónico</label>
+                      <label className="block text-sm font-semibold text-gray-600 mb-1">Correo electrónico</label>
                       <input type="email" required value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder="nuevo@manager.com" />
                    </div>
                    <div className="w-40">
@@ -711,7 +711,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                    disabled={savingSettings}
                    className="bg-[var(--theme-color-1)] text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-all disabled:opacity-50"
                  >
-                   {savingSettings ? 'Guardando...' : 'Guardar Cambios'}
+                   {savingSettings ? 'Guardando...' : 'Guardar cambios'}
                  </button>
                </div>
              </form>

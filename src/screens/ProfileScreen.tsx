@@ -134,10 +134,10 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
         </div>
       </div>
 
-      {/* Mis Eventos Activos */}
+      {/* Mis eventos activos */}
       <div className="mx-5 mt-4 glass rounded-2xl p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-semibold text-white/40 uppercase tracking-widest">Mis Eventos Activos</p>
+          <p className="text-xs font-semibold text-white/40 uppercase tracking-widest">Mis eventos activos</p>
           {pastEvents.length > 0 && (
              <button 
                onClick={() => setShowHistory(!showHistory)} 
@@ -190,10 +190,10 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
         </div>
       </div>
 
-      {/* Historial de Eventos Pasados */}
+      {/* Historial de eventos pasados */}
       {showHistory && pastEvents.length > 0 && (
         <div className="mx-5 glass rounded-2xl p-4 mb-4">
-          <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Historial de Eventos Pasados</p>
+          <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Historial de eventos pasados</p>
           <div className="flex flex-col gap-2">
              {pastEvents.map(e => {
                const dateStr = e.start_datetime ? new Date(e.start_datetime).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : ''

@@ -252,7 +252,7 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
               </button>
               
-              <h2 className="text-2xl font-black text-gray-800 mb-2 mt-2">Tu Código de Trago</h2>
+              <h2 className="text-2xl font-black text-gray-800 mb-2 mt-2">Tu código de trago</h2>
               <p className="text-sm text-gray-500 mb-6 font-medium">Muestra este código al empleado de la barra para que te entregue el trago.</p>
               
               <div className="bg-gray-50 p-4 rounded-2xl mb-6 shadow-inner border border-gray-100">

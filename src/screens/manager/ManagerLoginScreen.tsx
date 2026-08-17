@@ -37,7 +37,7 @@ export function ManagerLoginScreen() {
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Correo Electrónico</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Correo electrónico</label>
               <input 
                 type="email" 
                 required 

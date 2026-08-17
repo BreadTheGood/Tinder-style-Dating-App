@@ -86,7 +86,7 @@ export function EditProfileScreen({
         <button onClick={onBack} className="text-[var(--theme-color-1)] font-semibold active:scale-95 transition-all">
           Cancelar
         </button>
-        <span className="font-extrabold text-lg tracking-tight">Editar Perfil</span>
+        <span className="font-extrabold text-lg tracking-tight">Editar perfil</span>
         <button onClick={handleSave} disabled={isSaving} className="text-[var(--theme-color-1)] font-bold active:scale-95 transition-all disabled:opacity-50">
           {isSaving ? 'Guardando...' : 'Guardar'}
         </button>
@@ -109,7 +109,7 @@ export function EditProfileScreen({
           </div>
 
           <div>
-            <label className="text-white/60 text-sm font-medium">Fecha de Nacimiento</label>
+            <label className="text-white/60 text-sm font-medium">Fecha de nacimiento</label>
             <DatePicker value={birthdate} onChange={setBirthdate} />
           </div>
 
