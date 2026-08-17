@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { managerSupabase as supabase } from '../../lib/managerSupabase'
+import { Scanner } from '@yudiel/react-qr-scanner'
 
 export function BarPortal({ event }: { event: any }) {
   const [code, setCode] = useState('')
@@ -7,6 +8,7 @@ export function BarPortal({ event }: { event: any }) {
   const [transaction, setTransaction] = useState<any>(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [transactionsList, setTransactionsList] = useState<any[]>([])
+  const [showScanner, setShowScanner] = useState(false)
 
   const loadTransactions = async () => {
      const { data } = await supabase.rpc('get_event_transactions', {
@@ -68,24 +70,86 @@ export function BarPortal({ event }: { event: any }) {
     setLoading(false)
   }
 
+  const handleScan = async (text: string) => {
+    setCode(text)
+    setShowScanner(false)
+    setLoading(true)
+    setErrorMsg('')
+    setTransaction(null)
+
+    const searchCodeStr = text.trim().toUpperCase()
+    if (!searchCodeStr.startsWith('DRINK-')) {
+       setErrorMsg('Formato inválido. El código escaneado no es un trago (DRINK-...)')
+       setLoading(false)
+       return
+    }
+
+    const { data: tx, error } = await supabase.rpc('get_drink_details', {
+       p_qr_code: searchCodeStr,
+       p_bar_password: event.bar_password
+    })
+
+    if (error || !tx) {
+      setErrorMsg('Código no encontrado, inválido, o no pertenece a este evento.')
+    } else {
+      setTransaction(tx)
+    }
+    setLoading(false)
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
-      <p className="text-gray-500 mb-8">
-        Ingresa el código que te muestra el usuario para validar su compra y entregar el trago.
-      </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <p className="text-gray-500 m-0">
+          Ingresa el código que te muestra el usuario o escanea su QR para validar su compra y entregar el trago.
+        </p>
+        <button 
+          onClick={() => setShowScanner(true)}
+          className="bg-black text-white font-bold px-6 py-3 rounded-lg hover:bg-gray-800 flex items-center justify-center gap-2 whitespace-nowrap transition-colors shadow-lg"
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Escanear QR
+        </button>
+      </div>
+
+      {showScanner && (
+         <div className="fixed inset-0 z-[100] bg-black flex flex-col animate-fade-in">
+            <div className="p-4 flex justify-between items-center bg-black/80 absolute top-0 left-0 right-0 z-10 backdrop-blur-md border-b border-white/10">
+               <span className="text-white font-bold text-lg tracking-wide">Escáner de Tragos</span>
+               <button onClick={() => setShowScanner(false)} className="text-white p-2 hover:bg-white/10 rounded-full transition-colors">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+               </button>
+            </div>
+            <div className="flex-1 flex items-center justify-center bg-black/90">
+              <div className="w-full max-w-md aspect-square relative border-2 border-white/20 rounded-3xl overflow-hidden">
+                <Scanner 
+                  onScan={(result) => {
+                     if (result && result.length > 0) {
+                        handleScan(result[0].rawValue)
+                     }
+                  }}
+                  onError={(error) => console.log(error?.message)}
+                  formats={['qr_code']}
+                />
+                <div className="absolute inset-0 border-2 border-[var(--theme-color-1)] opacity-50 m-8 rounded-xl pointer-events-none" />
+              </div>
+            </div>
+            <div className="p-8 text-center text-white/50 text-sm absolute bottom-0 left-0 right-0">Apunta la cámara al código QR</div>
+         </div>
+      )}
 
       <form onSubmit={searchCode} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-6 flex gap-4">
          <input 
             type="text"
             value={code}
             onChange={e => setCode(e.target.value.toUpperCase())}
-            placeholder="Ej. DRINK-ABCDEF..."
+            placeholder="O escribe manualmente: DRINK-ABCDEF..."
             className="flex-1 bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-800 font-bold uppercase tracking-wider outline-none focus:border-[var(--theme-color-1)]"
          />
          <button 
            type="submit" 
            disabled={loading}
-           className="bg-[var(--theme-color-1)] text-white font-bold px-8 py-3 rounded-lg hover:opacity-90 disabled:opacity-50"
+           className="bg-[var(--theme-color-1)] text-white font-bold px-8 py-3 rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
          >
             {loading ? 'Buscando...' : 'Verificar'}
          </button>
