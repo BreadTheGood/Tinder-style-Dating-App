@@ -14,6 +14,8 @@ import { supabaseAppDataService } from './services/supabaseAppDataService'
 import type { Conversation, Profile, Screen, UserProfile, Message } from './types'
 import { supabase } from './lib/supabase'
 
+import { audio } from './utils/audio'
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>('login')
   const [navTab, setNavTab] = useState<'swipe' | 'messages' | 'profile'>('swipe')
@@ -251,6 +253,7 @@ export default function App() {
 
             // Show Match Modal solo si nosotros NO fuimos los que swipeamos (para evitar doble modal)
             if (match.profile2_id === currentUser.id) {
+               audio.playMatch()
                setMatchedProfile(mappedProfile)
                window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: '¡Nuevo Match!', body: `Has hecho match con ${mappedProfile.name}`, image: mappedProfile.image } }))
             }
@@ -302,6 +305,12 @@ export default function App() {
             if (!conv.messages.find(m => m.id === msg.id)) {
                const isUserInThisChat = activeChatIdRef.current === conv.id
                
+               if (msg.text.includes('DRINK-')) {
+                  audio.playDrink()
+               } else {
+                  audio.playReceive()
+               }
+
                if (!isUserInThisChat) {
                   window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: conv.profile.name, body: msg.text, image: conv.profile.image } }))
                }

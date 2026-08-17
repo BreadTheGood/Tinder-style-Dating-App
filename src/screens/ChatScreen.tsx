@@ -4,6 +4,7 @@ import { BackIcon, SendIcon, GlassWaterIcon } from '../components/icons'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
 import type { Conversation, Message, Profile } from '../types'
 import { QRCodeSVG } from 'qrcode.react'
+import { audio } from '../utils/audio'
 
 export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { conversation: Conversation; onBack: () => void; onUpdate: (msgs: Message[]) => void; onViewProfile?: (p: Profile) => void }) {
   const [text, setText] = useState('')
@@ -35,6 +36,8 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
     const msgText = text.trim()
     setText('')
     
+    audio.playSend()
+
     // Optimistic UI update
     const msg: Message = { id: Date.now(), text: msgText, from: 'me', time: 'Ahora' }
     onUpdate([...conversation.messages, msg])
@@ -176,11 +179,11 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
                   )}
                 </div>
               </div>
-              {idx === 9 && (
+              {idx === 9 && conversation.messages.length > 10 && conversation.messages.some(msg => msg.from === 'me') && conversation.messages.some(msg => msg.from === 'them') && (
                 <div className="flex justify-center my-6">
                   <div className="bg-white/5 border border-[var(--theme-color-1)]/30 rounded-2xl p-4 text-center max-w-[85%] shadow-lg">
                     <p className="text-white/80 text-sm font-medium mb-3">
-                      La charla está interesante... ¿Qué tal si invitas un trago para romper el hielo?
+                      Pinta algo de tomar?
                     </p>
                     <button 
                       onClick={() => {
