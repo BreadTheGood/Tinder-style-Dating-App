@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { BackIcon, SendIcon } from '../components/icons'
+import { DrinkModal } from '../components/DrinkModal'
+import { BackIcon, SendIcon, GlassWaterIcon } from '../components/icons'
 import { supabaseAppDataService } from '../services/supabaseAppDataService'
 import type { Conversation, Message, Profile } from '../types'
 
 export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { conversation: Conversation; onBack: () => void; onUpdate: (msgs: Message[]) => void; onViewProfile?: (p: Profile) => void }) {
   const [text, setText] = useState('')
+  const [showMenu, setShowMenu] = useState(false)
+  const [showDrinkModal, setShowDrinkModal] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -43,9 +46,21 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
           <p className="text-white font-bold text-sm">{conversation.profile.name}</p>
           <p className="text-white/40 text-xs font-medium">En línea ahora</p>
         </div>
-        <button className="w-9 h-9 rounded-full glass flex items-center justify-center">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
-        </button>
+        <div className="relative">
+          <button onClick={() => setShowMenu(!showMenu)} className="w-9 h-9 rounded-full glass flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
+          </button>
+          {showMenu && (
+            <div className="absolute right-0 top-full mt-2 w-48 bg-gray-900 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
+              <button 
+                onClick={() => { setShowMenu(false); alert('Usuario bloqueado'); onBack(); }}
+                className="w-full text-left px-4 py-3 text-sm text-red-500 font-semibold hover:bg-gray-800 transition-colors"
+              >
+                Bloquear al usuario
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
@@ -77,7 +92,13 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
         <div ref={bottomRef} />
       </div>
 
-      <div className="px-4 pb-6 pt-3 flex items-center gap-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+      <div className="px-4 pb-6 pt-3 flex items-center gap-3 relative" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <button 
+          onClick={() => setShowDrinkModal(true)}
+          className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-800 text-[var(--theme-color-1)] border border-[var(--theme-color-1)] hover:bg-gray-700 transition-colors flex-shrink-0"
+        >
+          <GlassWaterIcon size={20} />
+        </button>
         <input
           type="text"
           value={text}
@@ -90,11 +111,24 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
         <button
           onClick={send}
           className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-90 ${text.trim() ? 'gradient-brand' : ''}`}
-          style={text.trim() ? { boxShadow: '0 4px 16px rgba(255,62,108,0.4)' } : { background: 'rgba(255,255,255,0.07)' }}
+          style={text.trim() ? { boxShadow: '0 4px 16px color-mix(in srgb, var(--theme-color-1) 40%, transparent)' } : { background: 'rgba(255,255,255,0.07)' }}
         >
           <SendIcon size={16} className="text-white" />
         </button>
       </div>
+      {showDrinkModal && (
+        <DrinkModal 
+          partnerId={conversation.profile.id} 
+          onClose={() => setShowDrinkModal(false)}
+          onSend={(msgText) => {
+             const msg: Message = { id: Date.now(), text: msgText, from: 'me', time: 'Ahora' }
+             onUpdate([...conversation.messages, msg])
+             if (conversation.id) {
+               supabaseAppDataService.sendMessage!(conversation.id, msgText)
+             }
+          }}
+        />
+      )}
     </div>
   )
 }

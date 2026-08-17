@@ -73,3 +73,10 @@ export const EyeIcon = ({ size = 16, className = '' }) => (
     <circle cx="12" cy="12" r="3" />
   </svg>
 )
+
+export const GlassWaterIcon = ({ size = 24, className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z" />
+    <path d="M6 12h12" />
+  </svg>
+)

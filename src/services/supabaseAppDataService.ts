@@ -1,7 +1,83 @@
 import { supabase } from '../lib/supabase'
 import type { AppDataService } from './appDataService'
 
-export const supabaseAppDataService: AppDataService = {
+export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractions?: (profileId: string) => Promise<void> } = {
+  async cleanupExpiredInteractions(myProfileId: string) {
+    const { data: myEvents } = await supabase
+      .from('ProfileEvents')
+      .select('event_id, Events(end_datetime, is_suspended)')
+      .eq('profile_id', myProfileId);
+    
+    if (!myEvents) return;
+
+    const activeEventIds = myEvents
+      .filter((e: any) => {
+         const ev = e.Events;
+         if (!ev || ev.is_suspended) return false;
+         if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
+         return true;
+      })
+      .map((e: any) => e.event_id);
+
+    let validPartnerIds = new Set<string>();
+    if (activeEventIds.length > 0) {
+      const { data: partnerEvents } = await supabase
+        .from('ProfileEvents')
+        .select('profile_id')
+        .in('event_id', activeEventIds);
+      
+      if (partnerEvents) {
+        partnerEvents.forEach((pe: any) => validPartnerIds.add(pe.profile_id));
+      }
+    }
+
+    // Swipes
+    const { data: swipes } = await supabase
+      .from('Swipes')
+      .select('id, swiper_id, swiped_on_id')
+      .or(`swiper_id.eq.${myProfileId},swiped_on_id.eq.${myProfileId}`);
+
+    const swipeIdsToDelete: number[] = [];
+    if (swipes) {
+      for (const swipe of swipes) {
+        const partnerId = swipe.swiper_id === myProfileId ? swipe.swiped_on_id : swipe.swiper_id;
+        if (!validPartnerIds.has(partnerId)) {
+          swipeIdsToDelete.push(swipe.id);
+        }
+      }
+    }
+
+    if (swipeIdsToDelete.length > 0) {
+      for(let i=0; i<swipeIdsToDelete.length; i+=100) {
+         await supabase.from('Swipes').delete().in('id', swipeIdsToDelete.slice(i, i+100));
+      }
+    }
+
+    // Matches
+    const { data: matches } = await supabase
+      .from('Matches')
+      .select('id, profile1_id, profile2_id')
+      .or(`profile1_id.eq.${myProfileId},profile2_id.eq.${myProfileId}`);
+
+    const matchIdsToDelete: number[] = [];
+    if (matches) {
+      for (const match of matches) {
+        const partnerId = match.profile1_id === myProfileId ? match.profile2_id : match.profile1_id;
+        if (!validPartnerIds.has(partnerId)) {
+          matchIdsToDelete.push(match.id);
+        }
+      }
+    }
+
+    if (matchIdsToDelete.length > 0) {
+      for(let i=0; i<matchIdsToDelete.length; i+=100) {
+         const chunk = matchIdsToDelete.slice(i, i+100);
+         await supabase.from('Messages').delete().in('match_id', chunk);
+         await supabase.from('Matches').delete().in('id', chunk);
+      }
+    }
+  },
+
   async getProfiles() {
     const { data: { session } } = await supabase.auth.getSession()
     
@@ -26,6 +102,43 @@ export const supabaseAppDataService: AppDataService = {
     if (session) {
        const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', session.user.id).maybeSingle()
        if (myProfile) {
+          if (this.cleanupExpiredInteractions) {
+             await this.cleanupExpiredInteractions(myProfile.id);
+          }
+
+          // EVENT VISIBILITY LOGIC: Filter by shared active events
+          const { data: myEvents } = await supabase
+            .from('ProfileEvents')
+            .select('event_id, Events(end_datetime, is_suspended)')
+            .eq('profile_id', myProfile.id);
+          
+          let validPartnerIds = new Set<string>();
+          if (myEvents) {
+            const activeEventIds = myEvents
+              .filter((e: any) => {
+                 const ev = e.Events;
+                 if (!ev || ev.is_suspended) return false;
+                 if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
+                 return true;
+              })
+              .map((e: any) => e.event_id);
+
+            if (activeEventIds.length > 0) {
+              const { data: partnerEvents } = await supabase
+                .from('ProfileEvents')
+                .select('profile_id')
+                .in('event_id', activeEventIds);
+              
+              if (partnerEvents) {
+                partnerEvents.forEach((pe: any) => validPartnerIds.add(pe.profile_id));
+              }
+            }
+          }
+
+          // Only keep profiles that share an active event
+          filteredData = filteredData.filter(p => validPartnerIds.has(p.id));
+
+          // Also remove profiles we already swiped on
           const { data: swipedData } = await supabase.from('Swipes').select('swiped_on_id').eq('swiper_id', myProfile.id)
           if (swipedData && swipedData.length > 0) {
              const swipedIds = new Set(swipedData.map(s => s.swiped_on_id))
@@ -66,6 +179,10 @@ export const supabaseAppDataService: AppDataService = {
 
     const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
     if (!myProfile) return []
+
+    if (this.cleanupExpiredInteractions) {
+       await this.cleanupExpiredInteractions(myProfile.id);
+    }
 
     // Fetch Matches for this user
     const { data: matches, error: matchesError } = await supabase
