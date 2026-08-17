@@ -358,15 +358,24 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                   <h1 className="text-3xl font-bold text-gray-800">{isAdmin ? 'Todos los Eventos' : 'Tus Eventos'}</h1>
                   <p className="text-sm text-gray-500 mt-1">Crea, edita, suspende o elimina eventos para tus usuarios.</p>
                 </div>
-                <button 
-                  onClick={() => {
-                    if (showEventForm) resetEventForm()
-                    else setShowEventForm(true)
-                  }}
-                  className="bg-[var(--theme-color-1)] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity"
-                >
-                   {showEventForm ? 'Cancelar' : '+ Crear Evento'}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => setViewingAnalyticsFor('general')}
+                    className="bg-blue-100 text-blue-700 px-5 py-2.5 rounded-lg font-bold shadow-sm hover:bg-blue-200 transition-colors flex items-center gap-2"
+                  >
+                    <span>📊</span>
+                    Métricas Globales
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (showEventForm) resetEventForm()
+                      else setShowEventForm(true)
+                    }}
+                    className="bg-[var(--theme-color-1)] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity"
+                  >
+                     {showEventForm ? 'Cancelar' : '+ Crear Evento'}
+                  </button>
+                </div>
              </div>
 
              {/* Filtros de eventos */}
