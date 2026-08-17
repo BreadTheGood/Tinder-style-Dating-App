@@ -178,6 +178,12 @@ export default function App() {
          if (snap) {
            setProfiles(snap.profiles)
            setConversations(snap.conversations)
+           setActiveConversation(prev => {
+              if (prev) {
+                 return snap.conversations.find((c: Conversation) => c.id === prev.id) || prev
+              }
+              return prev
+           })
          }
        }
     }
