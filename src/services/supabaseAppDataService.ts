@@ -248,7 +248,11 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
       const rawMessages = match.Messages || []
       rawMessages.sort((a: any, b: any) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime())
 
-      const messages: any[] = rawMessages.map((msg: any) => ({
+      const myBlock = myBlocks.find(b => b.blocker_id === myProfile.id && b.blocked_id === profile.id)
+      const blockedByMe = !!myBlock
+      const blockedByThem = myBlocks.some(b => b.blocker_id === profile.id && b.blocked_id === myProfile.id)
+
+      let messages: any[] = rawMessages.map((msg: any) => ({
         id: msg.id,
         text: msg.content,
         from: msg.sender_id === myProfile.id ? 'me' : 'them',
@@ -256,8 +260,10 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
         createdAt: msg.sent_at
       }))
 
-      const blockedByMe = myBlocks.some(b => b.blocker_id === myProfile.id && b.blocked_id === profile.id)
-      const blockedByThem = myBlocks.some(b => b.blocker_id === profile.id && b.blocked_id === myProfile.id)
+      if (blockedByMe && myBlock) {
+         const blockTime = new Date(myBlock.created_at).getTime()
+         messages = messages.filter(m => m.from === 'me' || new Date(m.createdAt).getTime() < blockTime)
+      }
 
       conversations.push({
         id: match.id,

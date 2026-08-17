@@ -130,7 +130,7 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
           <p className="text-white/30 text-xs font-medium mt-0.5">¡Hicieron match! Empieza la conversación</p>
         </div>
 
-        {conversation.messages.map((m) => {
+        {conversation.messages.map((m, idx) => {
           const codeMatch = m.text.match(/(DRINK-[A-Z0-9]+)/)
           const isDrink = codeMatch !== null
           
@@ -149,31 +149,48 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
           }
 
           return (
-            <div key={m.id} className={`flex ${m.from === 'me' ? 'justify-end' : 'justify-start'}`}>
-              <div
-                className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm font-medium leading-relaxed ${m.from === 'me' ? 'gradient-brand text-white' : ''}`}
-                style={m.from === 'me'
-                  ? { borderBottomRightRadius: 4 }
-                  : { background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)', borderBottomLeftRadius: 4 }
-                }
-              >
-                {isDrink ? (
-                   <div>
-                      <p className="font-bold">{drinkTitle}</p>
-                      {m.from !== 'me' && (
-                         <button 
-                           onClick={() => setShowQR(codeMatch[1])}
-                           className="w-full mt-2 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1 bg-black/20 hover:bg-black/30"
-                         >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                            Presiona para mostrar el QR
-                         </button>
-                      )}
-                   </div>
-                ) : (
-                   m.text
-                )}
+            <div key={m.id}>
+              <div className={`flex ${m.from === 'me' ? 'justify-end' : 'justify-start'} mb-3`}>
+                <div
+                  className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm font-medium leading-relaxed ${m.from === 'me' ? 'gradient-brand text-white' : ''}`}
+                  style={m.from === 'me'
+                    ? { borderBottomRightRadius: 4 }
+                    : { background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)', borderBottomLeftRadius: 4 }
+                  }
+                >
+                  {isDrink ? (
+                     <div>
+                        <p className="font-bold">{drinkTitle}</p>
+                        {m.from !== 'me' && (
+                           <button 
+                             onClick={() => setShowQR(codeMatch[1])}
+                             className="w-full mt-2 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1 bg-black/20 hover:bg-black/30"
+                           >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                              Presiona para mostrar el QR
+                           </button>
+                        )}
+                     </div>
+                  ) : (
+                     m.text
+                  )}
+                </div>
               </div>
+              {idx === 9 && (
+                <div className="flex justify-center my-6">
+                  <div className="bg-white/5 border border-[var(--theme-color-1)]/30 rounded-2xl p-4 text-center max-w-[85%] shadow-lg">
+                    <p className="text-white/80 text-sm font-medium mb-3">
+                      La charla está interesante... ¿Qué tal si invitas un trago para romper el hielo?
+                    </p>
+                    <button 
+                      onClick={() => setShowDrinkModal(true)}
+                      className="bg-[var(--theme-color-1)] text-white text-xs font-bold py-2 px-4 rounded-xl w-full shadow-lg shadow-[var(--theme-color-1)]/20 transition-transform active:scale-95"
+                    >
+                      Invitar un trago 🍹
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )
         })}
@@ -203,11 +220,11 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !conversation.blockedByMe && !conversation.blockedByThem && send()}
-          disabled={conversation.blockedByMe || conversation.blockedByThem}
-          placeholder={conversation.blockedByMe ? "Usuario bloqueado" : conversation.blockedByThem ? "No puedes responder a esta conversación" : "Escribe un mensaje..."}
+          onKeyDown={(e) => e.key === 'Enter' && !conversation.blockedByMe && send()}
+          disabled={conversation.blockedByMe}
+          placeholder={conversation.blockedByMe ? "Usuario bloqueado" : "Escribe un mensaje..."}
           className={`flex-1 px-4 py-3 rounded-full text-sm font-medium outline-none ${
-             conversation.blockedByMe || conversation.blockedByThem
+             conversation.blockedByMe
              ? 'text-white/40 placeholder-white/20 cursor-not-allowed'
              : 'text-white placeholder-white/25'
           }`}
@@ -215,11 +232,11 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
         />
         <button
           onClick={send}
-          disabled={conversation.blockedByMe || conversation.blockedByThem || !text.trim()}
+          disabled={conversation.blockedByMe || !text.trim()}
           className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-90 ${
-            text.trim() && !conversation.blockedByMe && !conversation.blockedByThem ? 'gradient-brand' : ''
-          } ${conversation.blockedByMe || conversation.blockedByThem ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={text.trim() && !conversation.blockedByMe && !conversation.blockedByThem ? { boxShadow: '0 4px 16px color-mix(in srgb, var(--theme-color-1) 40%, transparent)' } : { background: 'rgba(255,255,255,0.07)' }}
+            text.trim() && !conversation.blockedByMe ? 'gradient-brand' : ''
+          } ${conversation.blockedByMe ? 'opacity-50 cursor-not-allowed' : ''}`}
+          style={text.trim() && !conversation.blockedByMe ? { boxShadow: '0 4px 16px color-mix(in srgb, var(--theme-color-1) 40%, transparent)' } : { background: 'rgba(255,255,255,0.07)' }}
         >
           <SendIcon size={16} className="text-white" />
         </button>
