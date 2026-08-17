@@ -437,7 +437,8 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
     if (!user) return false
 
     // 1. Delete the match via RPC to bypass any RLS limitations on DELETE
-    await supabase.rpc('unmatch_user', { p_match_id: parseInt(matchId) })
+    const { error: rpcErr } = await supabase.rpc('unmatch_user', { p_match_id: matchId })
+    if (rpcErr) console.error("Error unmatching user via RPC:", rpcErr)
 
     // 2. Change our interaction to 'pass' so they don't show up again in our feed
     if (this.recordSwipe) {
