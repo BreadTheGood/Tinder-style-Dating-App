@@ -214,6 +214,9 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
       return []
     }
 
+    const { data: blocks } = await supabase.from('Blocks').select('*').or(`blocker_id.eq.${myProfile.id},blocked_id.eq.${myProfile.id}`)
+    const myBlocks = blocks || []
+
     const conversations = []
     for (const match of matches) {
       const isUser1 = match.profile1_id === myProfile.id
@@ -253,11 +256,16 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
         createdAt: msg.sent_at
       }))
 
+      const blockedByMe = myBlocks.some(b => b.blocker_id === myProfile.id && b.blocked_id === profile.id)
+      const blockedByThem = myBlocks.some(b => b.blocker_id === profile.id && b.blocked_id === myProfile.id)
+
       conversations.push({
         id: match.id,
         profile,
         messages,
-        unread: 0 
+        unread: 0,
+        blockedByMe,
+        blockedByThem
       })
     }
     return conversations
@@ -447,7 +455,30 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
 
     return true
   },
-  
+
+  async blockUser(targetId: string) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
+    if (!myProfile) return false
+    await supabase.from('Blocks').insert({ blocker_id: myProfile.id, blocked_id: targetId })
+    return true
+  },
+
+  async unblockUser(targetId: string) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+    const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
+    if (!myProfile) return false
+    await supabase.from('Blocks').delete().eq('blocker_id', myProfile.id).eq('blocked_id', targetId)
+    return true
+  },
+
+  async deleteChat(matchId: string) {
+    await supabase.rpc('delete_chat', { p_match_id: matchId })
+    return true
+  },
+
   async sendMessage(matchId: string, text: string) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return false

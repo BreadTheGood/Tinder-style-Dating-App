@@ -28,6 +28,8 @@ export interface Conversation {
   messages: Message[]
   unread: number
   updatedAt?: string
+  blockedByMe?: boolean
+  blockedByThem?: boolean
 }
 
 export interface UserProfile {

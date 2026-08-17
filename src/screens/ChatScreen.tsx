@@ -54,18 +54,61 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
           </button>
           {showMenu && (
             <div className="absolute right-0 top-full mt-2 w-48 bg-gray-900 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
+              {conversation.blockedByMe ? (
+                <button 
+                  onClick={async () => { 
+                     setShowMenu(false); 
+                     if (confirm('¿Estás seguro que deseas desbloquear a este usuario?')) {
+                        if (conversation.id) await supabaseAppDataService.unblockUser?.(conversation.profile.id as string);
+                        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Usuario desbloqueado' } }))
+                        window.dispatchEvent(new CustomEvent('app-reload-data'))
+                     }
+                  }}
+                  className="w-full text-left px-4 py-3 text-sm text-green-500 font-semibold hover:bg-gray-800 transition-colors"
+                >
+                  Desbloquear usuario
+                </button>
+              ) : (
+                <button 
+                  onClick={async () => { 
+                     setShowMenu(false); 
+                     if (confirm('¿Estás seguro que deseas bloquear a este usuario?')) {
+                        if (conversation.id) await supabaseAppDataService.blockUser?.(conversation.profile.id as string);
+                        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Usuario bloqueado' } }))
+                        window.dispatchEvent(new CustomEvent('app-reload-data'))
+                     }
+                  }}
+                  className="w-full text-left px-4 py-3 text-sm text-red-500 font-semibold hover:bg-gray-800 transition-colors"
+                >
+                  Bloquear al usuario
+                </button>
+              )}
+              <div className="h-px bg-gray-700 my-1" />
               <button 
                 onClick={async () => { 
                    setShowMenu(false); 
-                   if (conversation.id) {
-                     await supabaseAppDataService.unmatchUser?.(conversation.id, conversation.profile.id as string);
+                   if (confirm('¿Estás seguro que deseas eliminar chat?')) {
+                      if (conversation.id) await supabaseAppDataService.deleteChat?.(conversation.id);
+                      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Chat eliminado' } }))
+                      onBack();
                    }
-                   alert('Usuario bloqueado'); 
-                   onBack(); 
+                }}
+                className="w-full text-left px-4 py-3 text-sm text-gray-300 font-semibold hover:bg-gray-800 transition-colors"
+              >
+                Eliminar chat
+              </button>
+              <button 
+                onClick={async () => { 
+                   setShowMenu(false); 
+                   if (confirm('¿Estás seguro que deseas eliminar match?')) {
+                      if (conversation.id) await supabaseAppDataService.unmatchUser?.(conversation.id, conversation.profile.id as string);
+                      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Match eliminado' } }))
+                      onBack();
+                   }
                 }}
                 className="w-full text-left px-4 py-3 text-sm text-red-500 font-semibold hover:bg-gray-800 transition-colors"
               >
-                Bloquear al usuario
+                Eliminar match (Dislike)
               </button>
             </div>
           )}
@@ -137,8 +180,20 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
 
       <div className="px-4 pb-6 pt-3 flex items-center gap-3 relative" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <button 
-          onClick={() => setShowDrinkModal(true)}
-          className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-800 text-[var(--theme-color-1)] border border-[var(--theme-color-1)] hover:bg-gray-700 transition-colors flex-shrink-0"
+          onClick={() => {
+             if (conversation.blockedByMe) return;
+             if (conversation.blockedByThem) {
+                window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'No permitido', body: 'No podes enviarle un trago a este usuario' } }))
+                return;
+             }
+             setShowDrinkModal(true)
+          }}
+          disabled={conversation.blockedByMe}
+          className={`w-11 h-11 rounded-full flex items-center justify-center border transition-colors flex-shrink-0 ${
+             conversation.blockedByMe 
+             ? 'bg-gray-800 border-gray-600 text-gray-500 opacity-50 cursor-not-allowed'
+             : 'bg-gray-800 text-[var(--theme-color-1)] border-[var(--theme-color-1)] hover:bg-gray-700'
+          }`}
         >
           <GlassWaterIcon size={20} />
         </button>
@@ -146,15 +201,23 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && send()}
-          placeholder="Escribe un mensaje..."
-          className="flex-1 px-4 py-3 rounded-full text-sm font-medium text-white placeholder-white/25 outline-none"
+          onKeyDown={(e) => e.key === 'Enter' && !conversation.blockedByMe && send()}
+          disabled={conversation.blockedByMe}
+          placeholder={conversation.blockedByMe ? "Usuario bloqueado" : "Escribe un mensaje..."}
+          className={`flex-1 px-4 py-3 rounded-full text-sm font-medium outline-none ${
+             conversation.blockedByMe 
+             ? 'text-white/40 placeholder-white/20 cursor-not-allowed'
+             : 'text-white placeholder-white/25'
+          }`}
           style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.08)' }}
         />
         <button
           onClick={send}
-          className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-90 ${text.trim() ? 'gradient-brand' : ''}`}
-          style={text.trim() ? { boxShadow: '0 4px 16px color-mix(in srgb, var(--theme-color-1) 40%, transparent)' } : { background: 'rgba(255,255,255,0.07)' }}
+          disabled={conversation.blockedByMe || !text.trim()}
+          className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-90 ${
+            text.trim() && !conversation.blockedByMe ? 'gradient-brand' : ''
+          } ${conversation.blockedByMe ? 'opacity-50 cursor-not-allowed' : ''}`}
+          style={text.trim() && !conversation.blockedByMe ? { boxShadow: '0 4px 16px color-mix(in srgb, var(--theme-color-1) 40%, transparent)' } : { background: 'rgba(255,255,255,0.07)' }}
         >
           <SendIcon size={16} className="text-white" />
         </button>

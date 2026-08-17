@@ -178,8 +178,8 @@ export function DrinkModal({ partnerId, onClose }: { partnerId: string | number,
                   </button>
                   <span className="text-white font-bold w-4 text-center">{quantity}</span>
                   <button 
-                    disabled={!selectedDrink}
-                    onClick={() => setQuantity(q => q + 1)}
+                    disabled={!selectedDrink || quantity >= 10}
+                    onClick={() => setQuantity(q => q < 10 ? q + 1 : 10)}
                     className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors disabled:opacity-30"
                   >
                     +
