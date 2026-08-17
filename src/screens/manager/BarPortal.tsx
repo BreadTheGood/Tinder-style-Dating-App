@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { managerSupabase as supabase } from '../../lib/managerSupabase'
 
 export function BarPortal({ event }: { event: any }) {
@@ -6,6 +6,19 @@ export function BarPortal({ event }: { event: any }) {
   const [loading, setLoading] = useState(false)
   const [transaction, setTransaction] = useState<any>(null)
   const [errorMsg, setErrorMsg] = useState('')
+  const [transactionsList, setTransactionsList] = useState<any[]>([])
+
+  const loadTransactions = async () => {
+     const { data } = await supabase.rpc('get_event_transactions', {
+        p_event_code: event.code,
+        p_bar_password: event.bar_password
+     })
+     if (data) setTransactionsList(data)
+  }
+
+  useEffect(() => {
+     loadTransactions()
+  }, [event])
 
   const searchCode = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,6 +63,7 @@ export function BarPortal({ event }: { event: any }) {
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Trago entregado y código invalidado.' } }))
       setTransaction({ ...transaction, status: 'redeemed' })
       setCode('')
+      loadTransactions()
     }
     setLoading(false)
   }
@@ -138,6 +152,35 @@ export function BarPortal({ event }: { event: any }) {
            </div>
         </div>
       )}
+
+      <div className="mt-12">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Historial de Tragos del Evento</h2>
+        {transactionsList.length === 0 ? (
+           <div className="text-center p-8 bg-gray-50 border border-gray-200 rounded-xl text-gray-500">
+             Todavía no hay compras en este evento.
+           </div>
+        ) : (
+           <div className="grid gap-3">
+             {transactionsList.map((tx: any) => (
+                <div key={tx.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
+                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
+                     {tx.drink_icon || '🥃'}
+                   </div>
+                   <div className="flex-1">
+                      <h4 className="font-bold text-gray-800">{tx.quantity}x {tx.drink_name || 'Trago'}</h4>
+                      <p className="text-xs text-gray-500">De: {tx.buyer_name || 'Alguien'} • {new Date(tx.created_at).toLocaleTimeString()}</p>
+                   </div>
+                   <div className="text-right">
+                      {tx.status === 'redeemed' && <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded">Entregado</span>}
+                      {tx.status === 'approved' && <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">Listo para entrega</span>}
+                      {tx.status === 'pending' && <span className="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded">Pendiente</span>}
+                      <p className="text-[10px] text-gray-400 font-mono mt-1">{tx.qr_code}</p>
+                   </div>
+                </div>
+             ))}
+           </div>
+        )}
+      </div>
     </div>
   )
 }
