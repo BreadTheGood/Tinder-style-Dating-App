@@ -99,6 +99,7 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
                 onClick={() => handleAction('¿Estás seguro que deseas eliminar chat?', async () => {
                    if (conversation.id) await supabaseAppDataService.deleteChat?.(conversation.id);
                    window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Chat eliminado' } }))
+                   window.dispatchEvent(new CustomEvent('app-reload-data'))
                    onBack();
                 })}
                 className="w-full text-left px-4 py-3 text-sm text-gray-300 font-semibold hover:bg-gray-800 transition-colors"
@@ -109,6 +110,7 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
                 onClick={() => handleAction('¿Estás seguro que deseas eliminar match?', async () => {
                    if (conversation.id) await supabaseAppDataService.unmatchUser?.(conversation.id, conversation.profile.id as string);
                    window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Match eliminado' } }))
+                   window.dispatchEvent(new CustomEvent('app-reload-data'))
                    onBack();
                 })}
                 className="w-full text-left px-4 py-3 text-sm text-red-500 font-semibold hover:bg-gray-800 transition-colors"
