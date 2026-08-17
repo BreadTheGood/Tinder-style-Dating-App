@@ -12,6 +12,20 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
   const [showQR, setShowQR] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
 
+  const [confirmDialog, setConfirmDialog] = useState<{title: string, action: () => void} | null>(null)
+
+  const handleAction = (title: string, action: () => void) => {
+    setShowMenu(false)
+    setConfirmDialog({ title, action })
+  }
+
+  const confirmAction = () => {
+    if (confirmDialog) {
+       confirmDialog.action()
+       setConfirmDialog(null)
+    }
+  }
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [conversation.messages])
@@ -56,28 +70,22 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
             <div className="absolute right-0 top-full mt-2 w-48 bg-gray-900 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
               {conversation.blockedByMe ? (
                 <button 
-                  onClick={async () => { 
-                     setShowMenu(false); 
-                     if (confirm('¿Estás seguro que deseas desbloquear a este usuario?')) {
-                        if (conversation.id) await supabaseAppDataService.unblockUser?.(conversation.profile.id as string);
-                        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Usuario desbloqueado' } }))
-                        window.dispatchEvent(new CustomEvent('app-reload-data'))
-                     }
-                  }}
+                  onClick={() => handleAction('¿Estás seguro que deseas desbloquear a este usuario?', async () => {
+                     if (conversation.id) await supabaseAppDataService.unblockUser?.(conversation.profile.id as string);
+                     window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Usuario desbloqueado' } }))
+                     window.dispatchEvent(new CustomEvent('app-reload-data'))
+                  })}
                   className="w-full text-left px-4 py-3 text-sm text-green-500 font-semibold hover:bg-gray-800 transition-colors"
                 >
                   Desbloquear usuario
                 </button>
               ) : (
                 <button 
-                  onClick={async () => { 
-                     setShowMenu(false); 
-                     if (confirm('¿Estás seguro que deseas bloquear a este usuario?')) {
-                        if (conversation.id) await supabaseAppDataService.blockUser?.(conversation.profile.id as string);
-                        window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Usuario bloqueado' } }))
-                        window.dispatchEvent(new CustomEvent('app-reload-data'))
-                     }
-                  }}
+                  onClick={() => handleAction('¿Estás seguro que deseas bloquear a este usuario?', async () => {
+                     if (conversation.id) await supabaseAppDataService.blockUser?.(conversation.profile.id as string);
+                     window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Usuario bloqueado' } }))
+                     window.dispatchEvent(new CustomEvent('app-reload-data'))
+                  })}
                   className="w-full text-left px-4 py-3 text-sm text-red-500 font-semibold hover:bg-gray-800 transition-colors"
                 >
                   Bloquear al usuario
@@ -85,27 +93,21 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
               )}
               <div className="h-px bg-gray-700 my-1" />
               <button 
-                onClick={async () => { 
-                   setShowMenu(false); 
-                   if (confirm('¿Estás seguro que deseas eliminar chat?')) {
-                      if (conversation.id) await supabaseAppDataService.deleteChat?.(conversation.id);
-                      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Chat eliminado' } }))
-                      onBack();
-                   }
-                }}
+                onClick={() => handleAction('¿Estás seguro que deseas eliminar chat?', async () => {
+                   if (conversation.id) await supabaseAppDataService.deleteChat?.(conversation.id);
+                   window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Chat eliminado' } }))
+                   onBack();
+                })}
                 className="w-full text-left px-4 py-3 text-sm text-gray-300 font-semibold hover:bg-gray-800 transition-colors"
               >
                 Eliminar chat
               </button>
               <button 
-                onClick={async () => { 
-                   setShowMenu(false); 
-                   if (confirm('¿Estás seguro que deseas eliminar match?')) {
-                      if (conversation.id) await supabaseAppDataService.unmatchUser?.(conversation.id, conversation.profile.id as string);
-                      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Match eliminado' } }))
-                      onBack();
-                   }
-                }}
+                onClick={() => handleAction('¿Estás seguro que deseas eliminar match?', async () => {
+                   if (conversation.id) await supabaseAppDataService.unmatchUser?.(conversation.id, conversation.profile.id as string);
+                   window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Acción confirmada', body: 'Match eliminado' } }))
+                   onBack();
+                })}
                 className="w-full text-left px-4 py-3 text-sm text-red-500 font-semibold hover:bg-gray-800 transition-colors"
               >
                 Eliminar match (Dislike)
@@ -201,11 +203,11 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !conversation.blockedByMe && send()}
-          disabled={conversation.blockedByMe}
-          placeholder={conversation.blockedByMe ? "Usuario bloqueado" : "Escribe un mensaje..."}
+          onKeyDown={(e) => e.key === 'Enter' && !conversation.blockedByMe && !conversation.blockedByThem && send()}
+          disabled={conversation.blockedByMe || conversation.blockedByThem}
+          placeholder={conversation.blockedByMe ? "Usuario bloqueado" : conversation.blockedByThem ? "No puedes responder a esta conversación" : "Escribe un mensaje..."}
           className={`flex-1 px-4 py-3 rounded-full text-sm font-medium outline-none ${
-             conversation.blockedByMe 
+             conversation.blockedByMe || conversation.blockedByThem
              ? 'text-white/40 placeholder-white/20 cursor-not-allowed'
              : 'text-white placeholder-white/25'
           }`}
@@ -213,11 +215,11 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
         />
         <button
           onClick={send}
-          disabled={conversation.blockedByMe || !text.trim()}
+          disabled={conversation.blockedByMe || conversation.blockedByThem || !text.trim()}
           className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-90 ${
-            text.trim() && !conversation.blockedByMe ? 'gradient-brand' : ''
-          } ${conversation.blockedByMe ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={text.trim() && !conversation.blockedByMe ? { boxShadow: '0 4px 16px color-mix(in srgb, var(--theme-color-1) 40%, transparent)' } : { background: 'rgba(255,255,255,0.07)' }}
+            text.trim() && !conversation.blockedByMe && !conversation.blockedByThem ? 'gradient-brand' : ''
+          } ${conversation.blockedByMe || conversation.blockedByThem ? 'opacity-50 cursor-not-allowed' : ''}`}
+          style={text.trim() && !conversation.blockedByMe && !conversation.blockedByThem ? { boxShadow: '0 4px 16px color-mix(in srgb, var(--theme-color-1) 40%, transparent)' } : { background: 'rgba(255,255,255,0.07)' }}
         >
           <SendIcon size={16} className="text-white" />
         </button>
@@ -249,6 +251,28 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
               <p className="text-lg font-mono font-bold text-gray-800 tracking-widest bg-gray-100 px-6 py-3 rounded-xl border border-gray-200">
                  {showQR}
               </p>
+           </div>
+        </div>
+      )}
+
+      {confirmDialog && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+           <div className="bg-gray-900 border border-gray-700 rounded-3xl w-full max-w-xs p-6 flex flex-col items-center text-center shadow-2xl animate-scale-up">
+              <h3 className="text-lg font-bold text-white mb-6">{confirmDialog.title}</h3>
+              <div className="flex w-full gap-3">
+                 <button 
+                    onClick={() => setConfirmDialog(null)}
+                    className="flex-1 py-3 rounded-xl bg-gray-800 text-white font-semibold hover:bg-gray-700 transition-colors"
+                 >
+                    Cancelar
+                 </button>
+                 <button 
+                    onClick={confirmAction}
+                    className="flex-1 py-3 rounded-xl bg-[var(--theme-color-1)] text-white font-bold transition-colors shadow-lg shadow-[var(--theme-color-1)]/20"
+                 >
+                    Confirmar
+                 </button>
+              </div>
            </div>
         </div>
       )}

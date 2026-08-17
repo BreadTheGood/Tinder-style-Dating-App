@@ -257,12 +257,14 @@ export default function App() {
            setConversations(prev => {
              const newConvs = prev.filter(c => c.id !== deletedMatch.id)
              if (newConvs.length !== prev.length) {
-                // Return to messages list if currently chatting with the deleted match
                 window.dispatchEvent(new CustomEvent('app-match-deleted', { detail: { matchId: deletedMatch.id } }))
              }
              return newConvs
            })
         }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Blocks' }, () => {
+        window.dispatchEvent(new CustomEvent('app-reload-data'))
       })
       .subscribe()
 
