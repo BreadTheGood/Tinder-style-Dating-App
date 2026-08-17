@@ -8,6 +8,7 @@ export function BarApp() {
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [eventData, setEventData] = useState<any>(null)
+  const [isInitializing, setIsInitializing] = useState(true)
 
   useEffect(() => {
     const sessionStr = localStorage.getItem('bar_session')
@@ -23,6 +24,7 @@ export function BarApp() {
         localStorage.removeItem('bar_session')
       }
     }
+    setIsInitializing(false)
   }, [])
 
   useEffect(() => {
@@ -84,6 +86,10 @@ export function BarApp() {
      setCode('')
      setPassword('')
      localStorage.removeItem('bar_session')
+  }
+
+  if (isInitializing) {
+     return <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 text-white font-bold">Cargando barra...</div>
   }
 
   if (eventData) {
