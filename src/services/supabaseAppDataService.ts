@@ -5,30 +5,37 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   async cleanupExpiredInteractions(myProfileId: string) {
     const { data: myEvents } = await supabase
       .from('ProfileEvents')
-      .select('event_id, Events(end_datetime, is_suspended)')
+      .select('event_id')
       .eq('profile_id', myProfileId);
     
-    if (!myEvents) return;
-
-    const activeEventIds = myEvents
-      .filter((e: any) => {
-         let ev = e.Events;
-         if (Array.isArray(ev)) ev = ev[0];
-         if (!ev || ev.is_suspended) return false;
-         if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
-         return true;
-      })
-      .map((e: any) => e.event_id);
-
     let validPartnerIds = new Set<string>();
-    if (activeEventIds.length > 0) {
-      const { data: partnerEvents } = await supabase
-        .from('ProfileEvents')
-        .select('profile_id')
-        .in('event_id', activeEventIds);
+    if (myEvents && myEvents.length > 0) {
+      const eventIds = myEvents.map((e: any) => e.event_id);
       
-      if (partnerEvents) {
-        partnerEvents.forEach((pe: any) => validPartnerIds.add(String(pe.profile_id)));
+      const { data: activeEvents } = await supabase
+         .from('Events')
+         .select('id, end_datetime, is_suspended')
+         .in('id', eventIds);
+
+      if (activeEvents && activeEvents.length > 0) {
+         const activeEventIds = activeEvents
+            .filter((ev: any) => {
+               if (ev.is_suspended) return false;
+               if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
+               return true;
+            })
+            .map((ev: any) => ev.id);
+
+         if (activeEventIds.length > 0) {
+            const { data: partnerEvents } = await supabase
+              .from('ProfileEvents')
+              .select('profile_id')
+              .in('event_id', activeEventIds);
+            
+            if (partnerEvents) {
+              partnerEvents.forEach((pe: any) => validPartnerIds.add(String(pe.profile_id)));
+            }
+         }
       }
     }
 
@@ -110,30 +117,38 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
           // EVENT VISIBILITY LOGIC: Filter by shared active events
           const { data: myEvents } = await supabase
             .from('ProfileEvents')
-            .select('event_id, Events(end_datetime, is_suspended)')
+            .select('event_id')
             .eq('profile_id', myProfile.id);
           
           let validPartnerIds = new Set<string>();
-          if (myEvents) {
-            const activeEventIds = myEvents
-              .filter((e: any) => {
-                 let ev = e.Events;
-                 if (Array.isArray(ev)) ev = ev[0];
-                 if (!ev || ev.is_suspended) return false;
-                 if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
-                 return true;
-              })
-              .map((e: any) => e.event_id);
+          if (myEvents && myEvents.length > 0) {
+            const eventIds = myEvents.map((e: any) => e.event_id);
+            
+            // Validate which of these events are active
+            const { data: activeEvents } = await supabase
+               .from('Events')
+               .select('id, end_datetime, is_suspended')
+               .in('id', eventIds);
 
-            if (activeEventIds.length > 0) {
-              const { data: partnerEvents } = await supabase
-                .from('ProfileEvents')
-                .select('profile_id')
-                .in('event_id', activeEventIds);
-              
-              if (partnerEvents) {
-                partnerEvents.forEach((pe: any) => validPartnerIds.add(String(pe.profile_id)));
-              }
+            if (activeEvents && activeEvents.length > 0) {
+               const activeEventIds = activeEvents
+                  .filter((ev: any) => {
+                     if (ev.is_suspended) return false;
+                     if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
+                     return true;
+                  })
+                  .map((ev: any) => ev.id);
+               
+               if (activeEventIds.length > 0) {
+                 const { data: partnerEvents } = await supabase
+                   .from('ProfileEvents')
+                   .select('profile_id')
+                   .in('event_id', activeEventIds);
+                 
+                 if (partnerEvents) {
+                   partnerEvents.forEach((pe: any) => validPartnerIds.add(String(pe.profile_id)));
+                 }
+               }
             }
           }
 
