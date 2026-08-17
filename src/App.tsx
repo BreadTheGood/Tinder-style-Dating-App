@@ -199,18 +199,27 @@ export default function App() {
         const match = payload.new
         if (match.profile1_id === currentUser.id || match.profile2_id === currentUser.id) {
           const otherId = match.profile1_id === currentUser.id ? match.profile2_id : match.profile1_id
-          const { data: otherProfile } = await supabase.from('Profiles').select('*').eq('id', otherId).single()
+          const { data: otherProfile } = await supabase.from('Profiles').select('*, Photos(*)').eq('id', otherId).single()
           
           if (otherProfile) {
+            const photos = otherProfile.Photos ? otherProfile.Photos.sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0)) : []
+            const images = photos.map((img: any) => img.photo_url)
+
+            let age = 25
+            if (otherProfile.birthdate) {
+               const diff = Date.now() - new Date(otherProfile.birthdate).getTime()
+               age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25))
+            }
+
             const mappedProfile: Profile = {
               id: otherProfile.id,
               name: otherProfile.name || 'Usuario',
-              age: otherProfile.age || 0,
+              age: age,
               bio: otherProfile.bio || '',
               distance: 'Cerca',
               job: '',
-              image: otherProfile.images?.[0] || 'https://placehold.co/600x700?text=Sin+Foto',
-              images: otherProfile.images || [],
+              image: images.length > 0 ? images[0] : 'https://placehold.co/600x700?text=Sin+Foto',
+              images: images,
               tags: otherProfile.tags || []
             }
             

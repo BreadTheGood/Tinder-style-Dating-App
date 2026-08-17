@@ -55,7 +55,12 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
           {showMenu && (
             <div className="absolute right-0 top-full mt-2 w-48 bg-gray-900 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
               <button 
-                onClick={() => { setShowMenu(false); alert('Usuario bloqueado'); onBack(); }}
+                onClick={async () => { 
+                   setShowMenu(false); 
+                   await supabaseAppDataService.unmatchUser(conversation.id, conversation.profile.id);
+                   alert('Usuario bloqueado'); 
+                   onBack(); 
+                }}
                 className="w-full text-left px-4 py-3 text-sm text-red-500 font-semibold hover:bg-gray-800 transition-colors"
               >
                 Bloquear al usuario
@@ -108,13 +113,15 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
                 {isDrink ? (
                    <div>
                       <p className="font-bold">{drinkTitle}</p>
-                      <button 
-                        onClick={() => setShowQR(codeMatch[1])}
-                        className={`w-full mt-2 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1 ${m.from === 'me' ? 'bg-white/20 hover:bg-white/30' : 'bg-black/20 hover:bg-black/30'}`}
-                      >
-                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                         Presiona para mostrar el QR
-                      </button>
+                      {m.from !== 'me' && (
+                         <button 
+                           onClick={() => setShowQR(codeMatch[1])}
+                           className="w-full mt-2 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1 bg-black/20 hover:bg-black/30"
+                         >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                            Presiona para mostrar el QR
+                         </button>
+                      )}
                    </div>
                 ) : (
                    m.text

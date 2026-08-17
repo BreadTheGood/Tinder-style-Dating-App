@@ -21,14 +21,14 @@ export function MatchModal({ profile, currentUser, onClose, onMessage }: { profi
           </p>
 
           <div className="flex items-center justify-center gap-4 mb-8">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 shadow-xl">
-              <img src={currentUser?.images?.[0] || 'https://placehold.co/200?text=Tu'} alt="Tú" className="w-full h-full object-cover" />
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 shadow-xl bg-gray-900">
+              <img src={currentUser?.images?.[0] || 'https://placehold.co/200?text=Tu'} alt="Tú" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = 'https://placehold.co/200?text=Tu' }} />
             </div>
             <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-lg">
               <HeartIcon filled size={14} className="text-white" />
             </div>
-            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[var(--theme-color-1)]/50 shadow-xl" style={{ boxShadow: '0 0 24px rgba(255,62,108,0.4)' }}>
-              <img src={profile.image} alt={profile.name} className="w-full h-full object-cover" />
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[var(--theme-color-1)]/50 shadow-xl bg-gray-900" style={{ boxShadow: '0 0 24px rgba(255,62,108,0.4)' }}>
+              <img src={profile.image || profile.images?.[0] || 'https://placehold.co/200?text=Match'} alt={profile.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = 'https://placehold.co/200?text=Match' }} />
             </div>
           </div>
 
