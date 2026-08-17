@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { managerSupabase as supabase } from '../../lib/managerSupabase'
 import { TicketManager } from './TicketManager'
+import { DrinkManager } from './DrinkManager'
 
 export function ManagerDashboard({ manager }: { manager: any }) {
   const isAdmin = manager.role === 'system_admin'
   const isActive = manager.is_active
 
-  const [activeTab, setActiveTab] = useState<'events' | 'managers'>('events')
+  const [activeTab, setActiveTab] = useState<'events' | 'managers' | 'settings'>('events')
   const [managersList, setManagersList] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [newEmail, setNewEmail] = useState('')
@@ -25,6 +26,10 @@ export function ManagerDashboard({ manager }: { manager: any }) {
   const [savingEvent, setSavingEvent] = useState(false)
   const [eventFilter, setEventFilter] = useState<'all' | 'active' | 'finished' | 'suspended'>('all')
   const [managingTicketsFor, setManagingTicketsFor] = useState<any | null>(null)
+  const [managingDrinksFor, setManagingDrinksFor] = useState<any | null>(null)
+
+  const [mpToken, setMpToken] = useState(manager.mp_access_token || '')
+  const [savingSettings, setSavingSettings] = useState(false)
 
   useEffect(() => {
     if (activeTab === 'managers' && isAdmin) {
@@ -159,6 +164,18 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     loadEvents()
   }
 
+  const saveSettings = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSavingSettings(true)
+    const { error } = await supabase.from('Managers').update({ mp_access_token: mpToken }).eq('id', manager.id)
+    setSavingSettings(false)
+    if (error) {
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: error.message } }))
+    } else {
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Configuración guardada.' } }))
+    }
+  }
+
   const deleteEvent = async (eventId: string) => {
     // Eliminar relaciones de ProfileEvents primero
     await supabase.from('ProfileEvents').delete().eq('event_id', eventId)
@@ -290,6 +307,12 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                 Managers
               </button>
             )}
+            <button 
+              onClick={() => setActiveTab('settings')} 
+              className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'settings' ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800'}`}
+            >
+              Configuración
+            </button>
          </nav>
 
          <div className="pt-6 border-t border-gray-800 mt-auto">
@@ -310,7 +333,10 @@ export function ManagerDashboard({ manager }: { manager: any }) {
          {activeTab === 'events' && managingTicketsFor && (
            <TicketManager event={managingTicketsFor} onBack={() => setManagingTicketsFor(null)} />
          )}
-         {activeTab === 'events' && !managingTicketsFor && (
+         {activeTab === 'events' && managingDrinksFor && (
+           <DrinkManager event={managingDrinksFor} onBack={() => setManagingDrinksFor(null)} />
+         )}
+         {activeTab === 'events' && !managingTicketsFor && !managingDrinksFor && (
            <>
              <div className="flex justify-between items-center mb-6">
                 <div>
@@ -468,6 +494,13 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                             Tickets
                           </button>
                           <button 
+                            onClick={() => setManagingDrinksFor(e)}
+                            className="mr-auto px-3 py-1.5 bg-[var(--theme-color-1)]/10 hover:bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                          >
+                            <span>🍹</span>
+                            Tragos
+                          </button>
+                          <button 
                             onClick={() => startEditEvent(e)}
                             className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-lg transition-colors"
                           >
@@ -574,8 +607,46 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                       ))}
                    </tbody>
                 </table>
-             </div>
-           </>
+              </div>
+            </>
+         )}
+
+         {activeTab === 'settings' && (
+           <div className="max-w-2xl mx-auto">
+             <h1 className="text-3xl font-bold text-gray-800 mb-2">Configuración</h1>
+             <p className="text-gray-500 mb-8">Administra tus credenciales y configuración general.</p>
+
+             <form onSubmit={saveSettings} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+               <h2 className="text-xl font-bold text-gray-800 mb-4">Mercado Pago</h2>
+               <p className="text-sm text-gray-500 mb-6">
+                 Ingresa tu Access Token de producción (o de prueba) para recibir directamente el dinero de las ventas de la barra en tu cuenta de Mercado Pago.
+               </p>
+
+               <div className="mb-6">
+                 <label className="block text-sm font-bold text-gray-700 mb-2">Access Token</label>
+                 <input
+                   type="password"
+                   value={mpToken}
+                   onChange={e => setMpToken(e.target.value)}
+                   className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-800 outline-none focus:border-[var(--theme-color-1)]"
+                   placeholder="APP_USR-..."
+                 />
+                 <p className="text-xs text-gray-400 mt-2">
+                   Puedes obtenerlo desde tu cuenta de desarrollador en Mercado Pago.
+                 </p>
+               </div>
+
+               <div className="flex justify-end">
+                 <button 
+                   type="submit"
+                   disabled={savingSettings}
+                   className="bg-[var(--theme-color-1)] text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-all disabled:opacity-50"
+                 >
+                   {savingSettings ? 'Guardando...' : 'Guardar Cambios'}
+                 </button>
+               </div>
+             </form>
+           </div>
          )}
       </div>
     </div>
