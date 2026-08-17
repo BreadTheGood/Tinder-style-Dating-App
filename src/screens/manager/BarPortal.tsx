@@ -138,7 +138,7 @@ export function BarPortal({ event }: { event: any }) {
          </div>
       )}
 
-      <form onSubmit={searchCode} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-6 flex gap-4">
+      <form onSubmit={searchCode} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-6 flex flex-col sm:flex-row gap-4">
          <input 
             type="text"
             value={code}
@@ -226,19 +226,23 @@ export function BarPortal({ event }: { event: any }) {
         ) : (
            <div className="grid gap-3">
              {transactionsList.map((tx: any) => (
-                <div key={tx.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
-                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
-                     {tx.drink_icon || '🥃'}
+                <div key={tx.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                   <div className="flex items-center gap-4 flex-1">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
+                        {tx.drink_icon || ''}
+                      </div>
+                      <div>
+                         <h4 className="font-bold text-gray-800">{tx.quantity}x {tx.drink_name || 'Trago'}</h4>
+                         <p className="text-xs text-gray-500">De: {tx.buyer_name || 'Alguien'} • {new Date(tx.created_at).toLocaleTimeString()}</p>
+                      </div>
                    </div>
-                   <div className="flex-1">
-                      <h4 className="font-bold text-gray-800">{tx.quantity}x {tx.drink_name || 'Trago'}</h4>
-                      <p className="text-xs text-gray-500">De: {tx.buyer_name || 'Alguien'} • {new Date(tx.created_at).toLocaleTimeString()}</p>
-                   </div>
-                   <div className="text-right">
-                      {tx.status === 'redeemed' && <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded">Entregado</span>}
-                      {tx.status === 'approved' && <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">Listo para entrega</span>}
-                      {tx.status === 'pending' && <span className="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded">Pendiente</span>}
-                      <p className="text-[10px] text-gray-400 font-mono mt-1">{tx.qr_code}</p>
+                   <div className="flex items-center sm:items-end justify-between sm:flex-col mt-2 sm:mt-0">
+                      <div>
+                         {tx.status === 'redeemed' && <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded">Entregado</span>}
+                         {tx.status === 'approved' && <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">Listo para entrega</span>}
+                         {tx.status === 'pending' && <span className="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded">Pendiente</span>}
+                      </div>
+                      <p className="text-[10px] text-gray-400 font-mono mt-1 text-right">{tx.qr_code}</p>
                    </div>
                 </div>
              ))}
