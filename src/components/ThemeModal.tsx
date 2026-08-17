@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { XIcon, HeartIcon } from './icons'
 
 const THEMES = [
-  { id: 'original', name: 'Original (Fucsia a Naranja)', bg: 'linear-gradient(135deg, #f304eb 0%, #ff7043 100%)' },
+  { id: 'original', name: 'Original', bg: 'linear-gradient(135deg, #f304eb 0%, #ff7043 100%)' },
   { id: 'warm-blue', name: 'Azul Profundo', bg: 'linear-gradient(135deg, #00d4ff 0%, #0088ff 20%, #0055ff 40%, #0033cc 60%, #001188 80%, #000044 100%)' },
-  { id: 'warm-fuchsia', name: 'Fucsia Profundo (Actual)', bg: 'linear-gradient(135deg, #ff2a85 0%, #ff00aa 20%, #f304eb 40%, #cc00b8 60%, #990088 80%, #5e0053 100%)' },
+  { id: 'warm-fuchsia', name: 'Fucsia Profundo', bg: 'linear-gradient(135deg, #ff2a85 0%, #ff00aa 20%, #f304eb 40%, #cc00b8 60%, #990088 80%, #5e0053 100%)' },
   { id: 'neon-night', name: 'Cian Profundo', bg: 'linear-gradient(135deg, #aaffff 0%, #00ffff 20%, #00cccc 40%, #008888 60%, #004444 80%, #001111 100%)' },
   { id: 'acid-party', name: 'Lima Profunda', bg: 'linear-gradient(135deg, #ccff00 0%, #99e600 20%, #66cc00 40%, #339900 60%, #116600 80%, #003300 100%)' },
   { id: 'ultraviolet-fire', name: 'Violeta Profundo', bg: 'linear-gradient(135deg, #d400ff 0%, #aa00ff 20%, #8800ff 40%, #5500cc 60%, #330088 80%, #110033 100%)' }
