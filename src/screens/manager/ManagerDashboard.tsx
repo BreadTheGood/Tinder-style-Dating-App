@@ -420,13 +420,40 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                         </div>
                      </div>
                      <p className="text-xs text-gray-400 mt-1">Por defecto, el evento durará 12 horas a partir de la fecha y hora seleccionadas.</p>
-                     <div className="pt-2 flex justify-end gap-3">
-                        <button type="button" onClick={resetEventForm} className="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-bold hover:bg-gray-300 transition-colors">
-                           Cancelar
-                        </button>
-                        <button type="submit" disabled={savingEvent} className="bg-gray-900 text-white px-8 py-2.5 rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50">
-                           {savingEvent ? 'Guardando...' : editingEventId ? 'Guardar Cambios' : 'Guardar Evento'}
-                        </button>
+                     <div className="pt-2 flex justify-between gap-3">
+                        {editingEventId ? (
+                           <div className="flex gap-2">
+                              <button 
+                                type="button"
+                                onClick={() => {
+                                  const ev = eventsList.find(e => e.id === editingEventId)
+                                  if (ev) toggleSuspendEvent(ev)
+                                }}
+                                className={`px-4 py-2.5 rounded-lg font-bold transition-colors text-sm ${
+                                  eventsList.find(e => e.id === editingEventId)?.status === 'suspendido' 
+                                  ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                                  : 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                                }`}
+                              >
+                                {eventsList.find(e => e.id === editingEventId)?.status === 'suspendido' ? 'Reanudar Evento' : 'Suspender Evento'}
+                              </button>
+                              <button 
+                                type="button"
+                                onClick={() => deleteEvent(editingEventId)}
+                                className="px-4 py-2.5 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg font-bold transition-colors text-sm"
+                              >
+                                Eliminar Evento
+                              </button>
+                           </div>
+                        ) : <div />}
+                        <div className="flex gap-2">
+                           <button type="button" onClick={resetEventForm} className="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-bold hover:bg-gray-300 transition-colors">
+                              Cancelar
+                           </button>
+                           <button type="submit" disabled={savingEvent} className="bg-gray-900 text-white px-8 py-2.5 rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50">
+                              {savingEvent ? 'Guardando...' : editingEventId ? 'Guardar Cambios' : 'Guardar Evento'}
+                           </button>
+                        </div>
                      </div>
                   </form>
                </div>
@@ -505,20 +532,6 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                             className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-lg transition-colors"
                           >
                             Editar
-                          </button>
-                          <button 
-                            onClick={() => toggleSuspendEvent(e)}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${
-                              isSuspended ? 'bg-green-100 hover:bg-green-200 text-green-700' : 'bg-amber-100 hover:bg-amber-200 text-amber-700'
-                            }`}
-                          >
-                            {isSuspended ? 'Reanudar' : 'Suspender'}
-                          </button>
-                          <button 
-                            onClick={() => deleteEvent(e.id)}
-                            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-600 text-xs font-bold rounded-lg transition-colors"
-                          >
-                            Eliminar
                           </button>
                        </div>
                      </div>
