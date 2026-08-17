@@ -52,43 +52,43 @@ export function AnalyticsDashboard({ eventId, onBack }: { eventId: string, onBac
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xl" title="Cantidad de personas que se han unido al evento">
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 overflow-hidden">
+          <div className="w-12 h-12 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xl" title="Cantidad de personas que se han unido al evento">
             👥
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500" title="Cantidad de perfiles distintos registrados en los eventos">Asistentes únicos</p>
-            <p className="text-2xl font-bold text-gray-900">{summary.total_attendees || 0}</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-gray-500 truncate" title="Cantidad de perfiles distintos registrados en los eventos">Asistentes únicos</p>
+            <p className="text-2xl font-bold text-gray-900 truncate">{summary.total_attendees || 0}</p>
           </div>
         </div>
         
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-2xl" title="Cantidad total de tragos regalados a través de la app">
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 overflow-hidden">
+          <div className="w-12 h-12 flex-shrink-0 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-2xl" title="Cantidad total de tragos regalados a través de la app">
             🍹
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Tragos Invitados</p>
-            <p className="text-2xl font-bold text-gray-900">{summary.total_drinks_sold || 0}</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-gray-500 truncate">Tragos Invitados</p>
+            <p className="text-2xl font-bold text-gray-900 truncate">{summary.total_drinks_sold || 0}</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-2xl" title="Ganancia bruta generada por las ventas">
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 overflow-hidden">
+          <div className="w-12 h-12 flex-shrink-0 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-2xl" title="Ganancia bruta generada por las ventas">
             💰
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Ingresos Totales</p>
-            <p className="text-2xl font-bold text-gray-900">${summary.total_revenue || 0}</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-gray-500 truncate">Ingresos Totales</p>
+            <p className="text-2xl font-bold text-gray-900 truncate">${summary.total_revenue || 0}</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-2xl" title="Cantidad de pagos procesados y aprobados">
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 overflow-hidden">
+          <div className="w-12 h-12 flex-shrink-0 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-2xl" title="Cantidad de pagos procesados y aprobados">
             📈
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Ventas</p>
-            <p className="text-2xl font-bold text-gray-900">{summary.total_transactions || 0}</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-gray-500 truncate">Ventas</p>
+            <p className="text-2xl font-bold text-gray-900 truncate">{summary.total_transactions || 0}</p>
           </div>
         </div>
       </div>
@@ -109,17 +109,17 @@ export function AnalyticsDashboard({ eventId, onBack }: { eventId: string, onBac
           ) : (
             <div className="space-y-3">
               {top_spenders.map((s: any, i: number) => (
-                <div key={s.profile_id} className="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[var(--theme-color-1)]/10 text-[var(--theme-color-1)] rounded-full flex items-center justify-center font-bold text-sm">
+                <div key={s.profile_id} className="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-100 gap-2">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-8 h-8 flex-shrink-0 bg-[var(--theme-color-1)]/10 text-[var(--theme-color-1)] rounded-full flex items-center justify-center font-bold text-sm">
                       {i + 1}
                     </div>
-                    <div>
-                      <p className="font-bold text-gray-900">{s.user_name}</p>
-                      <p className="text-xs text-gray-500">{s.total_drinks_bought} tragos ({s.purchase_count} compras)</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-gray-900 truncate">{s.user_name}</p>
+                      <p className="text-xs text-gray-500 truncate">{s.total_drinks_bought} tragos ({s.purchase_count} compras)</p>
                     </div>
                   </div>
-                  <div className="font-bold text-green-600">${s.total_spent}</div>
+                  <div className="font-bold text-green-600 whitespace-nowrap flex-shrink-0">${s.total_spent}</div>
                 </div>
               ))}
             </div>
@@ -141,14 +141,14 @@ export function AnalyticsDashboard({ eventId, onBack }: { eventId: string, onBac
           ) : (
             <div className="space-y-3">
               {top_receivers.map((r: any, i: number) => (
-                <div key={r.profile_id} className="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm">
+                <div key={r.profile_id} className="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-100 gap-2">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-8 h-8 flex-shrink-0 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm">
                       {i + 1}
                     </div>
-                    <p className="font-bold text-gray-900">{r.user_name}</p>
+                    <p className="font-bold text-gray-900 truncate min-w-0 flex-1">{r.user_name}</p>
                   </div>
-                  <div className="font-bold text-purple-600">{r.total_drinks_received} recibidos</div>
+                  <div className="font-bold text-purple-600 whitespace-nowrap flex-shrink-0">{r.total_drinks_received} recibidos</div>
                 </div>
               ))}
             </div>
@@ -170,18 +170,18 @@ export function AnalyticsDashboard({ eventId, onBack }: { eventId: string, onBac
           ) : (
             <div className="space-y-3">
               {top_drinks.map((d: any, i: number) => (
-                <div key={d.drink_name} className="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold text-sm">
+                <div key={d.drink_name} className="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-100 gap-2">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-8 h-8 flex-shrink-0 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold text-sm">
                       {i + 1}
                     </div>
-                    <div>
-                      <p className="font-bold text-gray-900">{d.drink_name}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-gray-900 truncate">{d.drink_name}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{d.drink_icon}</span>
-                    <div className="font-bold text-orange-600">{d.total_sold}</div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-xl flex-shrink-0">{d.drink_icon}</span>
+                    <div className="font-bold text-orange-600 whitespace-nowrap">{d.total_sold}</div>
                   </div>
                 </div>
               ))}
