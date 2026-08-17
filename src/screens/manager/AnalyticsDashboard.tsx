@@ -161,7 +161,7 @@ export function AnalyticsDashboard({ eventId, onBack }: { eventId: string, onBac
           
           {leastSoldDrink && (
             <div className="mb-4 p-3 bg-orange-50 border border-orange-100 rounded-lg text-xs text-orange-800">
-              <strong>Tip:</strong> Para aumentar tus ganancias, podrías poner una oferta de 2x1 en <strong>{leastSoldDrink.drink_name}</strong>, ya que es el menos vendido.
+              <strong>Tip:</strong> Para aumentar tus ventas, podrías lanzar una oferta o promoción especial para <strong>{leastSoldDrink.drink_name}</strong>, ya que es el menos vendido.
             </div>
           )}
 
