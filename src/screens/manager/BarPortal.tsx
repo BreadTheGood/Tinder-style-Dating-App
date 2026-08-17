@@ -233,7 +233,10 @@ export function BarPortal({ event }: { event: any }) {
                       </div>
                       <div>
                          <h4 className="font-bold text-gray-800">{tx.quantity}x {tx.drink_name || 'Trago'}</h4>
-                         <p className="text-xs text-gray-500">De: {tx.buyer_name || 'Alguien'} • {new Date(tx.created_at).toLocaleTimeString()}</p>
+                         <p className="text-xs text-gray-500">
+                           De: {tx.buyer_name || 'Alguien'} • {new Date(tx.created_at).toLocaleTimeString()}
+                           {tx.mp_payment_id && <span className="text-gray-400 font-mono ml-1">• MP: {tx.mp_payment_id}</span>}
+                         </p>
                       </div>
                    </div>
                    <div className="flex items-center sm:items-end justify-between sm:flex-col mt-2 sm:mt-0">
