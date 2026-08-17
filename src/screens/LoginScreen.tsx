@@ -392,18 +392,18 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
           )}
         </div>
 
-        <p className="text-center text-xs text-white/20 mt-6 pb-2 leading-relaxed">
+        <div className="text-center text-xs text-white/20 mt-8 leading-relaxed">
           Al continuar, aceptas nuestros{' '}
-          <button onClick={() => setShowLegalModal('terms')} className="text-[var(--theme-color-1)] font-semibold hover:underline">Términos de uso</button>{' '}
+          <button type="button" onClick={() => setShowLegalModal('terms')} className="text-[var(--theme-color-1)] font-semibold hover:underline cursor-pointer relative z-20">Términos de uso</button>{' '}
           y{' '}
-          <button onClick={() => setShowLegalModal('privacy')} className="text-[var(--theme-color-1)] font-semibold hover:underline">Política de privacidad</button>
-        </p>
+          <button type="button" onClick={() => setShowLegalModal('privacy')} className="text-[var(--theme-color-1)] font-semibold hover:underline cursor-pointer relative z-20">Política de privacidad</button>
+        </div>
 
-        <p className="text-center text-xs text-white/40 pb-8 leading-relaxed font-medium">
-          <a href="mailto:contacto@gira.app" className="text-[var(--theme-color-1)] font-bold hover:underline">
+        <div className="text-center text-xs text-white/40 mt-6 pb-8 leading-relaxed font-medium">
+          <a href="mailto:contacto@gira.app" className="text-[var(--theme-color-1)] font-bold hover:underline cursor-pointer relative z-20">
             Contactanos
           </a>
-        </p>
+        </div>
       </div>
 
       {/* Flotante (Modal) para ingresar Contraseña al usar Código */}
