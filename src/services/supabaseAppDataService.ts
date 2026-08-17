@@ -216,6 +216,9 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
 
     const { data: blocks } = await supabase.from('Blocks').select('*').or(`blocker_id.eq.${myProfile.id},blocked_id.eq.${myProfile.id}`)
     const myBlocks = blocks || []
+    
+    const { data: deletedChats } = await supabase.from('DeletedChats').select('*').eq('profile_id', myProfile.id)
+    const myDeletedChats = deletedChats || []
 
     const conversations = []
     for (const match of matches) {
@@ -263,6 +266,17 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
       if (blockedByMe && myBlock) {
          const blockTime = new Date(myBlock.created_at).getTime()
          messages = messages.filter(m => m.from === 'me' || new Date(m.createdAt).getTime() < blockTime)
+      }
+
+      const myDeleted = myDeletedChats.find(d => d.match_id === match.id)
+      if (myDeleted) {
+         const deleteTime = new Date(myDeleted.deleted_at).getTime()
+         messages = messages.filter(m => new Date(m.createdAt).getTime() > deleteTime)
+      }
+
+      // If the chat was explicitly deleted and there are no new messages, hide it from the list
+      if (myDeleted && messages.length === 0) {
+         continue;
       }
 
       conversations.push({

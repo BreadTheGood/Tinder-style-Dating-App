@@ -293,37 +293,47 @@ export default function App() {
         
         if (newMessage.sender_id === currentUser.id) return
 
-        setConversations(prev => prev.map(conv => {
-          if (conv.id === newMessage.match_id) {
-            if (conv.blockedByMe) return conv;
-            const msg: Message = {
-              id: newMessage.id,
-              text: newMessage.content,
-              from: 'them',
-              time: new Date(newMessage.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            }
-            if (!conv.messages.find(m => m.id === msg.id)) {
-               const isUserInThisChat = activeChatIdRef.current === conv.id
-               
-               if (msg.text.includes('DRINK-')) {
-                  audio.playDrink()
-               } else {
-                  audio.playReceive()
-               }
+        setConversations(prev => {
+          const updated = prev.map(conv => {
+            if (conv.id === newMessage.match_id) {
+              if (conv.blockedByMe) return conv;
+              const msg: Message = {
+                id: newMessage.id,
+                text: newMessage.content,
+                from: 'them',
+                time: new Date(newMessage.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              }
+              
+              // Only append if it doesn't already exist
+              if (!conv.messages.find(m => m.id === msg.id)) {
+                 const isUserInThisChat = activeChatIdRef.current === conv.id
+                 
+                 if (msg.text.includes('DRINK-')) {
+                    audio.playDrink()
+                 } else {
+                    audio.playReceive()
+                 }
 
-               if (!isUserInThisChat) {
-                  window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: conv.profile.name, body: msg.text, image: conv.profile.image } }))
-               }
-               
-               return {
-                 ...conv,
-                 messages: [...conv.messages, msg],
-                 unread: !isUserInThisChat ? conv.unread + 1 : conv.unread
-               }
+                 if (!isUserInThisChat) {
+                    window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: conv.profile.name, body: msg.text, image: conv.profile.image } }))
+                 }
+                 
+                 return {
+                   ...conv,
+                   messages: [...conv.messages, msg],
+                   unread: !isUserInThisChat ? conv.unread + 1 : conv.unread
+                 }
+              }
             }
+            return conv
+          })
+          
+          if (!prev.find(c => c.id === newMessage.match_id)) {
+             window.dispatchEvent(new CustomEvent('app-reload-data'))
           }
-          return conv
-        }))
+          
+          return updated
+        })
       })
       .subscribe()
 
