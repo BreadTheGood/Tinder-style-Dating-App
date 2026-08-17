@@ -440,7 +440,9 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
 
     // 2. Change our interaction to 'pass' so they don't show up again in our feed
     // We already have `recordSwipe(targetId, 'pass')` which does exactly this:
-    await this.recordSwipe(targetId, 'pass')
+    if (this.recordSwipe) {
+       await this.recordSwipe(targetId, 'pass')
+    }
 
     return true
   },

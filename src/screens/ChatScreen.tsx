@@ -57,7 +57,9 @@ export function ChatScreen({ conversation, onBack, onUpdate, onViewProfile }: { 
               <button 
                 onClick={async () => { 
                    setShowMenu(false); 
-                   await supabaseAppDataService.unmatchUser(conversation.id, conversation.profile.id);
+                   if (conversation.id) {
+                     await supabaseAppDataService.unmatchUser?.(conversation.id, conversation.profile.id as string);
+                   }
                    alert('Usuario bloqueado'); 
                    onBack(); 
                 }}
