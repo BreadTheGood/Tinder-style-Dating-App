@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { managerSupabase as supabase } from './lib/managerSupabase'
 import { BarPortal } from './screens/manager/BarPortal'
 
@@ -9,19 +9,57 @@ export function BarApp() {
   const [errorMsg, setErrorMsg] = useState('')
   const [eventData, setEventData] = useState<any>(null)
 
+  useEffect(() => {
+    const sessionStr = localStorage.getItem('bar_session')
+    if (sessionStr) {
+      try {
+        const session = JSON.parse(sessionStr)
+        if (Date.now() - session.lastActivity < 2 * 60 * 60 * 1000) {
+          setEventData(session.eventData)
+        } else {
+          localStorage.removeItem('bar_session')
+        }
+      } catch (e) {
+        localStorage.removeItem('bar_session')
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!eventData) return
+
+    const updateActivity = () => {
+      localStorage.setItem('bar_session', JSON.stringify({
+         eventData,
+         lastActivity: Date.now()
+      }))
+    }
+    
+    let lastUpdate = Date.now()
+    const handleActivity = () => {
+       if (Date.now() - lastUpdate > 60000) {
+          updateActivity()
+          lastUpdate = Date.now()
+       }
+    }
+
+    window.addEventListener('mousemove', handleActivity)
+    window.addEventListener('keydown', handleActivity)
+    window.addEventListener('touchstart', handleActivity)
+
+    return () => {
+      window.removeEventListener('mousemove', handleActivity)
+      window.removeEventListener('keydown', handleActivity)
+      window.removeEventListener('touchstart', handleActivity)
+    }
+  }, [eventData])
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!code || !password) return
     setLoading(true)
     setErrorMsg('')
 
-    // We use a regular Supabase RPC or direct query.
-    // Since managerSupabase uses anon key if not logged in, we need to allow Bar access
-    // Wait, the regular user can't query "Events.bar_password"!
-    // The bar needs to authenticate. But how?
-    // We can query Events where code = code and bar_password = password.
-    // We must ensure the RLS allows querying Events by code and bar_password.
-    // By default "Events" table is visible to everyone for SELECT!
     const { data, error } = await supabase
       .from('Events')
       .select('*')
@@ -33,6 +71,10 @@ export function BarApp() {
        setErrorMsg('Código de evento o contraseña incorrectos.')
     } else {
        setEventData(data)
+       localStorage.setItem('bar_session', JSON.stringify({
+          eventData: data,
+          lastActivity: Date.now()
+       }))
     }
     setLoading(false)
   }
@@ -41,6 +83,7 @@ export function BarApp() {
      setEventData(null)
      setCode('')
      setPassword('')
+     localStorage.removeItem('bar_session')
   }
 
   if (eventData) {
