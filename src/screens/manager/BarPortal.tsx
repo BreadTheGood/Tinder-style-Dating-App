@@ -9,81 +9,46 @@ export function BarPortal({ event }: { event: any }) {
   const [errorMsg, setErrorMsg] = useState('')
   const [transactionsList, setTransactionsList] = useState<any[]>([])
   const [showScanner, setShowScanner] = useState(false)
+  const [isClosed, setIsClosed] = useState(false)
+  const [closureCode, setClosureCode] = useState('')
+  const [totalAmount, setTotalAmount] = useState(0)
 
   const loadTransactions = async () => {
      const { data } = await supabase.rpc('get_event_transactions', {
         p_event_code: event.code,
         p_bar_password: event.bar_password
      })
-     if (data) setTransactionsList(data)
+     if (data) {
+        setTransactionsList(data.transactions || [])
+        setIsClosed(data.is_closed || false)
+        setClosureCode(data.closure_code || '')
+        setTotalAmount(data.total_amount || 0)
+     }
   }
 
   useEffect(() => {
      loadTransactions()
   }, [event])
 
-  const searchCode = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!code.trim()) return
-
+  const processCode = async (searchCodeStr: string) => {
     setLoading(true)
     setErrorMsg('')
     setTransaction(null)
-
-    const searchCodeStr = code.trim().toUpperCase()
-    if (!searchCodeStr.startsWith('DRINK-')) {
-       setErrorMsg('Formato inválido. El código debe empezar con DRINK-')
-       setLoading(false)
-       return
-    }
-
-    const { data: tx, error } = await supabase.rpc('get_drink_details', {
-       p_qr_code: searchCodeStr,
-       p_bar_password: event.bar_password
-    })
-
-    if (error || !tx) {
-      setErrorMsg('Código no encontrado, inválido, o no pertenece a este evento.')
-    } else {
-      setTransaction(tx)
-    }
-    setLoading(false)
-  }
-
-  const markAsRedeemed = async () => {
-    if (!transaction) return
-    setLoading(true)
-    
-    const { data: success, error } = await supabase.rpc('redeem_drink', {
-       p_qr_code: code.trim().toUpperCase(),
-       p_bar_password: event.bar_password
-    })
-
-    if (error || !success) {
-      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'No se pudo canjear.' } }))
-    } else {
-      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Trago entregado y código invalidado.' } }))
-      setTransaction({ ...transaction, status: 'redeemed' })
-      setCode('')
-      loadTransactions()
-    }
-    setLoading(false)
-  }
-
-  const handleScan = async (text: string) => {
-    setCode(text)
+    setCode(searchCodeStr)
     setShowScanner(false)
-    setLoading(true)
-    setErrorMsg('')
-    setTransaction(null)
 
-    const searchCodeStr = text.trim().toUpperCase()
     if (!searchCodeStr.startsWith('DRINK-')) {
        setErrorMsg('Formato inválido. El código escaneado no es un trago (DRINK-...)')
        setLoading(false)
        return
     }
 
+    if (isClosed) {
+       setErrorMsg('El evento ya finalizó y la caja está cerrada. No se pueden canjear más tragos.')
+       setLoading(false)
+       return
+    }
+
     const { data: tx, error } = await supabase.rpc('get_drink_details', {
        p_qr_code: searchCodeStr,
        p_bar_password: event.bar_password
@@ -92,9 +57,54 @@ export function BarPortal({ event }: { event: any }) {
     if (error || !tx) {
       setErrorMsg('Código no encontrado, inválido, o no pertenece a este evento.')
     } else {
+      if (tx.status === 'approved') {
+         // Auto redeem
+         const { data: success } = await supabase.rpc('redeem_drink', {
+            p_qr_code: searchCodeStr,
+            p_bar_password: event.bar_password
+         })
+         if (success) {
+            tx.status = 'redeemed'
+            window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Trago entregado y validado automáticamente.' } }))
+            loadTransactions() // reload history
+            setCode('')
+         } else {
+            setErrorMsg('Hubo un error al intentar canjear el código automáticamente.')
+         }
+      }
       setTransaction(tx)
     }
     setLoading(false)
+  }
+
+  const searchCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!code.trim()) return
+    processCode(code.trim().toUpperCase())
+  }
+
+  const handleScan = async (text: string) => {
+    if (!text.trim()) return
+    processCode(text.trim().toUpperCase())
+  }
+
+  const handleCloseRegister = async () => {
+     if (window.confirm('¿Estás seguro de que quieres cerrar la caja? Ya no se podrán canjear más tragos en este evento.')) {
+        setLoading(true)
+        const { data, error } = await supabase.rpc('close_bar_register', {
+           p_event_code: event.code,
+           p_bar_password: event.bar_password
+        })
+        if (error || !data) {
+           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'No se pudo cerrar la caja.' } }))
+        } else {
+           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Caja Cerrada', body: 'El evento ha finalizado exitosamente.' } }))
+           setIsClosed(true)
+           setClosureCode(data.code)
+           setTotalAmount(data.total)
+        }
+        setLoading(false)
+     }
   }
 
   return (
@@ -162,13 +172,10 @@ export function BarPortal({ event }: { event: any }) {
       )}
 
       {transaction && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
            <div className={`p-6 border-b ${transaction.status === 'redeemed' ? 'bg-gray-50 border-gray-200' : 'bg-green-50 border-green-200'}`}>
               <div className="flex justify-between items-center mb-2">
-                 <h2 className="text-xl font-bold text-gray-800">Detalles del Trago</h2>
-                 {transaction.status === 'approved' && (
-                    <span className="px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full uppercase">Listo para Entregar</span>
-                 )}
+                 <h2 className="text-xl font-bold text-gray-800">Detalle de trago</h2>
                  {transaction.status === 'redeemed' && (
                     <span className="px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full uppercase">Ya Entregado</span>
                  )}
@@ -176,20 +183,19 @@ export function BarPortal({ event }: { event: any }) {
                     <span className="px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-full uppercase">Pago Pendiente</span>
                  )}
               </div>
-              <p className="text-sm text-gray-500">Comprado por: <span className="font-bold text-gray-800">{transaction.buyer_name || 'Desconocido'}</span></p>
+              <p className="text-sm text-gray-500">De <span className="font-bold text-gray-800">{transaction.buyer_name || 'Alguien'}</span> para <span className="font-bold text-gray-800">{transaction.receiver_name || 'Alguien'}</span></p>
            </div>
 
            <div className="p-6">
-              <div className="flex items-center gap-6 mb-8">
+              <div className="flex items-center gap-6">
                  <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center text-4xl">
-                    {transaction.drink_icon || '🥃'}
+                    {transaction.drink_icon || ''}
                  </div>
                  <div>
                     <h3 className="text-3xl font-extrabold text-gray-800 mb-1">
-                       {transaction.quantity}x {transaction.drink_name || 'Trago Eliminado'}
+                       {transaction.quantity}x {transaction.drink_name || 'Trago'}
                     </h3>
                     
-                    {/* CONFIRMACIÓN DE MERCADO PAGO */}
                     {transaction.mp_payment_id && (
                        <div className="flex items-start sm:items-center gap-2 mt-2 text-sm text-green-700 font-medium bg-green-50 px-3 py-1.5 rounded-lg border border-green-200 w-full sm:w-fit max-w-full">
                           <svg className="w-4 h-4 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -198,27 +204,29 @@ export function BarPortal({ event }: { event: any }) {
                     )}
                  </div>
               </div>
-
-              {transaction.status === 'approved' && (
-                 <button 
-                   onClick={markAsRedeemed}
-                   disabled={loading}
-                   className="w-full bg-green-600 text-white text-xl font-bold py-4 rounded-xl shadow-lg hover:bg-green-700 active:scale-[0.98] transition-all disabled:opacity-50"
-                 >
-                    {loading ? 'Procesando...' : 'Entregar y Canjear Código'}
-                 </button>
-              )}
-              {transaction.status === 'redeemed' && (
-                 <div className="text-center p-4 bg-gray-100 text-gray-500 rounded-xl font-bold uppercase">
-                    Este trago ya fue entregado
-                 </div>
-              )}
            </div>
         </div>
       )}
 
       <div className="mt-12">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Historial de Tragos del Evento</h2>
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
+           <h2 className="text-xl font-bold text-gray-800 m-0">Historial de Tragos del Evento</h2>
+           {isClosed ? (
+              <div className="bg-red-50 text-red-700 px-4 py-2 rounded-lg border border-red-200">
+                 <p className="text-sm font-bold m-0 uppercase">Caja Cerrada</p>
+                 <p className="text-xs m-0">Total: <span className="font-mono text-base font-black">${totalAmount}</span></p>
+                 <p className="text-[10px] font-mono opacity-80 m-0 mt-0.5">CÓDIGO: {closureCode}</p>
+              </div>
+           ) : (
+              <button 
+                 onClick={handleCloseRegister}
+                 disabled={loading}
+                 className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors shadow-sm self-start sm:self-auto disabled:opacity-50"
+              >
+                 Cerrar Caja
+              </button>
+           )}
+        </div>
         {transactionsList.length === 0 ? (
            <div className="text-center p-8 bg-gray-50 border border-gray-200 rounded-xl text-gray-500">
              Todavía no hay compras en este evento.
@@ -234,7 +242,7 @@ export function BarPortal({ event }: { event: any }) {
                       <div>
                          <h4 className="font-bold text-gray-800">{tx.quantity}x {tx.drink_name || 'Trago'}</h4>
                          <p className="text-xs text-gray-500">
-                           De: {tx.buyer_name || 'Alguien'} • {new Date(tx.created_at).toLocaleTimeString()}
+                           De: {tx.buyer_name || 'Alguien'} para {tx.receiver_name || 'Alguien'} • {new Date(tx.created_at).toLocaleTimeString()}
                            {tx.mp_payment_id && <span className="text-gray-400 font-mono ml-1">• MP: {tx.mp_payment_id}</span>}
                          </p>
                       </div>
