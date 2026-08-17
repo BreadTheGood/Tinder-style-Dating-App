@@ -353,15 +353,15 @@ export function ManagerDashboard({ manager }: { manager: any }) {
         )}
         {activeTab === 'events' && !managingTicketsFor && !managingDrinksFor && !viewingAnalyticsFor && (
            <>
-             <div className="flex justify-between items-center mb-6">
+             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-800">{isAdmin ? 'Todos los Eventos' : 'Tus Eventos'}</h1>
                   <p className="text-sm text-gray-500 mt-1">Crea, edita, suspende o elimina eventos para tus usuarios.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                   <button 
                     onClick={() => setViewingAnalyticsFor('general')}
-                    className="bg-blue-100 text-blue-700 px-5 py-2.5 rounded-lg font-bold shadow-sm hover:bg-blue-200 transition-colors flex items-center gap-2"
+                    className="flex-1 md:flex-none bg-blue-100 text-blue-700 px-5 py-2.5 rounded-lg font-bold shadow-sm hover:bg-blue-200 transition-colors flex items-center justify-center gap-2"
                   >
                     <span>📊</span>
                     Métricas Globales
@@ -371,7 +371,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                       if (showEventForm) resetEventForm()
                       else setShowEventForm(true)
                     }}
-                    className="bg-[var(--theme-color-1)] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity"
+                    className="flex-1 md:flex-none bg-[var(--theme-color-1)] text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:opacity-90 transition-opacity whitespace-nowrap"
                   >
                      {showEventForm ? 'Cancelar' : '+ Crear Evento'}
                   </button>
@@ -560,31 +560,31 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                        </div>
 
                        {/* Acciones de Edición / Suspensión / Eliminación */}
-                       <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100 justify-end flex-wrap">
+                       <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100 flex-wrap">
                           <button 
                             onClick={() => setManagingTicketsFor(e)}
-                            className="mr-auto px-3 py-1.5 bg-[var(--theme-color-1)]/10 hover:bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                            className="flex-1 min-w-[80px] justify-center px-3 py-1.5 bg-[var(--theme-color-1)]/10 hover:bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
                             Tickets
                           </button>
                           <button 
                             onClick={() => setViewingAnalyticsFor(e.id)}
-                            className="mr-auto px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                            className="flex-1 min-w-[80px] justify-center px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
                           >
                             <span>📊</span>
                             Métricas
                           </button>
                           <button 
                             onClick={() => setManagingDrinksFor(e)}
-                            className="px-3 py-1.5 bg-[var(--theme-color-1)]/10 hover:bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                            className="flex-1 min-w-[80px] justify-center px-3 py-1.5 bg-[var(--theme-color-1)]/10 hover:bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
                           >
                             <span>🍹</span>
                             Tragos
                           </button>
                           <button 
                             onClick={() => startEditEvent(e)}
-                            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-lg transition-colors"
+                            className="flex-1 min-w-[80px] justify-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-lg transition-colors"
                           >
                             Editar
                           </button>
