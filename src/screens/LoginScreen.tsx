@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { EyeIcon } from '../components/icons'
 import { supabase } from '../lib/supabase'
+import { LegalModal } from '../components/LegalModal'
 
 export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean) => void }) {
   const [mode, setMode] = useState<'login' | 'ticket-code' | 'register'>('login')
@@ -11,6 +12,7 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const [showLegalModal, setShowLegalModal] = useState<'terms' | 'privacy' | null>(null)
 
   // Flotante de contraseña para código de evento
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -392,9 +394,9 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
 
         <p className="text-center text-xs text-white/20 mt-6 pb-2 leading-relaxed">
           Al continuar, aceptas nuestros{' '}
-          <span className="text-[var(--theme-color-1)] font-semibold">Términos de uso</span>{' '}
+          <button onClick={() => setShowLegalModal('terms')} className="text-[var(--theme-color-1)] font-semibold hover:underline">Términos de uso</button>{' '}
           y{' '}
-          <span className="text-[var(--theme-color-1)] font-semibold">Política de privacidad</span>
+          <button onClick={() => setShowLegalModal('privacy')} className="text-[var(--theme-color-1)] font-semibold hover:underline">Política de privacidad</button>
         </p>
 
         <p className="text-center text-xs text-white/40 pb-8 leading-relaxed font-medium">
@@ -563,6 +565,13 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
              )}
           </div>
         </div>
+      )}
+
+      {showLegalModal && (
+        <LegalModal 
+          type={showLegalModal} 
+          onClose={() => setShowLegalModal(null)} 
+        />
       )}
     </div>
   )
