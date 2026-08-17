@@ -3,6 +3,7 @@ import { managerSupabase as supabase } from '../../lib/managerSupabase'
 import { TicketManager } from './TicketManager'
 import { DrinkManager } from './DrinkManager'
 import { AnalyticsDashboard } from './AnalyticsDashboard'
+import { BarChart3, GlassWater } from 'lucide-react'
 
 export function ManagerDashboard({ manager }: { manager: any }) {
   const isAdmin = manager.role === 'system_admin'
@@ -363,7 +364,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                     onClick={() => setViewingAnalyticsFor('general')}
                     className="flex-1 md:flex-none bg-blue-100 text-blue-700 px-5 py-2.5 rounded-lg font-bold shadow-sm hover:bg-blue-200 transition-colors flex items-center justify-center gap-2"
                   >
-                    <span>📊</span>
+                    <BarChart3 className="w-5 h-5" />
                     Métricas Globales
                   </button>
                   <button 
@@ -572,14 +573,14 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                             onClick={() => setViewingAnalyticsFor(e.id)}
                             className="flex-1 min-w-[80px] justify-center px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
                           >
-                            <span>📊</span>
+                            <BarChart3 className="w-3.5 h-3.5" />
                             Métricas
                           </button>
                           <button 
                             onClick={() => setManagingDrinksFor(e)}
                             className="flex-1 min-w-[80px] justify-center px-3 py-1.5 bg-[var(--theme-color-1)]/10 hover:bg-[var(--theme-color-1)]/20 text-[var(--theme-color-1)] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
                           >
-                            <span>🍹</span>
+                            <GlassWater className="w-3.5 h-3.5" />
                             Tragos
                           </button>
                           <button 

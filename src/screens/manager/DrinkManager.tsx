@@ -7,7 +7,7 @@ export function DrinkManager({ event, onBack }: { event: any, onBack: () => void
 
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
-  const [icon, setIcon] = useState('🥃')
+  const [icon, setIcon] = useState('TR')
 
   const [saving, setSaving] = useState(false)
 
@@ -41,7 +41,7 @@ export function DrinkManager({ event, onBack }: { event: any, onBack: () => void
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: 'Trago añadido.' } }))
       setName('')
       setPrice('')
-      setIcon('🥃')
+      setIcon('TR')
       loadDrinks()
     }
   }
@@ -99,12 +99,12 @@ export function DrinkManager({ event, onBack }: { event: any, onBack: () => void
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Icono (Emoji)</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Siglas</label>
               <input 
                 type="text" 
                 value={icon} 
-                onChange={e => setIcon(e.target.value)} 
-                className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--theme-color-1)] text-center text-xl transition-colors"
+                onChange={e => setIcon(e.target.value.toUpperCase())} 
+                className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--theme-color-1)] text-center text-xl transition-colors font-bold"
                 maxLength={2}
                 required
               />
@@ -132,14 +132,16 @@ export function DrinkManager({ event, onBack }: { event: any, onBack: () => void
           ) : (
             <div className="space-y-2">
               {drinks.map(drink => (
-                <div key={drink.id} className="flex items-center justify-between bg-black/40 border border-white/5 p-4 rounded-xl">
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl">{drink.icon}</span>
-                    <div>
-                      <p className="text-white font-bold">{drink.name}</p>
-                      <p className="text-[var(--theme-color-1)] font-medium">${drink.price.toLocaleString('es-AR')}</p>
+                  <div key={drink.id} className="flex justify-between items-center bg-black/20 p-4 rounded-xl border border-white/5 hover:border-[var(--theme-color-1)]/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 flex-shrink-0 bg-white/5 rounded-full flex items-center justify-center font-bold text-white shadow-sm border border-white/10">
+                        {drink.icon}
+                      </div>
+                      <div>
+                        <p className="font-bold text-white">{drink.name}</p>
+                        <p className="text-[var(--theme-color-1)] font-semibold">${drink.price.toLocaleString('es-AR')}</p>
+                      </div>
                     </div>
-                  </div>
                   <button 
                     type="button"
                     onClick={() => handleDeleteDrink(drink.id)}
