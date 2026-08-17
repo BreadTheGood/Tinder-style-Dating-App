@@ -172,9 +172,22 @@ export default function App() {
        setToastMessage(e.detail)
        setTimeout(() => setToastMessage(null), 4000)
     }
+    const handleReload = async () => {
+       if (currentUser) {
+         const snap = await loadAppData(supabaseAppDataService).catch(() => null)
+         if (snap) {
+           setProfiles(snap.profiles)
+           setConversations(snap.conversations)
+         }
+       }
+    }
     window.addEventListener('app-toast', handleToast)
-    return () => window.removeEventListener('app-toast', handleToast)
-  }, [])
+    window.addEventListener('app-reload-data', handleReload)
+    return () => {
+      window.removeEventListener('app-toast', handleToast)
+      window.removeEventListener('app-reload-data', handleReload)
+    }
+  }, [currentUser])
 
   // Listen for real-time matches
   useEffect(() => {

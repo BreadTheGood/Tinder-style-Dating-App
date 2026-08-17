@@ -32,6 +32,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
            setTicketCode('')
            fetchEvents()
            window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: '¡Te has unido al evento con éxito!' } }))
+           window.dispatchEvent(new CustomEvent('app-reload-data'))
         } else {
            window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: res.error || 'Error al unirse al evento' } }))
         }

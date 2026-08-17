@@ -12,7 +12,8 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
 
     const activeEventIds = myEvents
       .filter((e: any) => {
-         const ev = e.Events;
+         let ev = e.Events;
+         if (Array.isArray(ev)) ev = ev[0];
          if (!ev || ev.is_suspended) return false;
          if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
          return true;
@@ -116,7 +117,8 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
           if (myEvents) {
             const activeEventIds = myEvents
               .filter((e: any) => {
-                 const ev = e.Events;
+                 let ev = e.Events;
+                 if (Array.isArray(ev)) ev = ev[0];
                  if (!ev || ev.is_suspended) return false;
                  if (ev.end_datetime && new Date(ev.end_datetime).getTime() <= Date.now()) return false;
                  return true;

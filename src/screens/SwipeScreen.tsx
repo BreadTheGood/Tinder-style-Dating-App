@@ -27,6 +27,7 @@ export function SwipeScreen({ profiles, isLoading, onMatchLocally, onSwipe, onVi
       setQueue((q) => q.slice(1))
       setAnimating(false)
       if (onSwipe) onSwipe(liked.id)
+      window.dispatchEvent(new CustomEvent('app-reload-data'))
     }, 400)
   }
 
@@ -41,6 +42,7 @@ export function SwipeScreen({ profiles, isLoading, onMatchLocally, onSwipe, onVi
       setQueue((q) => q.slice(1))
       setAnimating(false)
       if (onSwipe) onSwipe(disliked.id)
+      window.dispatchEvent(new CustomEvent('app-reload-data'))
     }, 400)
   }
 
