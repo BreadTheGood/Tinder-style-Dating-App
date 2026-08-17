@@ -1,5 +1,10 @@
 CREATE SCHEMA IF NOT EXISTS analytics;
 
+DROP VIEW IF EXISTS analytics.top_receivers;
+DROP VIEW IF EXISTS analytics.top_spenders;
+DROP VIEW IF EXISTS analytics.top_drinks;
+DROP VIEW IF EXISTS analytics.event_summary;
+
 CREATE OR REPLACE VIEW analytics.event_summary AS
 SELECT 
     e.id AS event_id,

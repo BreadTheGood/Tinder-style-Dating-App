@@ -41,11 +41,14 @@ export function AnalyticsDashboard({ eventId, onBack }: { eventId: string, onBac
 
   const isGeneral = !summary.name
 
+  // Encontrar el trago menos vendido (asumiendo que top_drinks está ordenado de mayor a menor)
+  const leastSoldDrink = top_drinks.length > 1 ? top_drinks[top_drinks.length - 1] : null
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4 mb-8">
-        {!isGeneral && <button onClick={onBack} className="text-gray-500 hover:text-gray-800 font-medium">← Volver a Eventos</button>}
-        <h2 className="text-2xl font-bold text-gray-800">{isGeneral ? 'Métricas Generales' : `Analíticas: ${summary.name}`}</h2>
+      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8">
+        <button onClick={onBack} className="text-gray-500 hover:text-gray-800 font-medium whitespace-nowrap">← Volver a Eventos</button>
+        <h2 className="text-2xl font-bold text-gray-800">{isGeneral ? 'Métricas Globales' : `Analíticas: ${summary.name}`}</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -156,9 +159,9 @@ export function AnalyticsDashboard({ eventId, onBack }: { eventId: string, onBac
           <h3 className="text-lg font-bold text-gray-800 mb-2">Top tragos</h3>
           <p className="text-sm text-gray-500 mb-4">Tragos mas pedidos.</p>
           
-          {top_drinks.length > 0 && (
+          {leastSoldDrink && (
             <div className="mb-4 p-3 bg-orange-50 border border-orange-100 rounded-lg text-xs text-orange-800">
-              <strong>Tip:</strong> Asegúrate de tener suficiente stock de <strong>{top_drinks[0].drink_name}</strong> para evitar quiebres de inventario.
+              <strong>Tip:</strong> Para aumentar tus ganancias, podrías poner una oferta de 2x1 en <strong>{leastSoldDrink.drink_name}</strong>, ya que es el menos vendido.
             </div>
           )}
 
