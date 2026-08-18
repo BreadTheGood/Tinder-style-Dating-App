@@ -35,11 +35,16 @@ export default function App() {
   const [recoveryLoading, setRecoveryLoading] = useState(false)
   const [recoveryError, setRecoveryError] = useState('')
   
-  // Ref para saber exactamente en qué chat está el usuario sin reiniciar el WebSocket
   const activeChatIdRef = useRef<string | number | null>(null)
+  const currentUserRef = useRef<UserProfile | null>(null)
+
   useEffect(() => {
      activeChatIdRef.current = (screen === 'chat' && activeConversation) ? (activeConversation.id || null) : null
   }, [screen, activeConversation])
+
+  useEffect(() => {
+     currentUserRef.current = currentUser
+  }, [currentUser])
 
   useEffect(() => {
     // Fallback: Si por alguna razón el evento PASSWORD_RECOVERY no se dispara a tiempo,
@@ -145,9 +150,11 @@ export default function App() {
 
       if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
         if (session) {
-          console.log('[AuthEvent] Starting loadUserData for', session.user.id)
-          setIsLoading(true)
-          await loadUserData(session.user.id)
+          if (!currentUserRef.current) {
+            console.log('[AuthEvent] Starting loadUserData for', session.user.id)
+            setIsLoading(true)
+            await loadUserData(session.user.id)
+          }
         } else {
           console.log('[AuthEvent] No session, loading mock data...')
           const mockSnap = await loadAppData(mockAppDataService).catch(() => null)
