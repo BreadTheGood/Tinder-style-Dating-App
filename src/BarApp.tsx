@@ -112,7 +112,7 @@ export function BarApp() {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-gray-800 p-8 rounded-2xl shadow-xl">
-        <h1 className="text-2xl font-black text-white mb-2 text-center tracking-tight">🍷 Portal de Barra</h1>
+        <h1 className="text-2xl font-black text-white mb-2 text-center tracking-tight">Portal de barra</h1>
         <p className="text-gray-400 text-center text-sm mb-8">Ingresa las credenciales de tu evento para validar tragos</p>
         
         <form onSubmit={handleLogin} className="space-y-4">
@@ -144,7 +144,7 @@ export function BarApp() {
             disabled={loading}
             className="w-full bg-[var(--theme-color-1)] hover:bg-[var(--theme-color-1)]/90 text-white font-bold py-3 rounded-lg mt-4 transition-colors disabled:opacity-50"
           >
-            {loading ? 'Verificando...' : 'Entrar a la Barra'}
+            {loading ? 'Verificando...' : 'Entrar a la barra'}
           </button>
         </form>
       </div>
