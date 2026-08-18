@@ -63,11 +63,10 @@ export function BarApp() {
     setErrorMsg('')
 
     const { data, error } = await supabase
-      .from('Events')
-      .select('*')
-      .eq('code', code.trim().toUpperCase())
-      .eq('bar_password', password.trim())
-      .single()
+      .rpc('login_bar', {
+        p_code: code.trim().toUpperCase(),
+        p_password: password.trim()
+      })
 
     if (error || !data) {
        setErrorMsg('Código de evento o contraseña incorrectos.')

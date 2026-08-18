@@ -59,7 +59,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     setNewEventName(evt.name || '')
     setNewEventDesc(evt.description || '')
     setNewEventCode(evt.code || '')
-    setNewEventBarPassword(evt.bar_password || '')
+    setNewEventBarPassword('') // La contraseña no se muestra por seguridad
     if (evt.start_datetime) {
       const d = new Date(evt.start_datetime)
       const yyyy = d.getFullYear()
@@ -117,8 +117,6 @@ export function ManagerDashboard({ manager }: { manager: any }) {
       }
       if (newEventBarPassword.trim() !== '') {
          payload.bar_password = newEventBarPassword.trim()
-      } else {
-         payload.bar_password = null
       }
 
       const { error: dbErr } = await supabase.from('Events').update(payload).eq('id', editingEventId)
@@ -435,7 +433,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                            </div>
                            <div>
                               <label className="block text-sm font-semibold text-gray-600 mb-1">Contraseña de barra</label>
-                              <input type="text" value={newEventBarPassword} onChange={e => setNewEventBarPassword(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder="Ej: barra2026" />
+                              <input type="text" value={newEventBarPassword} onChange={e => setNewEventBarPassword(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder={editingEventId ? "Dejar en blanco para no cambiar" : "Ej: barra2026"} />
                               <p className="text-[10px] text-gray-400 mt-1">Para acceso a empleados</p>
                            </div>
                         </div>
