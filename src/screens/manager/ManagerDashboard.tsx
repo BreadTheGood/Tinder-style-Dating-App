@@ -442,8 +442,8 @@ export function ManagerDashboard({ manager }: { manager: any }) {
                            </div>
                            <div>
                               <label className="block text-sm font-semibold text-gray-600 mb-1">Contraseña de barra</label>
-                              <input type="text" value={newEventBarPassword} onChange={e => setNewEventBarPassword(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)]" placeholder={editingEventId ? "Dejar en blanco para no cambiar" : "Ej: barra2026"} />
-                              <p className="text-[10px] text-gray-400 mt-1">Para acceso a empleados</p>
+                              <input type="text" value={newEventBarPassword} onChange={e => setNewEventBarPassword(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-800 focus:outline-none focus:border-[var(--theme-color-1)] placeholder:text-gray-400" placeholder={editingEventId ? "••••••••" : "Ej: Barra123!"} />
+                              <p className="text-[10px] text-gray-400 mt-1 leading-tight">{editingEventId ? "Déjalo vacío para mantener la actual" : "Para acceso a empleados"}</p>
                            </div>
                         </div>
                      </div>
