@@ -45,11 +45,10 @@ export function ManagerApp() {
         return
      }
 
-     // === CÓDIGO NUEVO: Verificación de expiración de 1 hora ===
      const loginTime = localStorage.getItem('manager_login_time')
      if (loginTime) {
         const timePassed = Date.now() - parseInt(loginTime, 10)
-        if (timePassed > 60 * 60 * 1000) { // 1 hora
+        if (timePassed > 60 * 60 * 1000) {
            console.log('Sesión expirada tras 1 hora de uso continuo.')
            localStorage.removeItem('manager_login_time')
            await supabase.auth.signOut()
@@ -64,7 +63,6 @@ export function ManagerApp() {
      } else {
         localStorage.setItem('manager_login_time', Date.now().toString())
      }
-     // ==========================================================
      
      if (isFetching.current) return
      isFetching.current = true

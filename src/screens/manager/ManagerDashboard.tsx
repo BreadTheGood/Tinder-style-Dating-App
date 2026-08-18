@@ -59,7 +59,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     setNewEventName(evt.name || '')
     setNewEventDesc(evt.description || '')
     setNewEventCode(evt.code || '')
-    setNewEventBarPassword('') // La contraseña no se muestra por seguridad
+    setNewEventBarPassword('')
     if (evt.start_datetime) {
       const d = new Date(evt.start_datetime)
       const yyyy = d.getFullYear()
