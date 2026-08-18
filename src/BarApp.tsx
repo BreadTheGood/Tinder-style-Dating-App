@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { managerSupabase as supabase } from './lib/managerSupabase'
 import { BarPortal } from './screens/manager/BarPortal'
 
@@ -8,54 +8,7 @@ export function BarApp() {
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [eventData, setEventData] = useState<any>(null)
-  const [isInitializing, setIsInitializing] = useState(true)
-
-  useEffect(() => {
-    const sessionStr = localStorage.getItem('bar_session')
-    if (sessionStr) {
-      try {
-        const session = JSON.parse(sessionStr)
-        if (Date.now() - session.lastActivity < 2 * 60 * 60 * 1000) {
-          setEventData(session.eventData)
-        } else {
-          localStorage.removeItem('bar_session')
-        }
-      } catch (e) {
-        localStorage.removeItem('bar_session')
-      }
-    }
-    setIsInitializing(false)
-  }, [])
-
-  useEffect(() => {
-    if (!eventData) return
-
-    const updateActivity = () => {
-      localStorage.setItem('bar_session', JSON.stringify({
-         eventData,
-         lastActivity: Date.now()
-      }))
-    }
-    
-    let lastUpdate = Date.now()
-    const handleActivity = () => {
-       if (Date.now() - lastUpdate > 60000) {
-          updateActivity()
-          lastUpdate = Date.now()
-       }
-    }
-
-    window.addEventListener('mousemove', handleActivity)
-    window.addEventListener('keydown', handleActivity)
-    window.addEventListener('touchstart', handleActivity)
-
-    return () => {
-      window.removeEventListener('mousemove', handleActivity)
-      window.removeEventListener('keydown', handleActivity)
-      window.removeEventListener('touchstart', handleActivity)
-    }
-  }, [eventData])
-
+  
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!code || !password) return
@@ -71,11 +24,10 @@ export function BarApp() {
     if (error || !data) {
        setErrorMsg('Código de evento o contraseña incorrectos.')
     } else {
-       setEventData(data)
-       localStorage.setItem('bar_session', JSON.stringify({
-          eventData: data,
-          lastActivity: Date.now()
-       }))
+       // Guardamos la contraseña en memoria (nunca en localStorage) para que BarPortal pueda usarla
+       const activeEventData = { ...data, bar_password: password.trim() }
+    
+       setEventData(activeEventData)
     }
     setLoading(false)
   }
@@ -84,11 +36,6 @@ export function BarApp() {
      setEventData(null)
      setCode('')
      setPassword('')
-     localStorage.removeItem('bar_session')
-  }
-
-  if (isInitializing) {
-     return <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 text-white font-bold">Cargando barra...</div>
   }
 
   if (eventData) {
