@@ -207,6 +207,7 @@ export function ManagerDashboard({ manager }: { manager: any }) {
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'Error eliminando evento: ' + error.message } }))
     } else {
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Eliminado', body: 'Evento eliminado permanentemente.' } }))
+      resetEventForm()
       loadEvents()
     }
   }
