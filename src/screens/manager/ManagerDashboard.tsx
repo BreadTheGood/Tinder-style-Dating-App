@@ -104,6 +104,15 @@ export function ManagerDashboard({ manager }: { manager: any }) {
     const min = String(endD.getMinutes()).padStart(2, '0')
     const endDateStr = `${y}-${m}-${d}T${h}:${min}:00`
 
+    const pw = newEventBarPassword.trim()
+    if (pw !== '') {
+       if (pw.length < 8 || !/[A-Z]/.test(pw) || !/[^a-zA-Z0-9]/.test(pw)) {
+          window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: 'La contraseña de la barra debe tener al menos 8 caracteres, una mayúscula y un carácter especial.' } }))
+          setSavingEvent(false)
+          return
+       }
+    }
+
     if (editingEventId) {
       const payload: any = {
          name: newEventName,
