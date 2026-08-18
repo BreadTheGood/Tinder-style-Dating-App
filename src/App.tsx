@@ -46,13 +46,7 @@ export default function App() {
      currentUserRef.current = currentUser
   }, [currentUser])
 
-  useEffect(() => {
-    // Fallback: Si por alguna razón el evento PASSWORD_RECOVERY no se dispara a tiempo,
-    // atrapamos el recovery leyendo la URL directamente al cargar la app.
-    if (window.location.hash.includes('type=recovery')) {
-      setShowRecoveryModal(true)
-    }
-  }, [])
+
 
   const loadUserData = async (userId: string) => {
     console.log('[loadUserData] Starting for', userId)
