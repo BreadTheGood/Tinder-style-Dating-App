@@ -112,8 +112,7 @@ export function BarApp() {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-gray-800 p-8 rounded-2xl shadow-xl">
-        <h1 className="text-2xl font-black text-white mb-2 text-center tracking-tight">Portal de barra</h1>
-        <p className="text-gray-400 text-center text-sm mb-8">Ingresa las credenciales de tu evento para validar tragos</p>
+        <h1 className="text-2xl font-black text-white mb-8 text-center tracking-tight">Portal de barra</h1>
         
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
