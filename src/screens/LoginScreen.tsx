@@ -464,12 +464,12 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
           )}
         </div>
 
-        <div className="text-center text-xs text-white/20 mt-8 leading-relaxed">
-          Al continuar, aceptas nuestros{' '}
-          <button type="button" onClick={() => setShowLegalModal('terms')} className="text-[var(--theme-color-1)] font-semibold hover:underline cursor-pointer relative z-20">Términos de uso</button>{' '}
-          y{' '}
-          <button type="button" onClick={() => setShowLegalModal('privacy')} className="text-[var(--theme-color-1)] font-semibold hover:underline cursor-pointer relative z-20">Política de privacidad</button>
-        </div>
+          <div className="text-center text-xs text-white/20 mt-8 leading-relaxed">
+            Al continuar, aceptas nuestros{' '}
+            <button type="button" onClick={() => setShowLegalModal('terms')} className="text-[var(--theme-color-1)] font-semibold hover:underline cursor-pointer relative z-20">Términos de uso</button>{' '}
+            y{' '}
+            <button type="button" onClick={() => setShowLegalModal('privacy')} className="text-[var(--theme-color-1)] font-semibold hover:underline cursor-pointer relative z-20">Política de privacidad</button>
+          </div>
 
         <div className="text-center text-xs text-white/40 mt-6 pb-8 leading-relaxed font-medium">
           <a href="mailto:contacto@gira.app" className="text-[var(--theme-color-1)] font-bold hover:underline cursor-pointer relative z-20">

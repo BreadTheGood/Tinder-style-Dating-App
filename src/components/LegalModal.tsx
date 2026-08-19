@@ -1,4 +1,4 @@
-import { XIcon } from './icons'
+﻿import { XIcon } from './icons'
 
 export function LegalModal({ type, onClose }: { type: 'terms' | 'privacy'; onClose: () => void }) {
   return (
@@ -120,3 +120,4 @@ export function LegalModal({ type, onClose }: { type: 'terms' | 'privacy'; onClo
     </div>
   )
 }
+
