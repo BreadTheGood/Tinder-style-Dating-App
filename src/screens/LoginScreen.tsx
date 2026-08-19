@@ -57,9 +57,32 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
           setLoading(false)
           return
         }
-        const { error } = await supabase.auth.signUp({ email, password })
+        const { data, error } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            emailRedirectTo: window.location.origin + window.location.pathname
+          }
+        })
         if (error) {
           setErrorMsg(error.message)
+          setLoading(false)
+          return
+        }
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          setErrorMsg('Este email ya está registrado.')
+          setLoading(false)
+          return
+        }
+        if (!data.session) {
+          // Email confirmation is required
+          window.dispatchEvent(new CustomEvent('app-toast', { 
+            detail: { 
+              title: 'Revisa tu correo', 
+              body: 'Te hemos enviado un enlace para confirmar tu cuenta. Ábrelo para poder iniciar sesión.' 
+            } 
+          }))
+          setMode('login')
           setLoading(false)
           return
         }
