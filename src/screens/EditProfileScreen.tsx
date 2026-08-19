@@ -25,6 +25,7 @@ export function EditProfileScreen({
   const [errorMsg, setErrorMsg] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [editingPhoto, setEditingPhoto] = useState<string | null>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const toggleTag = (t: string) => {
@@ -185,6 +186,15 @@ export function EditProfileScreen({
             </p>
           </div>
         </div>
+        
+        <div className="mt-8 pt-6 border-t border-white/10">
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="w-full py-3.5 bg-red-500/10 text-red-500 font-bold rounded-xl border border-red-500/20 hover:bg-red-500/20 transition-all text-sm"
+          >
+            Eliminar mi cuenta
+          </button>
+        </div>
 
       </div>
 
@@ -195,6 +205,42 @@ export function EditProfileScreen({
           onCancel={() => setEditingPhoto(null)} 
           onSave={handleSaveCropped} 
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4" style={{ background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(12px)' }}>
+          <div className="w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border border-white/10" style={{ background: '#18181f' }}>
+            <h3 className="text-xl font-extrabold text-white mb-4">¿Eliminar cuenta?</h3>
+            <p className="text-sm text-white/60 mb-6 leading-relaxed">
+              Esta acción es irreversible. Se borrarán permanentemente todas tus fotos, chats, matches y toda la información de tu perfil.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-3 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-colors text-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={async () => {
+                   setShowDeleteConfirm(false)
+                   const { supabase } = await import('../lib/supabase')
+                   const { error } = await supabase.rpc('delete_user_account')
+                   if (error) {
+                      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: error.message } }))
+                   } else {
+                      window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Cuenta eliminada', body: 'Tu cuenta ha sido borrada exitosamente.' } }))
+                      supabase.auth.signOut()
+                   }
+                }}
+                className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors text-sm"
+              >
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
