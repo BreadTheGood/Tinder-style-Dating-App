@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { HeartIcon, XIcon } from '../components/icons'
 import { SwipeCard } from '../components/SwipeCard'
 import type { Profile } from '../types'
@@ -58,16 +58,16 @@ export function SwipeScreen({ profiles, isLoading, onMatchLocally, onSwipe, onVi
       <div className="flex-1 relative mx-4 mb">
         {isLoading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-            <p className="text-white/40 font-semibold text-center animate-pulse">Preparando tus matchesâ€¦</p>
+            <p className="text-white/40 font-semibold text-center animate-pulse">Preparando tus matches…</p>
           </div>
         ) : queue.length === 0 ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-8 text-center">
               <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-2">
-                <span className="text-3xl">ðŸ»</span>
+                <span className="text-3xl">🍻</span>
               </div>
               <div>
-                <h3 className="text-xl font-extrabold text-white mb-2">Â¡Parece que no hay nadie mÃ¡s!</h3>
-                <p className="text-white/60 text-sm font-medium">EstÃ¡s a tiempo de invitar a alguien</p>
+                <h3 className="text-xl font-extrabold text-white mb-2">¡Parece que no hay nadie más!</h3>
+                <p className="text-white/60 text-sm font-medium">Estás a tiempo de invitar a alguien</p>
               </div>
               
               <div className="flex flex-col gap-3 w-full max-w-[200px]">
