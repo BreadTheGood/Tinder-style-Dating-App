@@ -89,9 +89,7 @@ export function ManagerApp() {
           setManagerData(data)
        } else {
           console.error('Cuenta sin permisos de manager:', userEmail, error)
-          await supabase.auth.signOut()
           setManagerData(null)
-          setSession(null)
           window.dispatchEvent(new CustomEvent('app-toast', { 
             detail: { title: 'Acceso Denegado', body: `La cuenta ${userEmail} no está registrada en el sistema de Managers.` } 
           }))
