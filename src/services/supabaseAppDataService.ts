@@ -311,7 +311,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
             name: '',
             age: 25,
             job: '',
-            bio: '¡Bienvenido! Pronto podrás editar tu perfil.',
+            bio: '',
             images: [],
             tags: [],
             stats: [{ label: 'Likes', value: '0' }, { label: 'Matches', value: '0' }]

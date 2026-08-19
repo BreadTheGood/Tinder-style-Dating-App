@@ -120,7 +120,7 @@ export function OnboardingScreen({
             <h2 className="text-2xl font-extrabold mb-6">Sobre ti</h2>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Biografía</label>
-              <textarea value={bio} onChange={e => setBio(e.target.value)} className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white resize-none focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" placeholder="Cuéntanos un poco sobre tus gustos, hobbies..." maxLength={500} />
+              <textarea value={bio} onChange={e => setBio(e.target.value)} className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white resize-none focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" placeholder="Cuenta un poco sobre vos..." maxLength={500} />
               <div className="text-right text-white/40 text-xs mt-1">{bio.length}/500</div>
             </div>
             <div>
