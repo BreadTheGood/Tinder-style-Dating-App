@@ -77,12 +77,24 @@ export default function App() {
       
       console.log('[loadUserData] App data loaded:', snap ? 'SUCCESS' : 'NULL')
 
-      if (snap && snap.currentUser) {
-        setProfiles(snap.profiles)
-        setConversations(snap.conversations)
-        setCurrentUser(snap.currentUser)
+        if (snap && snap.currentUser) {
+          setProfiles(snap.profiles)
+          setConversations(snap.conversations)
+          setCurrentUser(snap.currentUser)
 
-        if (!snap.currentUser.images || snap.currentUser.images.length === 0) {
+          const pendingEventCode = localStorage.getItem('pending_join_event_code')
+          if (pendingEventCode && supabaseAppDataService.joinEvent) {
+             localStorage.removeItem('pending_join_event_code')
+             supabaseAppDataService.joinEvent(pendingEventCode).then(res => {
+                if (res.success) {
+                   window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Exito!', body: 'Te has unido al evento exitosamente.' } }))
+                } else if (res.error !== 'Ya estabas unido a este evento') {
+                   window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Aviso', body: res.error } }))
+                }
+             })
+          }
+
+          if (!snap.currentUser.images || snap.currentUser.images.length === 0) {
           console.log('[loadUserData] No images, routing to onboarding')
           setScreen('onboarding')
           setNavTab('profile')
@@ -622,3 +634,4 @@ export default function App() {
     </div>
   )
 }
+
