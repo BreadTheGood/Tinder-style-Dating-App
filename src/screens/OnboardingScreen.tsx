@@ -55,7 +55,7 @@ export function OnboardingScreen({
     if (step === 1) {
       if (!name || !birthdate) return setErrorMsg('Por favor, completa todos los campos para continuar.')
       const age = Math.floor((Date.now() - new Date(birthdate).getTime()) / (1000 * 60 * 60 * 24 * 365.25))
-      if (age < 18) return setErrorMsg('Debes ser mayor de 18 aÃ±os para usar la aplicaciÃ³n.')
+      if (age < 18) return setErrorMsg('Debes ser mayor de 18 años para usar la aplicación.')
       setStep(2)
     } else if (step === 2) {
       setStep(3)
@@ -67,7 +67,7 @@ export function OnboardingScreen({
         await finishOnboarding()
       }
     } else if (step === 4) {
-      if (!password || password.length < 6) return setErrorMsg('La contraseÃ±a debe tener al menos 6 caracteres.')
+      if (!password || password.length < 6) return setErrorMsg('La contraseña debe tener al menos 6 caracteres.')
       await finishOnboarding()
     }
   }
@@ -98,14 +98,14 @@ export function OnboardingScreen({
             <h2 className="text-2xl font-extrabold mb-6">Tus datos</h2>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Nombre</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" placeholder="Â¿CÃ³mo te llamas?" />
+              <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" placeholder="¿Cómo te llamas?" />
             </div>
             <div>
               <label className="text-white/60 text-sm font-medium">FECHA DE NACIMIENTO</label>
               <DatePicker value={birthdate} onChange={setBirthdate} />
             </div>
             <div>
-              <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">GÃ©nero</label>
+              <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Género</label>
               <select value={gender} onChange={e => setGender(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] appearance-none">
                 <option value="female" className="text-black">Mujer</option>
                 <option value="male" className="text-black">Hombre</option>
@@ -119,7 +119,7 @@ export function OnboardingScreen({
           <div className="space-y-6 animate-fade-in">
             <h2 className="text-2xl font-extrabold mb-6">Sobre ti</h2>
             <div>
-              <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">BiografÃ­a</label>
+              <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Biografía</label>
               <textarea value={bio} onChange={e => setBio(e.target.value)} className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white resize-none focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" placeholder="Cuenta un poco sobre vos..." maxLength={150} />
               <div className="text-right text-white/40 text-xs mt-1">{bio.length}/150</div>
             </div>
@@ -166,7 +166,7 @@ export function OnboardingScreen({
                 <span className="text-3xl pb-1">+</span>
               </div>
             </div>
-            <p className="text-xs text-white/40 text-center mt-4">Sube al menos una foto para que los demÃ¡s puedan verte.</p>
+            <p className="text-xs text-white/40 text-center mt-4">Sube al menos una foto para que los demás puedan verte.</p>
           </div>
         )}
 
@@ -174,16 +174,16 @@ export function OnboardingScreen({
           <div className="space-y-6 animate-fade-in">
             <h2 className="text-2xl font-extrabold mb-6">Protege tu cuenta</h2>
             <p className="text-sm text-white/60 leading-relaxed mb-4">
-              EstÃ¡s ingresando con la entrada del evento. Por favor, crea una contraseÃ±a definitiva para tu cuenta y asÃ­ proteger tu perfil.
+              Estás ingresando con la entrada del evento. Por favor, crea una contraseña definitiva para tu cuenta y así proteger tu perfil.
             </p>
             <div>
-              <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">ContraseÃ±a</label>
+              <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Contraseña</label>
               <input 
                 type="password" 
                 value={password} 
                 onChange={e => setPassword(e.target.value)} 
                 className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" 
-                placeholder="MÃ­nimo 6 caracteres" 
+                placeholder="Mínimo 6 caracteres" 
               />
             </div>
           </div>

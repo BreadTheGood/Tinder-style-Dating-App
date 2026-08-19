@@ -31,7 +31,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
         if (res.success) {
            setTicketCode('')
            fetchEvents()
-           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Ã‰xito', body: 'Â¡Te has unido al evento con Ã©xito!' } }))
+           window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Éxito', body: '¡Te has unido al evento con éxito!' } }))
            window.dispatchEvent(new CustomEvent('app-reload-data'))
         } else {
            window.dispatchEvent(new CustomEvent('app-toast', { detail: { title: 'Error', body: res.error || 'Error al unirse al evento' } }))
@@ -119,7 +119,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
       </div>
 
       <div className="mx-5 mt-4 glass rounded-2xl p-4">
-        <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">Sobre mÃ­</p>
+        <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">Sobre mí</p>
         <p className="text-white/80 text-sm leading-relaxed break-words whitespace-pre-wrap">{me.bio}</p>
       </div>
 
@@ -150,7 +150,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
         
         <div className="flex flex-col gap-2 mb-4">
            {activeEvents.length === 0 ? (
-             <p className="text-white/40 text-sm">No estÃ¡s en ningÃºn evento activo actualmente.</p>
+             <p className="text-white/40 text-sm">No estás en ningún evento activo actualmente.</p>
            ) : (
              activeEvents.map(e => {
                const remainingText = getTimeRemaining(e.end_datetime)
@@ -177,7 +177,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
             type="text" 
             value={ticketCode} 
             onChange={e => setTicketCode(e.target.value)} 
-            placeholder="Ingresar cÃ³digo de ticket..." 
+            placeholder="Ingresar código de ticket..." 
             className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[var(--theme-color-1)] uppercase placeholder:normal-case placeholder:text-white/30 transition-colors" 
           />
           <button 
@@ -217,7 +217,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
            Estilos
         </button>
         <button onClick={onEdit} className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all active:scale-95 glass border border-white/10">Editar perfil</button>
-        <button onClick={() => supabase.auth.signOut()} className="w-full mt-3 py-4 rounded-xl font-bold text-red-500 text-sm transition-all active:scale-95 bg-white/5 border border-red-500/20 hover:bg-red-500/10">Cerrar sesiÃ³n</button>
+        <button onClick={() => supabase.auth.signOut()} className="w-full mt-3 py-4 rounded-xl font-bold text-red-500 text-sm transition-all active:scale-95 bg-white/5 border border-red-500/20 hover:bg-red-500/10">Cerrar sesión</button>
       </div>
 
       {showThemeModal && <ThemeModal onClose={() => setShowThemeModal(false)} />}

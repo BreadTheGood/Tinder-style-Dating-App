@@ -36,7 +36,7 @@ export function EditProfileScreen({
     setErrorMsg('')
     if (!name || !birthdate) return setErrorMsg('Por favor, completa tu nombre y FECHA DE NACIMIENTO.')
     const age = Math.floor((Date.now() - new Date(birthdate).getTime()) / (1000 * 60 * 60 * 24 * 365.25))
-    if (age < 18) return setErrorMsg('Debes ser mayor de 18 aÃ±os para usar la aplicaciÃ³n.')
+    if (age < 18) return setErrorMsg('Debes ser mayor de 18 años para usar la aplicación.')
     
     if (images.length === 0) return setErrorMsg('Debes tener al menos 1 foto en tu perfil.')
 
@@ -105,7 +105,7 @@ export function EditProfileScreen({
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] transition-colors"
-              placeholder="Â¿CÃ³mo te llamas?"
+              placeholder="¿Cómo te llamas?"
             />
           </div>
 
@@ -115,7 +115,7 @@ export function EditProfileScreen({
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">GÃ©nero</label>
+            <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Género</label>
             <select value={gender} onChange={e => setGender(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] appearance-none">
               <option value="female" className="text-black">Mujer</option>
               <option value="male" className="text-black">Hombre</option>
@@ -125,12 +125,12 @@ export function EditProfileScreen({
 
           {/* Bio input */}
           <div>
-            <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Sobre mÃ­</label>
+            <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Sobre mí</label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] transition-colors resize-none"
-              placeholder="CuÃ©ntanos un poco sobre ti..."
+              placeholder="Cuéntanos un poco sobre ti..."
               maxLength={150}
             />
             <div className="text-right text-white/40 text-xs mt-1">{bio.length}/150</div>
@@ -182,7 +182,7 @@ export function EditProfileScreen({
               </div>
             </div>
             <p className="text-xs text-white/40 mt-3 text-center">
-              {images.length === 0 ? "Debes subir al menos una foto para que los demÃ¡s puedan verte." : ""}
+              {images.length === 0 ? "Debes subir al menos una foto para que los demás puedan verte." : ""}
             </p>
           </div>
         </div>
@@ -211,9 +211,9 @@ export function EditProfileScreen({
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4" style={{ background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(12px)' }}>
           <div className="w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border border-white/10" style={{ background: '#18181f' }}>
-            <h3 className="text-xl font-extrabold text-white mb-4">Â¿Eliminar cuenta?</h3>
+            <h3 className="text-xl font-extrabold text-white mb-4">¿Eliminar cuenta?</h3>
             <p className="text-sm text-white/60 mb-6 leading-relaxed">
-              Esta acciÃ³n es irreversible. Se borrarÃ¡n permanentemente todas tus fotos, chats, matches y toda la informaciÃ³n de tu perfil.
+              Esta acción es irreversible. Se borrarán permanentemente todas tus fotos, chats, matches y toda la información de tu perfil.
             </p>
             <div className="flex gap-3">
               <button
@@ -236,7 +236,7 @@ export function EditProfileScreen({
                 }}
                 className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors text-sm"
               >
-                SÃ­, eliminar
+                Sí, eliminar
               </button>
             </div>
           </div>
