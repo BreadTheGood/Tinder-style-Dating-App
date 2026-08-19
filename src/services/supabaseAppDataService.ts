@@ -192,7 +192,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async getConversations() {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return []
 
     const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
@@ -292,7 +292,8 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async getCurrentUser() {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession()
+    const user = session?.user
     
     if (!user) {
         throw new Error('Not logged in')
@@ -353,7 +354,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async getMyEvents() {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return []
 
     const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
@@ -375,7 +376,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async joinEvent(code: string) {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return { success: false, error: 'Not logged in' }
 
     const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
@@ -414,7 +415,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async recordSwipe(targetId, action) {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return { matchId: null }
 
     // Use our own profile ID to swipe
@@ -461,7 +462,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async unmatchUser(matchId: string, targetId: string) {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return false
 
     // 1. Delete the match via RPC to bypass any RLS limitations on DELETE
@@ -477,7 +478,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async blockUser(targetId: string) {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return false
     const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
     if (!myProfile) return false
@@ -486,7 +487,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async unblockUser(targetId: string) {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return false
     const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
     if (!myProfile) return false
@@ -500,7 +501,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async sendMessage(matchId: string, text: string) {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return false
 
     const { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
@@ -522,7 +523,8 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async updateProfile(data) {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession()
+    const user = session?.user
     if (!user) return false
 
     // Ensure profile exists
@@ -584,7 +586,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async uploadPhoto(file: File) {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return false
 
     let { data: myProfile } = await supabase.from('Profiles').select('id').eq('user_id', user.id).maybeSingle()
@@ -638,7 +640,7 @@ export const supabaseAppDataService: AppDataService & { cleanupExpiredInteractio
   },
 
   async deletePhoto(photoUrl: string) {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession(); const user = session?.user
     if (!user) return false
 
     // Delete record from DB
