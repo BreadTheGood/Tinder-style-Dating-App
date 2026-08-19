@@ -4,7 +4,7 @@ import { supabaseAppDataService } from '../services/supabaseAppDataService'
 import { PhotoEditor } from '../components/PhotoEditor'
 import { DatePicker } from '../components/DatePicker'
 
-const AVAILABLE_TAGS = ['Música', 'Deportes', 'Cine', 'Viajes', 'Lectura', 'Arte', 'Cocina', 'Fotografía', 'Videojuegos', 'Naturaleza', 'Mascotas', 'Fiesta']
+const AVAILABLE_TAGS = ['Bailar', 'Hacer previa', 'Ir de after', 'Vino', 'Vodka', 'Fernet', 'Gin', 'Cerveza', 'Reggaetón', 'Cumbia', 'RKT', 'Cuarteto', 'Electrónica', 'Techno', 'Pop', 'Rock', 'Trap', 'Hip Hop', 'Música', 'Deportes', 'Cine', 'Viajes', 'Lectura', 'Arte', 'Cocina', 'Fotografía', 'Videojuegos', 'Naturaleza', 'Mascotas', 'Fiesta']
 
 export function EditProfileScreen({
   user,
@@ -245,3 +245,4 @@ export function EditProfileScreen({
     </div>
   )
 }
+
