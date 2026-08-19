@@ -45,6 +45,13 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
       setLoading(true)
       
       if (mode === 'login') {
+        const { data: userExists } = await supabase.rpc('check_email_exists', { user_email: email })
+        if (!userExists) {
+          setErrorMsg('Este email no está registrado.')
+          setLoading(false)
+          return
+        }
+
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) {
           setErrorMsg('Credenciales incorrectas. Verifica tu email y contraseña.')
