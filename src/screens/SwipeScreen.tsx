@@ -72,7 +72,7 @@ export function SwipeScreen({ profiles, isLoading, onMatchLocally, onSwipe, onVi
               
               <div className="flex flex-col gap-3 w-full max-w-[200px]">
                 <a 
-                  href={`https://wa.me/?text=${encodeURIComponent('Vamos de gira?\ngiraapp.com')}`}
+                  href={`https://wa.me/?text=${encodeURIComponent('Vamos de gira?\nhttps://giraapp.com')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-3 rounded-xl font-bold text-white text-sm gradient-brand transition-all flex items-center justify-center gap-2 active:scale-95"
