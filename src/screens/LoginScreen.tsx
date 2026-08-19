@@ -448,18 +448,6 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
                   </svg>
                   Continuar con Google
                 </button>
-                <button
-                  type="button"
-                  onClick={() => handleOAuth('apple')}
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl font-semibold text-white/90 text-sm transition-all active:scale-95 disabled:opacity-50"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
-                >
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
-                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.15 2.95.93 3.78 2.04-3.19 1.9-2.69 5.98.54 7.21-.73 1.54-1.74 3.19-2.97 3.76zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.4-1.92 4.38-3.74 4.25z"/>
-                  </svg>
-                  Continuar con Apple
-                </button>
               </div>
             </>
           )}
