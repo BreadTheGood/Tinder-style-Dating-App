@@ -4,7 +4,7 @@ import { supabaseAppDataService } from '../services/supabaseAppDataService'
 import { PhotoEditor } from '../components/PhotoEditor'
 import { DatePicker } from '../components/DatePicker'
 
-const AVAILABLE_TAGS = ['Bailar', 'Hacer previa', 'Ir de after', 'Vino', 'Vodka', 'Fernet', 'Gin', 'Cerveza', 'Reggaetón', 'Cumbia', 'RKT', 'Cuarteto', 'Electrónica', 'Techno', 'Pop', 'Rock', 'Trap', 'Hip Hop', 'Música', 'Deportes', 'Cine', 'Viajes', 'Lectura', 'Arte', 'Cocina', 'Fotografía', 'Videojuegos', 'Naturaleza', 'Mascotas', 'Fiesta']
+const AVAILABLE_TAGS = ['Bailar', 'Hacer previa', 'Ir de after', 'Vino', 'Vodka', 'Fernet', 'Gin', 'Cerveza', 'Reggaet�n', 'Cumbia', 'RKT', 'Cuarteto', 'Electr�nica', 'Techno', 'Pop', 'Rock', 'Trap', 'Hip Hop']
 
 export function EditProfileScreen({
   user,
@@ -34,7 +34,7 @@ export function EditProfileScreen({
 
   const handleSave = async () => {
     setErrorMsg('')
-    if (!name || !birthdate) return setErrorMsg('Por favor, completa tu nombre y fecha de nacimiento.')
+    if (!name || !birthdate) return setErrorMsg('Por favor, completa tu nombre y FECHA DE NACIMIENTO.')
     const age = Math.floor((Date.now() - new Date(birthdate).getTime()) / (1000 * 60 * 60 * 24 * 365.25))
     if (age < 18) return setErrorMsg('Debes ser mayor de 18 años para usar la aplicación.')
     
@@ -110,7 +110,7 @@ export function EditProfileScreen({
           </div>
 
           <div>
-            <label className="text-white/60 text-sm font-medium">Fecha de nacimiento</label>
+            <label className="text-white/60 text-sm font-medium">FECHA DE NACIMIENTO</label>
             <DatePicker value={birthdate} onChange={setBirthdate} />
           </div>
 
@@ -131,9 +131,9 @@ export function EditProfileScreen({
               onChange={(e) => setBio(e.target.value)}
               className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] transition-colors resize-none"
               placeholder="Cuéntanos un poco sobre ti..."
-              maxLength={500}
+              maxLength={150}
             />
-            <div className="text-right text-white/40 text-xs mt-1">{bio.length}/500</div>
+            <div className="text-right text-white/40 text-xs mt-1">{bio.length}/150</div>
           </div>
 
           <div>
@@ -245,4 +245,5 @@ export function EditProfileScreen({
     </div>
   )
 }
+
 

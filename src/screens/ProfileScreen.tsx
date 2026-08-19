@@ -120,7 +120,7 @@ export function ProfileScreen({ user, onEdit }: { user: UserProfile; onEdit: () 
 
       <div className="mx-5 mt-4 glass rounded-2xl p-4">
         <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">Sobre mí</p>
-        <p className="text-white/80 text-sm leading-relaxed">{me.bio}</p>
+        <p className="text-white/80 text-sm leading-relaxed break-words whitespace-pre-wrap">{me.bio}</p>
       </div>
 
       <div className="mx-5 mt-4 glass rounded-2xl p-4 mb-4">

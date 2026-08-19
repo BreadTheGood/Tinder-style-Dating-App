@@ -3,7 +3,7 @@ import type { UserProfile } from '../types'
 import { PhotoEditor } from '../components/PhotoEditor'
 import { DatePicker } from '../components/DatePicker'
 
-const AVAILABLE_TAGS = ['Bailar', 'Hacer previa', 'Ir de after', 'Vino', 'Vodka', 'Fernet', 'Gin', 'Cerveza', 'Reggaetón', 'Cumbia', 'RKT', 'Cuarteto', 'Electrónica', 'Techno', 'Pop', 'Rock', 'Trap', 'Hip Hop', 'Música', 'Deportes', 'Cine', 'Viajes', 'Lectura', 'Arte', 'Cocina', 'Fotografía', 'Videojuegos', 'Naturaleza', 'Mascotas', 'Fiesta']
+const AVAILABLE_TAGS = ['Bailar', 'Hacer previa', 'Ir de after', 'Vino', 'Vodka', 'Fernet', 'Gin', 'Cerveza', 'Reggaet�n', 'Cumbia', 'RKT', 'Cuarteto', 'Electr�nica', 'Techno', 'Pop', 'Rock', 'Trap', 'Hip Hop']
 
 export function OnboardingScreen({
   user,
@@ -18,7 +18,7 @@ export function OnboardingScreen({
   
   const [name, setName] = useState(user?.name || '')
   const [birthdate, setBirthdate] = useState(user?.birthdate || '')
-  const [gender, setGender] = useState(user?.gender || 'female')
+  const [gender, setGender] = useState(user?.gender || 'other')
   
   const [bio, setBio] = useState(user?.bio || '')
   const [tags, setTags] = useState<string[]>(user?.tags || [])
@@ -101,7 +101,7 @@ export function OnboardingScreen({
               <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" placeholder="¿Cómo te llamas?" />
             </div>
             <div>
-              <label className="text-white/60 text-sm font-medium">Fecha de nacimiento</label>
+              <label className="text-white/60 text-sm font-medium">FECHA DE NACIMIENTO</label>
               <DatePicker value={birthdate} onChange={setBirthdate} />
             </div>
             <div>
@@ -120,8 +120,8 @@ export function OnboardingScreen({
             <h2 className="text-2xl font-extrabold mb-6">Sobre ti</h2>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Biografía</label>
-              <textarea value={bio} onChange={e => setBio(e.target.value)} className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white resize-none focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" placeholder="Cuenta un poco sobre vos..." maxLength={500} />
-              <div className="text-right text-white/40 text-xs mt-1">{bio.length}/500</div>
+              <textarea value={bio} onChange={e => setBio(e.target.value)} className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white resize-none focus:outline-none focus:border-[var(--theme-color-1)] transition-colors" placeholder="Cuenta un poco sobre vos..." maxLength={150} />
+              <div className="text-right text-white/40 text-xs mt-1">{bio.length}/150</div>
             </div>
             <div>
               <label className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 block">Intereses (Etiquetas)</label>
@@ -208,4 +208,5 @@ export function OnboardingScreen({
     </div>
   )
 }
+
 
