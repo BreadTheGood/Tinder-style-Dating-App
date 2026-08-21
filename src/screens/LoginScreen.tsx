@@ -471,10 +471,6 @@ export function LoginScreen({ onLogin }: { onLogin: (requiresPassword?: boolean)
             <button type="button" onClick={() => setShowLegalModal('privacy')} className="text-[var(--theme-color-1)] font-semibold hover:underline cursor-pointer relative z-20">Política de privacidad</button>
           </div>
 
-          <div className="text-center text-[10px] text-white/10 mt-6 leading-relaxed max-w-xs mx-auto pb-4">
-            Gira App es la plataforma exclusiva para conectar y hacer match en bares y eventos.
-          </div>
-
         <div className="text-center text-xs text-white/40 mt-2 pb-8 leading-relaxed font-medium">
           <a href="mailto:contacto@gira.app" className="text-[var(--theme-color-1)] font-bold hover:underline cursor-pointer relative z-20">
             Contactanos
